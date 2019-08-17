@@ -4,7 +4,7 @@
 #include "BirthSignMenu.h"
 #include "Events.h"
 #include "Patches.h"
-#include "Skywind.h"
+#include "Scaleform.h"
 #include "version.h"
 
 #include "RE/Skyrim.h"

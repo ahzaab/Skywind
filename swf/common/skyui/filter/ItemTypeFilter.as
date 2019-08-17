@@ -76,7 +76,7 @@ class skyui.filter.ItemTypeFilter implements IFilter
 	
   /* PRIVATE FUNCTIONS */
 	
-	public static function entryMatchesFilter(a_entry: Object, a_flag: Boolean): Boolean
+	public static function entryMatchesFilter(a_entry: Object, a_flag: Number): Boolean
 	{
 		return a_entry != undefined &&
 			(a_entry.filterFlag == undefined || (a_entry.filterFlag & a_flag) != 0);

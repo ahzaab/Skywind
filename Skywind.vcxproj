@@ -159,7 +159,7 @@
     <ClCompile Include="src\Papyrus.cpp" />
     <ClCompile Include="src\Patches.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\SkyWind.cpp" />
+    <ClCompile Include="src\Scaleform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BirthSignMenu.h" />
@@ -168,7 +168,7 @@
     <ClInclude Include="include\LevelUpMenu.h" />
     <ClInclude Include="include\Papyrus.h" />
     <ClInclude Include="include\Patches.h" />
-    <ClInclude Include="include\SkyWind.h" />
+    <ClInclude Include="include\Scaleform.h" />
     <ClInclude Include="include\version.h" />
   </ItemGroup>
   <ItemGroup>

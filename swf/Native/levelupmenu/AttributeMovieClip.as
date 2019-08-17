@@ -20,7 +20,7 @@
 	/* PRIVATE VARIABLES */
 	
 	private var _toggled = false;
-	private var _av: Number;
+	private var _av: Number = 0;
 	private var _base: Number = 0;
 	private var _mod: Number = 0;
 	
@@ -47,15 +47,8 @@
 	public function setInfo(a_av: Number, a_modGlobalFormID: Number): Void
 	{
 		_av = a_av;
-		
-		_base = getPlayerAV(_av);
-		baseMC.htmlText = _base.toString();
-		
-		_mod = getGlobal(a_modGlobalFormID);
-		if (_mod == undefined) {
-			_mod = DF_INCR;
-		}
-		raiseMC.htmlText = "+" + _mod.toString();
+		getPlayerAV(_av);
+		getGlobal(a_modGlobalFormID);
 	}
 	
 
@@ -101,49 +94,22 @@
 	}
 	
 	
-	// @override Button
-	function handleMouseRollOver(controllerIdx)
+	public function setMod(a_value: Number): Void
 	{
-		if (_disabled) {
-			return undefined;
+		log("setMod");
+		_mod = a_value;
+		if (_mod == undefined) {
+			_mod = DF_INCR;
 		}
-		
-		if ((!_focused && !_displayFocus) || focusIndicator != null) {
-			setState("over");
-		}
-		
-		dispatchEventAndSound({type: "rollOver", controllerIdx: controllerIdx, sender: this});
+		raiseMC.htmlText = "+" + _mod.toString();
 	}
 	
 	
-	// @override Button
-	function handleMouseRollOut(controllerIdx)
+	public function setBase(a_value: Number): Void
 	{
-		if (_disabled) {
-			return undefined;
-		}
-		
-		if ((!_focused && !_displayFocus) || focusIndicator != null) {
-			setState("out");
-		}
-		
-		dispatchEventAndSound({type: "rollOut", controllerIdx: controllerIdx, sender: this});
-	}
-	
-
-	// @override Button
-	public function handleMousePress(controllerIdx, keyboardOrMouse, button): Void
-	{
-		if (!_disableFocus) {
-			Selection.setFocus(this, controllerIdx);
-		}
-		
-		setState("down");
-		dispatchEventAndSound({type: "press", controllerIdx: controllerIdx, button: button, sender: this});
-		
-		if (autoRepeat) {
-			buttonRepeatInterval = setInterval(this, "beginButtonRepeat", buttonRepeatDelay, controllerIdx, button);
-		}
+		log("setBase");
+		_base = a_value;
+		baseMC.htmlText = _base.toString();
 	}
 	
 
@@ -156,25 +122,74 @@
 	
 	/* PRIVATE FUNCTIONS */
 	
-	public function getGlobal(a_formID: Number, a_plugin: String): Number
+	// @override Button
+	private function handleMouseRollOver(controllerIdx: Number): Void
+	{
+		if (_disabled) {
+			return;
+		}
+		
+		if ((!_focused && !_displayFocus) || focusIndicator != null) {
+			setState("over");	// Otherwise it is focused, and has no focusIndicator, so do nothing.
+		}
+		
+		dispatchEventAndSound({type: "rollOver", controllerIdx: controllerIdx, sender: this});
+	}
+	
+	
+	// @override Button
+	private function handleMouseRollOut(controllerIdx: Number): Void
+	{
+		if (_disabled) {
+			return;
+		}
+		
+		if ((!_focused && !_displayFocus) || focusIndicator != null) {
+			setState("out");	// Otherwise it is focused, and has no focusIndicator, so do nothing.
+		}
+		
+		dispatchEventAndSound({type: "rollOut", controllerIdx: controllerIdx, sender: this});
+	}
+	
+
+	// @override Button
+	private function handleMousePress(controllerIdx: Number, keyboardOrMouse: Number, button: Number): Void
+	{
+		if (_disabled) {
+			return;
+		}
+		
+		if (!_disableFocus) {
+			Selection.setFocus(this, controllerIdx);
+		}
+		
+		setState("down"); // Focus changes in the setState will override those in the changeFocus (above)
+		dispatchEventAndSound({type: "press", controllerIdx: controllerIdx, button: button, sender: this});		
+		if (autoRepeat) {
+			buttonRepeatInterval = setInterval(this, "beginButtonRepeat", buttonRepeatDelay, controllerIdx, button);
+		}
+	}
+	
+	
+	private function closeMenu(): Void
+	{
+		GameDelegate.call("CloseMenu", []);	// skywind
+	}
+	
+	
+	public function getGlobal(a_formID: Number, a_plugin: String): Void
 	{
 		if (a_plugin == undefined) {
 			a_plugin = "SkyWind.esm";
 		}
 		
-		return _global.skse.plugins.SkyWind.getGlobal(a_formID, a_plugin);
+		GameDelegate.call("GetGlobal", [a_formID, a_plugin], this, "setMod");	// skywind
 	}
 	
 	
-	public function getPlayerAV(a_av: Number): Number
+	public function getPlayerAV(a_av: Number): Void
 	{
-		return _global.skse.plugins.SkyWind.getPlayerAV(a_av);
-	}
-	
-	
-	private function close(): Void
-	{
-		GameDelegate.call("Close", []);	// skywind
+		GameDelegate.call("GetPlayerAV", [a_av], this, "setBase");	// skywind
 	}
 	
 	

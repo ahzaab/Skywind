@@ -79,7 +79,10 @@ namespace Scaleform
 
 	void LevelUpMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg)
 	{
-		a_cbReg->Process("Close", Close);
+		a_cbReg->Process("CloseMenu", CloseMenu);
+		a_cbReg->Process("GetGlobal", GetGlobal);
+		a_cbReg->Process("GetPlayerAV", GetPlayerAV);
+		a_cbReg->Process("GetPlayerLevel", GetPlayerLevel);
 		a_cbReg->Process("Log", Log);
 		a_cbReg->Process("PlaySound", PlaySound);
 		a_cbReg->Process("UpdatePlayerAV", UpdatePlayerAV);
@@ -104,7 +107,7 @@ namespace Scaleform
 	}
 
 
-	void LevelUpMenu::Close(const RE::FxDelegateArgs& a_params)
+	void LevelUpMenu::CloseMenu(const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 0);
 
@@ -112,6 +115,68 @@ namespace Scaleform
 		player->skills->AdvanceLevel(false);
 
 		Close();
+	}
+
+
+	void LevelUpMenu::GetGlobal(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 2);
+		assert(a_params[0].IsNumber());
+		assert(a_params[1].IsString());
+
+		RE::FxResponseArgs<1> response;
+		RE::GFxValue retVal;
+		retVal.SetUndefined();
+
+		auto dataHandler = RE::TESDataHandler::GetSingleton();
+		auto mod = dataHandler->LookupModByName(a_params[1].GetString());
+		if (mod && mod->modIndex != 0xFF) {
+			auto formID = static_cast<RE::FormID>(a_params[0].GetUInt());
+			formID += mod->modIndex << (8 * 3);
+			formID += mod->lightIndex << ((8 * 1) + (8 / 2));
+
+			auto global = RE::TESForm::LookupByID<RE::TESGlobal>(formID);
+			if (global) {
+				retVal.SetNumber(global->value);
+			}
+		}
+
+		response.Add(retVal);
+		a_params.Respond(response);
+	}
+
+
+	void LevelUpMenu::GetPlayerAV(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 1);
+		assert(a_params[0].IsNumber());
+
+		RE::FxResponseArgs<1> response;
+		RE::GFxValue retVal;
+
+		auto av = static_cast<RE::ActorValue>(a_params[0].GetUInt());
+		auto player = RE::PlayerCharacter::GetSingleton();
+		auto currentAV = player->GetActorValueCurrent(av);
+		retVal.SetNumber(currentAV);
+
+		response.Add(retVal);
+		a_params.Respond(response);
+	}
+
+
+	void LevelUpMenu::GetPlayerLevel(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 0);
+
+		RE::FxResponseArgs<1> response;
+		RE::GFxValue retVal;
+
+		auto player = RE::PlayerCharacter::GetSingleton();
+		auto level = static_cast<double>(player->GetLevel());
+		retVal.SetNumber(level);
+
+		response.Add(retVal);
+		a_params.Respond(response);
 	}
 
 
@@ -139,7 +204,7 @@ namespace Scaleform
 		assert(a_params[0].IsNumber());
 		assert(a_params[1].IsNumber());
 
-		auto av = static_cast<RE::ActorValue>(static_cast<UInt32>(std::round(a_params[0].GetNumber())));
+		auto av = static_cast<RE::ActorValue>(a_params[0].GetUInt());
 		auto val = static_cast<float>(a_params[0].GetNumber());
 
 		auto player = RE::PlayerCharacter::GetSingleton();

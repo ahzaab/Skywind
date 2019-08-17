@@ -54,7 +54,7 @@ dynamic class LevelUpMenu extends MovieClip
 	{
 		super();
 		_attributeMCs = [StrengthMC, IntelligenceMC, WillpowerMC, AgilityMC, SpeedMC, EnduranceMC, PersonalityMC, LuckMC];
-	}LevelUpMenuObj
+	}
 	
 
 	public function InitExtensions(): Void
@@ -74,22 +74,21 @@ dynamic class LevelUpMenu extends MovieClip
 		HealthButton["addEventListener"]("press", this, "closeCallback");
 		HealthButton["addEventListener"]("rollOver", this, "playFocusSound");
 		
-		setLevelText();
+		getPlayerLevel();
 	}
 	
 	
 	/* PUBLIC FUNCTIONS */
 	
-	public function setLevelText(): Void
-	{		
-		var level: Number = getPlayerLevel();
-		var toTranslate: String = "$SK_ASCENDED{" + level.toString() + "}";
+	public function setLevelText(a_level: Number): Void
+	{
+		var toTranslate: String = "$SK_ASCENDED{" + a_level.toString() + "}";
 		ItemTextField.htmlText = Translator.translateNested(toTranslate);
 		
 		var levelUpText: String = "$SK_LEVEL";
-		levelUpText += level.toString();
+		levelUpText += a_level.toString();
 		
-		if (level > 1 && level < 21) {
+		if (a_level > 1 && a_level < 21) {
 			LevelUpTextField.htmlText = levelUpText;
 		} else {
 			LevelUpTextField.htmlText = "$SK_LEVELDEFAULT";
@@ -127,7 +126,7 @@ dynamic class LevelUpMenu extends MovieClip
 		for (var i: Number = 0; i < _attributeMCs.length; ++i) {
 			_attributeMCs[i].onClose();
 		}
-		close();
+		closeMenu();
 	}
 	
 	
@@ -150,17 +149,23 @@ dynamic class LevelUpMenu extends MovieClip
 	}
 	
 	
-	/* PRIVATE FUNCTIONS */
-	
-	private function getPlayerLevel(): Number
+	public function getPlayerLevelCallback(a_level: Number): Void
 	{
-		return _global.skse.plugins.SkyWind.getPlayerLevel();
+		
 	}
 	
-
-	private function close(): Void
+	
+	/* PRIVATE FUNCTIONS */
+	
+	private function closeMenu(): Void
 	{
-		GameDelegate.call("Close", []);	// skywind
+		GameDelegate.call("CloseMenu", []);	// skywind
+	}
+	
+	
+	private function getPlayerLevel(): Void
+	{
+		GameDelegate.call("GetPlayerLevel", [], this, "setLevelText");	// skywind
 	}
 	
 	
@@ -173,11 +178,5 @@ dynamic class LevelUpMenu extends MovieClip
 	private function playSound(a_sound: String): Void
 	{
 		GameDelegate.call("PlaySound", [a_sound]);	// skywind
-	}
-	
-	
-	private function updatePlayerAV(a_av: Number, a_newVal: Number): Void
-	{
-		GameDelegate.call("UpdatePlayerAV", [a_av, a_newVal]);	// skywind
 	}
 }

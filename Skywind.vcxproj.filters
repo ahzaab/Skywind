@@ -22,7 +22,7 @@
     <ClCompile Include="src\LevelUpMenu.cpp">
       <Filter>src\Scaleform</Filter>
     </ClCompile>
-    <ClCompile Include="src\SkyWind.cpp">
+    <ClCompile Include="src\Scaleform.cpp">
       <Filter>src\Scaleform</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,7 +48,7 @@
     <ClInclude Include="include\LevelUpMenu.h">
       <Filter>include\Scaleform</Filter>
     </ClInclude>
-    <ClInclude Include="include\SkyWind.h">
+    <ClInclude Include="include\Scaleform.h">
       <Filter>include\Scaleform</Filter>
     </ClInclude>
   </ItemGroup>
