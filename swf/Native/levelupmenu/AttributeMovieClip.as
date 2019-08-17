@@ -1,56 +1,98 @@
-﻿import gfx.io.GameDelegate;
+﻿import gfx.events.EventTypes;
+import gfx.io.GameDelegate;
 
 
 [InspectableList("label")]
  class AttributeMovieClip extends gfx.controls.Button
 {
 	/* CONSTANTS */
-	
+
 	public static var TOGGLE_NOP: Number = 0;
 	public static var TOGGLE_ON: Number = 1;
 	public static var TOGGLE_OFF: Number = 2;
-	
-	public static var DF_INCR: Number = 1;
-	
+
+	private static var DF_INCR: Number = 1;
+
+
 	/* PROPERTIES */
-	
+
 	[Inspectable(type="String", defaultValue="attributeName")]
 	public var label;
-	
+
+
 	/* PRIVATE VARIABLES */
-	
+
 	private var _toggled = false;
 	private var _av: Number = 0;
 	private var _base: Number = 0;
 	private var _mod: Number = 0;
-	
+	private var _rollOverCallback: Object;
+	private var _rollOutCallback: Object;
+	private var _pressCallback: Object;
+
+
 	/* STAGE ELEMENTS */
-	
+
 	public var name: TextField;
 	public var raiseMC: TextField;
 	public var baseMC: TextField;
 	public var indicatorMC: MovieClip;
-	
-	
+
+
 	/* INITIALIZATION */
-	
+
 	public function AttributeMovieClip()
 	{
 		super();
 		indicatorMC._alpha = 0;
 		name.htmlText = label;
 	}
-	
-	
+
+
 	/* PUBLIC FUNCTIONS */
-	
-	public function setInfo(a_av: Number, a_modGlobalFormID: Number): Void
+
+	public function init(a_av: Number, a_modGlobalFormID: Number): Void
 	{
+		addEventListener(EventTypes.ROLL_OVER, this, "rollOverHandler");
+		addEventListener(EventTypes.ROLL_OUT, this, "rollOutHandler");
+		addEventListener(EventTypes.PRESS, this, "pressHandler");
+
 		_av = a_av;
+
 		getPlayerAV(_av);
 		getGlobal(a_modGlobalFormID);
 	}
-	
+
+
+	public function setRollOverCallback(a_context: Object, a_method: String): Void
+	{
+		if (_rollOverCallback == undefined) {
+			_rollOverCallback = new Object();
+		}
+		_rollOverCallback.context = a_context;
+		_rollOverCallback.method = a_method;
+	}
+
+
+	public function setRollOutCallback(a_context: Object, a_method: String): Void
+	{
+		if (_rollOutCallback == undefined) {
+			_rollOutCallback = new Object();
+		}
+		_rollOutCallback.context = a_context;
+		_rollOutCallback.method = a_method;
+	}
+
+
+	public function setPressCallback(a_context: Object, a_method: String): Void
+	{
+		if (_pressCallback == undefined) {
+			_pressCallback = new Object();
+		}
+		_pressCallback.context = a_context;
+		_pressCallback.method = a_method;
+	}
+
 
 	public function toggle(a_canToggleOn: Boolean): Number
 	{
@@ -68,143 +110,116 @@
 			return TOGGLE_NOP;
 		}
 	}
-	
-	
+
+
 	public function setHighlight(): Void
 	{
 		if (!_toggled && !_disabled) {
 			indicatorMC._alpha = 50;
 		}
 	}
-	
-	
+
+
 	public function clearHighlight(): Void
 	{
 		if (!_toggled && !_disabled) {
 			indicatorMC._alpha = 0;
 		}
 	}
-	
-	
+
+
 	public function onClose(): Void
 	{
 		if (_toggled) {
 			updatePlayerAV(_av, _base + _mod);
 		}
 	}
-	
-	
+
+
 	public function setMod(a_value: Number): Void
 	{
-		log("setMod");
 		_mod = a_value;
 		if (_mod == undefined) {
 			_mod = DF_INCR;
 		}
 		raiseMC.htmlText = "+" + _mod.toString();
 	}
-	
-	
+
+
 	public function setBase(a_value: Number): Void
 	{
-		log("setBase");
 		_base = a_value;
 		baseMC.htmlText = _base.toString();
 	}
-	
+
 
 	// @override Object
 	public function toString(): String
 	{
 		return name.text;
 	}
-	
-	
-	/* PRIVATE FUNCTIONS */
-	
-	// @override Button
-	private function handleMouseRollOver(controllerIdx: Number): Void
-	{
-		if (_disabled) {
-			return;
-		}
-		
-		if ((!_focused && !_displayFocus) || focusIndicator != null) {
-			setState("over");	// Otherwise it is focused, and has no focusIndicator, so do nothing.
-		}
-		
-		dispatchEventAndSound({type: "rollOver", controllerIdx: controllerIdx, sender: this});
-	}
-	
-	
-	// @override Button
-	private function handleMouseRollOut(controllerIdx: Number): Void
-	{
-		if (_disabled) {
-			return;
-		}
-		
-		if ((!_focused && !_displayFocus) || focusIndicator != null) {
-			setState("out");	// Otherwise it is focused, and has no focusIndicator, so do nothing.
-		}
-		
-		dispatchEventAndSound({type: "rollOut", controllerIdx: controllerIdx, sender: this});
-	}
-	
 
-	// @override Button
-	private function handleMousePress(controllerIdx: Number, keyboardOrMouse: Number, button: Number): Void
+
+	/* PRIVATE FUNCTIONS */
+
+	private function rollOverHandler(a_event: Object): Void
 	{
-		if (_disabled) {
-			return;
-		}
-		
-		if (!_disableFocus) {
-			Selection.setFocus(this, controllerIdx);
-		}
-		
-		setState("down"); // Focus changes in the setState will override those in the changeFocus (above)
-		dispatchEventAndSound({type: "press", controllerIdx: controllerIdx, button: button, sender: this});		
-		if (autoRepeat) {
-			buttonRepeatInterval = setInterval(this, "beginButtonRepeat", buttonRepeatDelay, controllerIdx, button);
+		var context: Object = _rollOverCallback.context;
+		var method: String = _rollOverCallback.method;
+		if (context != undefined && method != undefined) {
+			context[method](this);
 		}
 	}
-	
-	
-	private function closeMenu(): Void
+
+
+	private function rollOutHandler(a_event: Object): Void
 	{
-		GameDelegate.call("CloseMenu", []);	// skywind
+		var context: Object = _rollOutCallback.context;
+		var method: String = _rollOutCallback.method;
+		if (context != undefined && method != undefined) {
+			context[method](this);
+		}
 	}
-	
-	
+
+
+	private function pressHandler(a_event: Object): Void
+	{
+		var context: Object = _pressCallback.context;
+		var method: String = _pressCallback.method;
+		if (context != undefined && method != undefined) {
+			context[method](this);
+		}
+	}
+
+
 	public function getGlobal(a_formID: Number, a_plugin: String): Void
 	{
 		if (a_plugin == undefined) {
 			a_plugin = "SkyWind.esm";
 		}
-		
+
 		GameDelegate.call("GetGlobal", [a_formID, a_plugin], this, "setMod");	// skywind
 	}
-	
-	
+
+
 	public function getPlayerAV(a_av: Number): Void
 	{
 		GameDelegate.call("GetPlayerAV", [a_av], this, "setBase");	// skywind
 	}
-	
-	
+
+
 	private function log(a_str: String): Void
 	{
 		GameDelegate.call("Log", [a_str]);	// skywind
 	}
-	
-	
+
+
 	private function playSound(a_sound: String): Void
 	{
 		GameDelegate.call("PlaySound", [a_sound]);	// skywind
 	}
-	
-	
+
+
 	private function updatePlayerAV(a_av: Number, a_newVal: Number): Void
 	{
 		GameDelegate.call("UpdatePlayerAV", [a_av, a_newVal]);	// skywind

@@ -17,7 +17,6 @@
   <classpaths>
     <class path="src" />
     <class path="common" />
-    <class path="CLIK" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -42,7 +41,6 @@
   <!-- Assets to embed into the output SWF -->
   <library>
     <asset path="common" />
-    <asset path="CLIK" />
   </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

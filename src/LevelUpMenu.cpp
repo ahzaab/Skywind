@@ -79,6 +79,7 @@ namespace Scaleform
 
 	void LevelUpMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg)
 	{
+		a_cbReg->Process("AdvanceLevel", AdvanceLevel);
 		a_cbReg->Process("CloseMenu", CloseMenu);
 		a_cbReg->Process("GetGlobal", GetGlobal);
 		a_cbReg->Process("GetPlayerAV", GetPlayerAV);
@@ -107,12 +108,18 @@ namespace Scaleform
 	}
 
 
-	void LevelUpMenu::CloseMenu(const RE::FxDelegateArgs& a_params)
+	void LevelUpMenu::AdvanceLevel(const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 0);
 
 		auto player = RE::PlayerCharacter::GetSingleton();
 		player->skills->AdvanceLevel(false);
+	}
+
+
+	void LevelUpMenu::CloseMenu(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 0);
 
 		Close();
 	}

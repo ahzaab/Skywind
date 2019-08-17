@@ -26,6 +26,7 @@ namespace Scaleform
 		virtual Result ProcessMessage(RE::UIMessage* a_message) override;
 
 	private:
+		static void AdvanceLevel(const RE::FxDelegateArgs& a_params);
 		static void CloseMenu(const RE::FxDelegateArgs& a_params);
 		static void GetGlobal(const RE::FxDelegateArgs& a_params);
 		static void GetPlayerAV(const RE::FxDelegateArgs& a_params);
