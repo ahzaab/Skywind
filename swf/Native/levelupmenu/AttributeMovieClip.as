@@ -164,28 +164,26 @@ import gfx.io.GameDelegate;
 
 	private function rollOverHandler(a_event: Object): Void
 	{
-		var context: Object = _rollOverCallback.context;
-		var method: String = _rollOverCallback.method;
-		if (context != undefined && method != undefined) {
-			context[method](this);
-		}
+		invokeCallback(_rollOverCallback);
 	}
 
 
 	private function rollOutHandler(a_event: Object): Void
 	{
-		var context: Object = _rollOutCallback.context;
-		var method: String = _rollOutCallback.method;
-		if (context != undefined && method != undefined) {
-			context[method](this);
-		}
+		invokeCallback(_rollOutCallback);
 	}
 
 
 	private function pressHandler(a_event: Object): Void
 	{
-		var context: Object = _pressCallback.context;
-		var method: String = _pressCallback.method;
+		invokeCallback(_pressCallback);
+	}
+
+
+	private function invokeCallback(a_info: Object): Void
+	{
+		var context: Object = a_info.context;
+		var method: String = a_info.method;
 		if (context != undefined && method != undefined) {
 			context[method](this);
 		}
