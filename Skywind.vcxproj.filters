@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Patches.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BirthSignMenu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Delegates.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Papyrus.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Events.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelUpMenu.cpp">
+      <Filter>src\Scaleform</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SkyWind.cpp">
+      <Filter>src\Scaleform</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\version.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Patches.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BirthSignMenu.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Delegates.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Papyrus.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Events.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LevelUpMenu.h">
+      <Filter>include\Scaleform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SkyWind.h">
+      <Filter>include\Scaleform</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="version.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{5b4753d0-a12a-45de-a25f-3da9c119def2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{238172b9-863c-48b4-aabe-a4f4950d1181}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Scaleform">
+      <UniqueIdentifier>{3fe3a4c3-2fc2-47ba-80f2-a105d3e5e7a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Scaleform">
+      <UniqueIdentifier>{af1484ec-a485-4a67-bdbc-f84aa954d608}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
