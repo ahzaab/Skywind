@@ -85,8 +85,8 @@ namespace Scaleform
 		a_cbReg->Process("GetPlayerAV", GetPlayerAV);
 		a_cbReg->Process("GetPlayerLevel", GetPlayerLevel);
 		a_cbReg->Process("Log", Log);
+		a_cbReg->Process("ModPlayerAV", ModPlayerAV);
 		a_cbReg->Process("PlaySound", PlaySound);
-		a_cbReg->Process("UpdatePlayerAV", UpdatePlayerAV);
 	}
 
 
@@ -196,16 +196,7 @@ namespace Scaleform
 	}
 
 
-	void LevelUpMenu::PlaySound(const RE::FxDelegateArgs& a_params)
-	{
-		assert(a_params.GetArgCount() == 1);
-		assert(a_params[0].IsString());
-
-		RE::PlaySound(a_params[0].GetString());
-	}
-
-
-	void LevelUpMenu::UpdatePlayerAV(const RE::FxDelegateArgs& a_params)
+	void LevelUpMenu::ModPlayerAV(const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 2);
 		assert(a_params[0].IsNumber());
@@ -213,9 +204,17 @@ namespace Scaleform
 
 		auto av = static_cast<RE::ActorValue>(a_params[0].GetUInt());
 		auto val = static_cast<float>(a_params[0].GetNumber());
-
 		auto player = RE::PlayerCharacter::GetSingleton();
 		player->ModActorValueBase(av, val);
+	}
+
+
+	void LevelUpMenu::PlaySound(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 1);
+		assert(a_params[0].IsString());
+
+		RE::PlaySound(a_params[0].GetString());
 	}
 
 

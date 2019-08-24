@@ -32,8 +32,8 @@ namespace Scaleform
 		static void GetPlayerAV(const RE::FxDelegateArgs& a_params);
 		static void GetPlayerLevel(const RE::FxDelegateArgs& a_params);
 		static void Log(const RE::FxDelegateArgs& a_params);
+		static void ModPlayerAV(const RE::FxDelegateArgs& a_params);
 		static void PlaySound(const RE::FxDelegateArgs& a_params);
-		static void UpdatePlayerAV(const RE::FxDelegateArgs& a_params);
 
 		void OnOpen();
 		void OnClose();

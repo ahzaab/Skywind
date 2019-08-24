@@ -141,7 +141,6 @@ extern "C" {
 
 		auto messaging = SKSE::GetMessagingInterface();
 		if (!messaging->RegisterListener("SKSE", MessageHandler)) {
-			_FATALERROR("Messaging interface registration failed!\n");
 			return false;
 		}
 

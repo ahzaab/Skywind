@@ -24,7 +24,6 @@ import gfx.io.GameDelegate;
 
 	private var _toggled = false;
 	private var _av: Number = 0;
-	private var _base: Number = 0;
 	private var _mod: Number = 0;
 	private var _rollOverCallback: Object;
 	private var _rollOutCallback: Object;
@@ -131,7 +130,7 @@ import gfx.io.GameDelegate;
 	public function onClose(): Void
 	{
 		if (_toggled) {
-			updatePlayerAV(_av, _base + _mod);
+			modPlayerAV(_av, _mod);
 		}
 	}
 
@@ -148,8 +147,7 @@ import gfx.io.GameDelegate;
 
 	public function setBase(a_value: Number): Void
 	{
-		_base = a_value;
-		baseMC.htmlText = _base.toString();
+		baseMC.htmlText = a_value.toString();
 	}
 
 
@@ -218,8 +216,8 @@ import gfx.io.GameDelegate;
 	}
 
 
-	private function updatePlayerAV(a_av: Number, a_newVal: Number): Void
+	private function modPlayerAV(a_av: Number, a_newVal: Number): Void
 	{
-		GameDelegate.call("UpdatePlayerAV", [a_av, a_newVal]);	// skywind
+		GameDelegate.call("ModPlayerAV", [a_av, a_newVal]);	// skywind
 	}
 }
