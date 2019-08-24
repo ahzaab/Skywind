@@ -1,11 +1,15 @@
 ﻿#include "skse64_common/BranchTrampoline.h"
 #include "skse64_common/skse_version.h"
 
-#include "BirthSignMenu.h"
 #include "Events.h"
 #include "Patches.h"
 #include "Scaleform.h"
 #include "version.h"
+
+// TODO
+#include "BirthSignMenu.h"
+#include "StatsMenuEx.h"
+// TODO
 
 #include "RE/Skyrim.h"
 #include "SKSE/API.h"
@@ -47,10 +51,10 @@ namespace
 
 				switch (button->keyMask) {
 				case Key::kNum0:
-					BirthSignMenu::Open();
+					Scaleform::StatsMenuEx::Open();
 					break;
 				case Key::kNum9:
-					BirthSignMenu::Close();
+					Scaleform::StatsMenuEx::Close();
 					break;
 				}
 			}

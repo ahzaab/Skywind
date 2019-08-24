@@ -14,16 +14,17 @@ namespace Scaleform
 		LevelUpMenu();
 		virtual ~LevelUpMenu() = default;
 
-		static void Register();
-		static RE::IMenu* Create();
-		static constexpr std::string_view Name();
+		// IMenu
+		virtual void Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg) override;
+		virtual Result ProcessMessage(RE::UIMessage* a_message) override;
 
 		static void Open();
 		static void Close();
 
-		// IMenu
-		virtual void Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg) override;
-		virtual Result ProcessMessage(RE::UIMessage* a_message) override;
+		static constexpr std::string_view Name();
+
+		static void Register();
+		static RE::IMenu* Create();
 
 	private:
 		static void AdvanceLevel(const RE::FxDelegateArgs& a_params);
@@ -35,8 +36,8 @@ namespace Scaleform
 		static void ModPlayerAV(const RE::FxDelegateArgs& a_params);
 		static void PlaySound(const RE::FxDelegateArgs& a_params);
 
-		void OnOpen();
-		void OnClose();
+		void OnMenuOpen();
+		void OnMenuClose();
 
 		static constexpr char SWF_NAME[] = "levelupmenu";
 	};

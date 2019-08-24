@@ -16,7 +16,7 @@ namespace Scaleform
 		using Flag = RE::IMenu::Flag;
 
 		flags |= Flag::kTryShowCursor;
-		auto loader = RE::GFxLoader::GetSingleton();
+		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
 		if (loader->LoadMovie(this, view, SWF_NAME, ScaleModeType::kShowAll, 0.0)) {
 			flags |= Flag::kPauseGame | Flag::kModal | Flag::kPreventGameLoad;
 			context = Context::kMenuMode;
@@ -36,44 +36,6 @@ namespace Scaleform
 		}
 
 		view->SetVisible(false);
-	}
-
-
-	void LevelUpMenu::Register()
-	{
-		auto mm = RE::MenuManager::GetSingleton();
-		auto it = mm->menuTable.find(Name());
-		if (it != mm->menuTable.end()) {
-			it->second.menuConstructor = Create;
-		} else {
-			mm->Register(Name(), Create);
-		}
-
-		_MESSAGE("Registered %s", Name().data());
-	}
-
-
-	RE::IMenu* LevelUpMenu::Create()
-	{
-		return new LevelUpMenu();
-	}
-
-
-	void LevelUpMenu::Open()
-	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kOpen, 0);
-	}
-
-
-	void LevelUpMenu::Close()
-	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kClose, 0);
 	}
 
 
@@ -97,14 +59,52 @@ namespace Scaleform
 
 		switch (a_message->message) {
 		case Message::kOpen:
-			OnOpen();
+			OnMenuOpen();
 			return Result::kProcessed;
 		case Message::kClose:
-			OnClose();
+			OnMenuClose();
 			return Result::kProcessed;
 		default:
 			return Base::ProcessMessage(a_message);
 		}
+	}
+
+
+	void LevelUpMenu::Open()
+	{
+		using Message = RE::UIMessage::Message;
+
+		auto ui = RE::UIManager::GetSingleton();
+		ui->AddMessage(Name(), Message::kOpen, 0);
+	}
+
+
+	void LevelUpMenu::Close()
+	{
+		using Message = RE::UIMessage::Message;
+
+		auto ui = RE::UIManager::GetSingleton();
+		ui->AddMessage(Name(), Message::kClose, 0);
+	}
+
+
+	void LevelUpMenu::Register()
+	{
+		auto mm = RE::MenuManager::GetSingleton();
+		auto it = mm->menuTable.find(Name());
+		if (it != mm->menuTable.end()) {
+			it->second.menuConstructor = Create;
+		} else {
+			mm->Register(Name(), Create);
+		}
+
+		_MESSAGE("Registered %s", Name().data());
+	}
+
+
+	RE::IMenu* LevelUpMenu::Create()
+	{
+		return new LevelUpMenu();
 	}
 
 
@@ -218,13 +218,13 @@ namespace Scaleform
 	}
 
 
-	void LevelUpMenu::OnOpen()
+	void LevelUpMenu::OnMenuOpen()
 	{
 		view->SetVisible(true);
 	}
 
 
-	void LevelUpMenu::OnClose()
+	void LevelUpMenu::OnMenuClose()
 	{
 		RE::GFxValue boolean(false);
 		view->Invoke("Selection.captureFocus", 0, &boolean, 1);
