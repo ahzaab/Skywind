@@ -83,12 +83,6 @@ namespace
 				auto input = RE::InputManager::GetSingleton();
 				//input->AddEventSink(InputEventHandler::GetSingleton());
 
-				auto mm = RE::MenuManager::GetSingleton();
-				mm->Register(BirthSignMenu::Name(), []() -> RE::IMenu*
-				{
-					return new BirthSignMenu();
-				});
-
 				Scaleform::RegisterCreators();
 			}
 			break;
