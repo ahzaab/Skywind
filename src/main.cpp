@@ -81,7 +81,7 @@ namespace
 				Events::Install();
 
 				auto input = RE::InputManager::GetSingleton();
-				//input->AddEventSink(InputEventHandler::GetSingleton());
+				input->AddEventSink(InputEventHandler::GetSingleton());
 
 				Scaleform::RegisterCreators();
 			}

@@ -7,12 +7,6 @@
     <ClCompile Include="src\Patches.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\BirthSignMenu.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Delegates.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Papyrus.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -25,18 +19,18 @@
     <ClCompile Include="src\Scaleform.cpp">
       <Filter>src\Scaleform</Filter>
     </ClCompile>
+    <ClCompile Include="src\StatsMenuEx.cpp">
+      <Filter>src\Scaleform</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BirthSignMenu.cpp">
+      <Filter>src\Scaleform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\version.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Patches.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\BirthSignMenu.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Delegates.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Papyrus.h">
@@ -49,6 +43,12 @@
       <Filter>include\Scaleform</Filter>
     </ClInclude>
     <ClInclude Include="include\Scaleform.h">
+      <Filter>include\Scaleform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StatsMenuEx.h">
+      <Filter>include\Scaleform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BirthSignMenu.h">
       <Filter>include\Scaleform</Filter>
     </ClInclude>
   </ItemGroup>

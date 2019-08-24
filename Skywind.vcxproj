@@ -153,22 +153,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BirthSignMenu.cpp" />
-    <ClCompile Include="src\Delegates.cpp" />
     <ClCompile Include="src\Events.cpp" />
     <ClCompile Include="src\LevelUpMenu.cpp" />
     <ClCompile Include="src\Papyrus.cpp" />
     <ClCompile Include="src\Patches.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Scaleform.cpp" />
+    <ClCompile Include="src\StatsMenuEx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BirthSignMenu.h" />
-    <ClInclude Include="include\Delegates.h" />
     <ClInclude Include="include\Events.h" />
     <ClInclude Include="include\LevelUpMenu.h" />
     <ClInclude Include="include\Papyrus.h" />
     <ClInclude Include="include\Patches.h" />
     <ClInclude Include="include\Scaleform.h" />
+    <ClInclude Include="include\StatsMenuEx.h" />
     <ClInclude Include="include\version.h" />
   </ItemGroup>
   <ItemGroup>
