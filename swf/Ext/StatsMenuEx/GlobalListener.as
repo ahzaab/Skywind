@@ -60,30 +60,30 @@ class GlobalListener extends MovieClip
 	}
 
 
-	public function handleClassPress(a_event: Object): Void
+	/* PRIVATE FUNCTIONS */
+
+	private function handleClassPress(a_event: Object): Void
 	{
 		var index: Number = a_event.index;
 		GameDelegate.call("OnClassPress", [index]);
 	}
 
 
-	public function handleTreePress(a_event: Object): Void
+	private function handleTreePress(a_event: Object): Void
 	{
 		var index: Number = a_event.index;
 		GameDelegate.call("OnTreePress", [index]);
 	}
 
 
-	public function handlePerkPress(a_event: Object): Void
+	private function handlePerkPress(a_event: Object): Void
 	{
 		var index: Number = a_event.index;
 		GameDelegate.call("OnPerkPress", [index]);
 	}
 
 
-	/* PRIVATE FUNCTIONS */
-
-	public function handleRankPress(a_event: Object): Void
+	private function handleRankPress(a_event: Object): Void
 	{
 		var rankIndex: Number = a_event.index;
 		var treeIndex: Number = _trees.selectedIndex;
@@ -91,7 +91,7 @@ class GlobalListener extends MovieClip
 	}
 
 
-	public function handleUnlockPress(a_event: Object): Void
+	private function handleUnlockPress(a_event: Object): Void
 	{
 		var rankIndex: Number = _ranks.selectedIndex;
 		var perkIndex: Number = _perks.selectedIndex;

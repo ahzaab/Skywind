@@ -8,6 +8,10 @@
 
 #include "RE/Skyrim.h"
 
+#include "CLIK/Button.h"
+#include "CLIK/ScrollingList.h"
+#include "CLIK/TextField.h"
+
 
 namespace Scaleform
 {
@@ -58,39 +62,25 @@ namespace Scaleform
 		};
 
 
-		struct ScrollingList
+		struct HeaderList
 		{
-			std::ptrdiff_t GetSelectedIndex();
-			void SetDataProvider(const RE::GFxValue& a_data);
-			void SetSelectedIndex(std::ptrdiff_t a_index);
-			void SetVisible(bool a_visible);
+			void Visible(bool a_visible);
 
-			RE::GFxValue list;
-			RE::GFxValue bar;
-		};
-
-
-		struct Button
-		{
-			void SetVisible(bool a_visible);
-			void SetDisabled(bool a_disabled);
-
-			RE::GFxValue btn;
+			CLIK::GFx::Controls::ScrollingList list;
+			CLIK::TextField header;
 		};
 
 
 		struct Description
 		{
 			void Init();
-			void SetVisible(bool a_visible);
-			void SetHeader(const std::string_view& a_header);
-			void SetText(const std::string_view& a_text);
-			void SetUnlockText(const std::string_view& a_text);
-			void SetUnlockDisabled(bool a_disabled);
+			void Visible(bool a_visible);
 
-			RE::GFxValue header;
-			RE::GFxValue text;
-			Button unlock;
+			CLIK::TextField header;
+			CLIK::TextField text;
+			HeaderList requisites;
+			HeaderList unlocks;
+			CLIK::GFx::Controls::Button unlock;
 		};
 
 
@@ -153,6 +143,7 @@ namespace Scaleform
 		void OnMenuClose();
 
 		void SetClasses();
+		void SetLeads(std::size_t a_rankIdx, std::size_t a_treeIdx);
 		void UnlockPerk(std::size_t a_rankIdx, std::size_t a_perkIdx, std::size_t a_treeIdx);
 
 		void OnClassPress(std::size_t a_classIdx);
@@ -176,10 +167,10 @@ namespace Scaleform
 
 		static constexpr char SWF_NAME[] = "StatsMenuEx";
 
-		ScrollingList _classes;
-		ScrollingList _trees;
-		ScrollingList _perks;
-		ScrollingList _ranks;
+		CLIK::GFx::Controls::ScrollingList _classes;
+		CLIK::GFx::Controls::ScrollingList _trees;
+		CLIK::GFx::Controls::ScrollingList _perks;
+		CLIK::GFx::Controls::ScrollingList _ranks;
 		Description _desc;
 		ClassMap _classMappings;
 		std::vector<Tree> _treeMappings;

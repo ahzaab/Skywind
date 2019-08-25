@@ -3,6 +3,8 @@
 #include <queue>
 #include <unordered_set>
 
+#include "CLIK/Array.h"
+
 
 namespace Scaleform
 {
@@ -50,114 +52,29 @@ namespace Scaleform
 		}
 
 
-		std::ptrdiff_t ScrollingList::GetSelectedIndex()
+		void HeaderList::Visible(bool a_visible)
 		{
-			RE::GFxValue num;
-			auto success = list.GetMember("selectedIndex", &num);
-			assert(success);
-			return num.GetSInt();
-		}
-
-
-		void ScrollingList::SetDataProvider(const RE::GFxValue& a_data)
-		{
-			auto success = list.SetMember("dataProvider", a_data);
-			assert(success);
-		}
-
-
-		void ScrollingList::SetSelectedIndex(std::ptrdiff_t a_index)
-		{
-			RE::GFxValue num(static_cast<double>(a_index));
-			auto success = list.SetMember("selectedIndex", num);
-			assert(success);
-		}
-
-
-		void ScrollingList::SetVisible(bool a_visible)
-		{
-			bool success;
-
-			RE::GFxValue boolean(a_visible);
-			success = list.SetMember("visible", boolean);
-			assert(success);
-			success = bar.SetMember("visible", boolean);
-			assert(success);
-
-			if (a_visible) {
-				SetSelectedIndex(-1.0);
-			}
-		}
-
-
-		void Button::SetVisible(bool a_visible)
-		{
-			RE::GFxValue boolean(a_visible);
-			auto success = btn.SetMember("visible", boolean);
-			assert(success);
-		}
-
-
-		void Button::SetDisabled(bool a_disabled)
-		{
-			RE::GFxValue boolean(a_disabled);
-			auto success = btn.SetMember("disabled", boolean);
-			assert(success);
+			list.Visible(a_visible);
+			header.Visible(a_visible);
 		}
 
 
 		void Description::Init()
 		{
-			bool success;
-
-			RE::GFxValue boolean(true);
-			success = header.SetMember("wordWrap", boolean);
-			assert(success);
-			success = text.SetMember("wordWrap", boolean);
-			assert(success);
+			header.WordWrap(true);
+			text.WordWrap(true);
+			requisites.header.Text("Requires");
+			unlocks.header.Text("Unlocks");
 		}
 
 
-		void Description::SetVisible(bool a_visible)
+		void Description::Visible(bool a_visible)
 		{
-			bool success;
-
-			RE::GFxValue boolean(a_visible);
-			success = header.SetMember("_visible", boolean);
-			assert(success);
-			success = text.SetMember("_visible", boolean);
-			assert(success);
-			unlock.SetVisible(a_visible);
-		}
-
-
-		void Description::SetHeader(const std::string_view& a_header)
-		{
-			RE::GFxValue str(a_header.data());
-			auto success = header.SetMember("htmlText", str);
-			assert(success);
-		}
-
-
-		void Description::SetText(const std::string_view& a_text)
-		{
-			RE::GFxValue str(a_text.data());
-			auto success = text.SetMember("htmlText", str);
-			assert(success);
-		}
-
-
-		void Description::SetUnlockText(const std::string_view& a_text)
-		{
-			RE::GFxValue str(a_text.data());
-			auto success = unlock.btn.SetMember("label", str);
-			assert(success);
-		}
-
-
-		void Description::SetUnlockDisabled(bool a_disabled)
-		{
-			unlock.SetDisabled(a_disabled);
+			header.Visible(a_visible);
+			text.Visible(a_visible);
+			requisites.Visible(a_visible);
+			unlocks.Visible(a_visible);
+			unlock.Visible(a_visible);
 		}
 	}
 
@@ -333,27 +250,35 @@ namespace Scaleform
 		bool success;
 		view->SetVisible(true);
 
-		std::vector<std::pair<RE::GFxValue*, std::string>> toGet;
-		toGet.push_back(std::make_pair(&_classes.list, "classes"));
-		toGet.push_back(std::make_pair(&_classes.bar, "classesSB"));
-		toGet.push_back(std::make_pair(&_trees.list, "trees"));
-		toGet.push_back(std::make_pair(&_trees.bar, "treesSB"));
-		toGet.push_back(std::make_pair(&_perks.list, "perks"));
-		toGet.push_back(std::make_pair(&_perks.bar, "perksSB"));
-		toGet.push_back(std::make_pair(&_ranks.list, "ranks"));
-		toGet.push_back(std::make_pair(&_ranks.bar, "ranksSB"));
+		std::vector<std::pair<CLIK::Object*, std::string>> toGet;
+		toGet.push_back(std::make_pair(&_classes, "classes"));
+		toGet.push_back(std::make_pair(&_trees, "trees"));
+		toGet.push_back(std::make_pair(&_perks, "perks"));
+		toGet.push_back(std::make_pair(&_ranks, "ranks"));
 		toGet.push_back(std::make_pair(&_desc.header, "descHeader"));
 		toGet.push_back(std::make_pair(&_desc.text, "descText"));
-		toGet.push_back(std::make_pair(&_desc.unlock.btn, "unlock"));
+		toGet.push_back(std::make_pair(&_desc.requisites.header, "requisitesHeader"));
+		toGet.push_back(std::make_pair(&_desc.requisites.list, "requisites"));
+		toGet.push_back(std::make_pair(&_desc.unlocks.header, "unlocksHeader"));
+		toGet.push_back(std::make_pair(&_desc.unlocks.list, "unlocks"));
+		toGet.push_back(std::make_pair(&_desc.unlock, "unlock"));
+		RE::GFxValue var;
 		for (auto& elem : toGet) {
-			success = view->GetVariable(elem.first, elem.second.c_str());
+			success = view->GetVariable(&var, elem.second.c_str());
 			assert(success);
+			*elem.first = var;
 		}
 
-		_trees.SetVisible(false);
-		_perks.SetVisible(false);
-		_ranks.SetVisible(false);
-		_desc.SetVisible(false);
+		CLIK::Object obj("scrollBar");
+		_classes.ScrollBar(obj);
+		_trees.ScrollBar(obj);
+		_perks.ScrollBar(obj);
+		_ranks.ScrollBar(obj);
+
+		_trees.Visible(false);
+		_perks.Visible(false);
+		_ranks.Visible(false);
+		_desc.Visible(false);
 
 		_desc.Init();
 
@@ -374,17 +299,76 @@ namespace Scaleform
 		names.emplace_back(VAMPIRE);
 		names.emplace_back(WEREWOLF);
 
-		RE::GFxValue arr;
-		view->CreateArray(&arr);
-		assert(arr.IsArray());
-
-		RE::GFxValue str;
+		CLIK::Array arr(view);
+		CLIK::Object elem;
 		for (auto& name : names) {
-			str = name.c_str();
-			arr.PushBack(str);
+			elem = name.c_str();
+			arr.Push(elem);
 		}
 
-		_classes.SetDataProvider(arr);
+		_classes.DataProvider(arr);
+	}
+
+
+	void StatsMenuEx::SetLeads(std::size_t a_rankIdx, std::size_t a_treeIdx)
+	{
+		if (a_rankIdx == 0) {
+			_desc.requisites.list.SelectedIndex(-1);
+			_desc.unlocks.list.SelectedIndex(-1);
+			auto perkIDToFind = _rankMappings[0].perkID;
+			auto av = RE::TESForm::LookupByID<RE::ActorValueInfo>(_treeMappings[a_treeIdx].avInfoID);
+			BFSOnPerkTree(av, [&](RE::BGSSkillPerkTreeNode* a_node) -> bool
+			{
+				if (a_node->perk && a_node->perk->formID == perkIDToFind) {
+					std::string name;
+					CLIK::Object str;
+					bool disabled;
+					RE::BSTArray<RE::BGSSkillPerkTreeNode*>* srcArr = 0;
+					HeaderList* headerList = 0;
+
+					for (std::size_t i = 0; i < 2; ++i) {
+						CLIK::Array dstArr(view);
+
+						switch (i) {
+						case 0:
+							srcArr = &a_node->parents;
+							headerList = &_desc.requisites;
+							break;
+						case 1:
+							srcArr = &a_node->children;
+							headerList = &_desc.unlocks;
+							break;
+						default:
+							assert(false);
+							break;
+						}
+
+						disabled = true;
+						for (auto& node : *srcArr) {
+							if (node->perk && !node->perk->name.empty()) {
+								disabled = false;
+								name = node->perk->name;
+								SanitizeString(name);
+								str = name.c_str();
+								dstArr.Push(str);
+							}
+						}
+
+						headerList->list.DataProvider(dstArr);
+						headerList->list.Disabled(disabled);
+					}
+
+					return false;
+				}
+				return true;
+			});
+		} else {
+			CLIK::Array arr(view);
+			_desc.requisites.list.DataProvider(arr);
+			_desc.requisites.list.Disabled(true);
+			_desc.unlocks.list.DataProvider(arr);
+			_desc.unlocks.list.Disabled(true);
+		}
 	}
 
 
@@ -394,7 +378,7 @@ namespace Scaleform
 		assert(a_perkIdx < _perkMappings.size());
 		assert(a_treeIdx < _treeMappings.size());
 
-		_desc.SetUnlockDisabled(true);
+		_desc.unlock.Disabled(true);
 
 		auto& rank = _rankMappings[a_rankIdx];
 		auto perk = RE::TESForm::LookupByID<RE::BGSPerk>(rank.perkID);
@@ -408,23 +392,18 @@ namespace Scaleform
 		auto idToFind = _perkMappings[a_perkIdx].perkID;
 		UpdatePerks(a_treeIdx);
 
-		RE::GFxValue arr;
-		view->CreateArray(&arr);
-		assert(arr.IsArray());
-
-		RE::GFxValue str;
-		bool success;
+		CLIK::Array arr(view);
+		CLIK::Object str;
 		for (auto& perk : _perkMappings) {
 			str = perk.text.c_str();
-			success = arr.PushBack(str);
-			assert(success);
+			arr.Push(str);
 		}
 
-		_perks.SetDataProvider(arr);
+		_perks.DataProvider(arr);
 
 		for (std::size_t i = 0; i < _perkMappings.size(); ++i) {
 			if (_perkMappings[i].perkID == idToFind) {
-				_perks.SetSelectedIndex(i);
+				_perks.SelectedIndex(i);
 				break;
 			}
 		}
@@ -433,23 +412,19 @@ namespace Scaleform
 
 	void StatsMenuEx::OnClassPress(std::size_t a_classIdx)
 	{
-		RE::GFxValue arr;
-		view->CreateArray(&arr);
-		assert(arr.IsArray());
-
+		CLIK::Array arr(view);
 		UpdateTrees(a_classIdx);
 
 		if (!_treeMappings.empty()) {
-			RE::GFxValue str;
-			bool success;
+			CLIK::Object str;
 			for (auto& tree : _treeMappings) {
 				str = tree.text.c_str();
-				success = arr.PushBack(str);
-				assert(success);
+				arr.Push(str);
 			}
-			_trees.SetVisible(true);
+			_trees.Visible(true);
 			InvalidatePerks();
-			_trees.SetDataProvider(arr);
+			_trees.DataProvider(arr);
+			_trees.SelectedIndex(-1);
 		} else {
 			InvalidateTrees();
 		}
@@ -458,23 +433,19 @@ namespace Scaleform
 
 	void StatsMenuEx::OnTreePress(std::size_t a_treeIdx)
 	{
-		RE::GFxValue arr;
-		view->CreateArray(&arr);
-		assert(arr.IsArray());
-
+		CLIK::Array arr(view);
 		UpdatePerks(a_treeIdx);
 
 		if (!_perkMappings.empty()) {
-			RE::GFxValue str;
-			bool success;
+			CLIK::Object str;
 			for (auto& perk : _perkMappings) {
 				str = perk.text.c_str();
-				success = arr.PushBack(str);
-				assert(success);
+				arr.Push(str);
 			}
-			_perks.SetVisible(true);
+			_perks.Visible(true);
 			InvalidateRanks();
-			_perks.SetDataProvider(arr);
+			_perks.DataProvider(arr);
+			_perks.SelectedIndex(-1);
 		} else {
 			InvalidatePerks();
 		}
@@ -483,23 +454,19 @@ namespace Scaleform
 
 	void StatsMenuEx::OnPerkPress(std::size_t a_perkIdx)
 	{
-		RE::GFxValue arr;
-		view->CreateArray(&arr);
-		assert(arr.IsArray());
-
+		CLIK::Array arr(view);
 		UpdateRanks(a_perkIdx);
 
 		if (!_rankMappings.empty()) {
-			RE::GFxValue str;
-			bool success;
+			CLIK::Object str;
 			for (auto& rank : _rankMappings) {
 				str = rank.text.c_str();
-				success = arr.PushBack(str);
-				assert(success);
+				arr.Push(str);
 			}
-			_ranks.SetVisible(true);
+			_ranks.Visible(true);
 			InvalidateDesc();
-			_ranks.SetDataProvider(arr);
+			_ranks.DataProvider(arr);
+			_ranks.SelectedIndex(-1);
 		} else {
 			InvalidateRanks();
 		}
@@ -518,10 +485,10 @@ namespace Scaleform
 		RE::BSString desc;
 		perk->GetDescription(desc, perk);
 
-		_desc.SetVisible(true);
-		_desc.SetHeader("Description");
-		_desc.SetText(desc);
-		_desc.SetUnlockText("Unlock");
+		_desc.Visible(true);
+		_desc.header.Text("Description");
+		_desc.text.Text(desc.c_str());
+		_desc.unlock.Label("Unlock");
 
 		auto player = RE::PlayerCharacter::GetSingleton();
 		bool disabled = player->HasPerk(perk) || !perk->conditions.Run(player, player);
@@ -552,29 +519,8 @@ namespace Scaleform
 		}
 #endif
 
-		_desc.SetUnlockDisabled(disabled);
-
-#if 0
-		auto perkIDToFind = _rankMappings[0].second;
-		auto av = RE::TESForm::LookupByID<RE::ActorValueInfo>(_treeMappings[a_treeIdx].second);
-		BFSOnPerkTree(av, [&](RE::BGSSkillPerkTreeNode* a_node) -> bool
-		{
-			if (a_node->perk && a_node->perk->formID == perkIDToFind) {
-				for (auto& parent : a_node->parents) {
-					if (parent->perk && !parent->perk->name.empty()) {
-						// push back required
-					}
-				}
-				for (auto& child : a_node->children) {
-					if (child->perk && !child->perk->name.empty()) {
-						// push back unlocks
-					}
-				}
-				return false;
-			}
-			return true;
-		});
-#endif
+		_desc.unlock.Disabled(disabled);
+		SetLeads(a_rankIdx, a_treeIdx);
 	}
 
 
@@ -687,28 +633,31 @@ namespace Scaleform
 
 	void StatsMenuEx::InvalidateTrees()
 	{
-		_trees.SetVisible(false);
+		_trees.Visible(false);
+		_trees.SelectedIndex(-1);
 		InvalidatePerks();
 	}
 
 
 	void StatsMenuEx::InvalidatePerks()
 	{
-		_perks.SetVisible(false);
+		_perks.Visible(false);
+		_perks.SelectedIndex(-1);
 		InvalidateRanks();
 	}
 
 
 	void StatsMenuEx::InvalidateRanks()
 	{
-		_ranks.SetVisible(false);
+		_ranks.Visible(false);
+		_ranks.SelectedIndex(-1);
 		InvalidateDesc();
 	}
 
 
 	void StatsMenuEx::InvalidateDesc()
 	{
-		_desc.SetVisible(false);
+		_desc.Visible(false);
 	}
 
 
