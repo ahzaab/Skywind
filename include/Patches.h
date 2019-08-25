@@ -7,6 +7,7 @@ namespace Patches
 	{
 		void DisableLegendaryPrompt();
 		void DisableTemperString();
+		void PatchEra();
 	}
 
 

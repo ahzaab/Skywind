@@ -9,6 +9,7 @@ class GlobalListener extends MovieClip
 	/* PRIVATE VARIABLES */
 
 	private var _trees: ScrollingList;
+	private var _perks: ScrollingList;
 	private var _ranks: ScrollingList;
 
 
@@ -36,9 +37,9 @@ class GlobalListener extends MovieClip
 			log("could not get trees");
 		}
 
-		var perks: ScrollingList = _root.perks;
-		if (perks != undefined) {
-			perks.addEventListener(EventTypes.ITEM_PRESS, this, "handlePerkPress");
+		_perks = _root.perks;
+		if (_perks != undefined) {
+			_perks.addEventListener(EventTypes.ITEM_PRESS, this, "handlePerkPress");
 		} else {
 			log("could not get perks");
 		}
@@ -80,6 +81,8 @@ class GlobalListener extends MovieClip
 	}
 
 
+	/* PRIVATE FUNCTIONS */
+
 	public function handleRankPress(a_event: Object): Void
 	{
 		var rankIndex: Number = a_event.index;
@@ -90,12 +93,12 @@ class GlobalListener extends MovieClip
 
 	public function handleUnlockPress(a_event: Object): Void
 	{
-		var index: Number = _ranks.selectedIndex;
-		GameDelegate.call("UnlockPerk", [index]);
+		var rankIndex: Number = _ranks.selectedIndex;
+		var perkIndex: Number = _perks.selectedIndex;
+		var treeIndex: Number = _trees.selectedIndex;
+		GameDelegate.call("UnlockPerk", [rankIndex, perkIndex, treeIndex]);
 	}
 
-
-	/* PRIVATE FUNCTIONS */
 
 	private function log(a_message: String): Void
 	{

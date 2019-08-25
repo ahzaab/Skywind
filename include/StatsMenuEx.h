@@ -1,9 +1,9 @@
 #pragma once
 
-#include <functional>
 #include <optional>
+#include <string>
 #include <string_view>
-#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "RE/Skyrim.h"
@@ -60,8 +60,10 @@ namespace Scaleform
 
 		struct ScrollingList
 		{
-			void SetVisible(bool a_visible);
+			std::ptrdiff_t GetSelectedIndex();
 			void SetDataProvider(const RE::GFxValue& a_data);
+			void SetSelectedIndex(std::ptrdiff_t a_index);
+			void SetVisible(bool a_visible);
 
 			RE::GFxValue list;
 			RE::GFxValue bar;
@@ -101,6 +103,8 @@ namespace Scaleform
 
 		struct Perk
 		{
+			enum : UInt32 { kInvalid = static_cast<UInt32>(-1) };
+
 			std::string text;
 			BGSPerkID perkID;
 			UInt32 level;
@@ -149,12 +153,16 @@ namespace Scaleform
 		void OnMenuClose();
 
 		void SetClasses();
-		void UnlockPerk(std::size_t a_idx);
+		void UnlockPerk(std::size_t a_rankIdx, std::size_t a_perkIdx, std::size_t a_treeIdx);
 
-		void OnClassPress(std::size_t a_idx);
-		void OnTreePress(std::size_t a_idx);
-		void OnPerkPress(std::size_t a_idx);
+		void OnClassPress(std::size_t a_classIdx);
+		void OnTreePress(std::size_t a_treeIdx);
+		void OnPerkPress(std::size_t a_perkIdx);
 		void OnRankPress(std::size_t a_rankIdx, std::size_t a_treeIdx);
+
+		void UpdateTrees(std::size_t a_classIdx);
+		void UpdatePerks(std::size_t a_treeIdx);
+		void UpdateRanks(std::size_t a_perkIdx);
 
 		void InvalidateTrees();
 		void InvalidatePerks();

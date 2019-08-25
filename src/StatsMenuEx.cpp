@@ -1,7 +1,6 @@
 #include "StatsMenuEx.h"
 
 #include <queue>
-#include <set>
 #include <unordered_set>
 
 
@@ -51,6 +50,30 @@ namespace Scaleform
 		}
 
 
+		std::ptrdiff_t ScrollingList::GetSelectedIndex()
+		{
+			RE::GFxValue num;
+			auto success = list.GetMember("selectedIndex", &num);
+			assert(success);
+			return num.GetSInt();
+		}
+
+
+		void ScrollingList::SetDataProvider(const RE::GFxValue& a_data)
+		{
+			auto success = list.SetMember("dataProvider", a_data);
+			assert(success);
+		}
+
+
+		void ScrollingList::SetSelectedIndex(std::ptrdiff_t a_index)
+		{
+			RE::GFxValue num(static_cast<double>(a_index));
+			auto success = list.SetMember("selectedIndex", num);
+			assert(success);
+		}
+
+
 		void ScrollingList::SetVisible(bool a_visible)
 		{
 			bool success;
@@ -62,17 +85,8 @@ namespace Scaleform
 			assert(success);
 
 			if (a_visible) {
-				RE::GFxValue number(-1.0);
-				success = list.SetMember("selectedIndex", number);
-				assert(success);
+				SetSelectedIndex(-1.0);
 			}
-		}
-
-
-		void ScrollingList::SetDataProvider(const RE::GFxValue& a_data)
-		{
-			auto success = list.SetMember("dataProvider", a_data);
-			assert(success);
 		}
 
 
@@ -301,12 +315,16 @@ namespace Scaleform
 
 	void StatsMenuEx::UnlockPerk(const RE::FxDelegateArgs& a_params)
 	{
-		assert(a_params.GetArgCount() == 1);
+		assert(a_params.GetArgCount() == 3);
 		assert(a_params[0].IsNumber());
+		assert(a_params[1].IsNumber());
+		assert(a_params[2].IsNumber());
 
 		auto menu = static_cast<StatsMenuEx*>(a_params.GetHandler());
-		auto num = a_params[0].GetUInt();
-		menu->UnlockPerk(num);
+		auto rankIndex = a_params[0].GetUInt();
+		auto perkIndex = a_params[1].GetUInt();
+		auto treeIndex = a_params[2].GetUInt();
+		menu->UnlockPerk(rankIndex, perkIndex, treeIndex);
 	}
 
 
@@ -370,15 +388,15 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::UnlockPerk(std::size_t a_idx)
+	void StatsMenuEx::UnlockPerk(std::size_t a_rankIdx, std::size_t a_perkIdx, std::size_t a_treeIdx)
 	{
+		assert(a_rankIdx < _rankMappings.size());
+		assert(a_perkIdx < _perkMappings.size());
+		assert(a_treeIdx < _treeMappings.size());
+
 		_desc.SetUnlockDisabled(true);
 
-		if (a_idx >= _rankMappings.size()) {
-			return;
-		}
-
-		auto& rank = _rankMappings[a_idx];
+		auto& rank = _rankMappings[a_rankIdx];
 		auto perk = RE::TESForm::LookupByID<RE::BGSPerk>(rank.perkID);
 		if (!perk) {
 			return;
@@ -386,47 +404,48 @@ namespace Scaleform
 
 		auto player = RE::PlayerCharacter::GetSingleton();
 		player->AddPerk(perk);
+
+		auto idToFind = _perkMappings[a_perkIdx].perkID;
+		UpdatePerks(a_treeIdx);
+
+		RE::GFxValue arr;
+		view->CreateArray(&arr);
+		assert(arr.IsArray());
+
+		RE::GFxValue str;
+		bool success;
+		for (auto& perk : _perkMappings) {
+			str = perk.text.c_str();
+			success = arr.PushBack(str);
+			assert(success);
+		}
+
+		_perks.SetDataProvider(arr);
+
+		for (std::size_t i = 0; i < _perkMappings.size(); ++i) {
+			if (_perkMappings[i].perkID == idToFind) {
+				_perks.SetSelectedIndex(i);
+				break;
+			}
+		}
 	}
 
 
-	void StatsMenuEx::OnClassPress(std::size_t a_idx)
+	void StatsMenuEx::OnClassPress(std::size_t a_classIdx)
 	{
 		RE::GFxValue arr;
 		view->CreateArray(&arr);
 		assert(arr.IsArray());
 
-		_treeMappings.clear();
-
-		if (a_idx < _classMappings.size()) {
-			auto& elem = _classMappings[a_idx];
-			auto player = RE::PlayerCharacter::GetSingleton();
-			for (auto& pair : elem.second) {
-				auto avInfoID = pair.first;
-				auto av = pair.second;
-				auto avInfo = RE::TESForm::LookupByID<RE::ActorValueInfo>(avInfoID);
-				if (avInfo && !avInfo->name.empty()) {
-					std::string name(avInfo->name);
-					SanitizeString(name);
-
-					auto baseVal = static_cast<UInt32>(player->GetActorValueBase(av));
-
-					name += " (";
-					name += std::to_string(baseVal);
-					name += ')';
-
-					_treeMappings.push_back({ std::move(name), avInfoID });
-				}
-			}
-		}
+		UpdateTrees(a_classIdx);
 
 		if (!_treeMappings.empty()) {
-			using value_type = decltype(_treeMappings)::value_type;
-			std::sort(_treeMappings.begin(), _treeMappings.end(), [](const value_type& a_lhs, const value_type& a_rhs) -> bool
-			{
-				return a_lhs.text < a_rhs.text;
-			});
+			RE::GFxValue str;
+			bool success;
 			for (auto& tree : _treeMappings) {
-				arr.PushBack(tree.text.c_str());
+				str = tree.text.c_str();
+				success = arr.PushBack(str);
+				assert(success);
 			}
 			_trees.SetVisible(true);
 			InvalidatePerks();
@@ -437,46 +456,22 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::OnTreePress(std::size_t a_idx)
+	void StatsMenuEx::OnTreePress(std::size_t a_treeIdx)
 	{
 		RE::GFxValue arr;
 		view->CreateArray(&arr);
 		assert(arr.IsArray());
 
-		_perkMappings.clear();
-
-		if (a_idx < _treeMappings.size()) {
-			auto& elem = _treeMappings[a_idx];
-			auto av = RE::TESForm::LookupByID<RE::ActorValueInfo>(elem.avInfoID);
-			BFSOnPerkTree(av, [&](RE::BGSSkillPerkTreeNode* a_node) -> bool
-			{
-				auto perk = a_node->perk;
-				if (perk && !perk->name.empty()) {
-					std::string name(perk->name);
-					SanitizeString(name);
-
-					auto level = GetPerkLvlReq(perk).value_or(0);
-
-					name += " (";
-					name += std::to_string(level);
-					name += ')';
-
-					_perkMappings.push_back({ std::move(name), perk->formID, level });
-				}
-				return true;
-			});
-		}
+		UpdatePerks(a_treeIdx);
 
 		if (!_perkMappings.empty()) {
-			std::stable_sort(_perkMappings.begin(), _perkMappings.end(), [](const Perk& a_lhs, const Perk& a_rhs) -> bool
-			{
-				return a_lhs.level < a_rhs.level;
-			});
-
+			RE::GFxValue str;
+			bool success;
 			for (auto& perk : _perkMappings) {
-				arr.PushBack(perk.text.c_str());
+				str = perk.text.c_str();
+				success = arr.PushBack(str);
+				assert(success);
 			}
-
 			_perks.SetVisible(true);
 			InvalidateRanks();
 			_perks.SetDataProvider(arr);
@@ -486,36 +481,21 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::OnPerkPress(std::size_t a_idx)
+	void StatsMenuEx::OnPerkPress(std::size_t a_perkIdx)
 	{
 		RE::GFxValue arr;
 		view->CreateArray(&arr);
 		assert(arr.IsArray());
 
-		_rankMappings.clear();
-
-		if (a_idx < _perkMappings.size()) {
-			auto& elem = _perkMappings[a_idx];
-			auto perk = RE::TESForm::LookupByID<RE::BGSPerk>(elem.perkID);
-			std::size_t idx = 1;
-			std::string name;
-			UInt32 reqRank = 0;
-			while (perk) {
-				name = std::to_string(idx++);
-				reqRank = GetPerkLvlReq(perk).value_or(reqRank);
-
-				name += " (";
-				name += std::to_string(reqRank);
-				name += ')';
-
-				_rankMappings.push_back({ std::move(name), perk->formID });
-				perk = perk->nextPerk;
-			}
-		}
+		UpdateRanks(a_perkIdx);
 
 		if (!_rankMappings.empty()) {
+			RE::GFxValue str;
+			bool success;
 			for (auto& rank : _rankMappings) {
-				arr.PushBack(rank.text.c_str());
+				str = rank.text.c_str();
+				success = arr.PushBack(str);
+				assert(success);
 			}
 			_ranks.SetVisible(true);
 			InvalidateDesc();
@@ -595,6 +575,113 @@ namespace Scaleform
 			return true;
 		});
 #endif
+	}
+
+
+	void StatsMenuEx::UpdateTrees(std::size_t a_classIdx)
+	{
+		using value_type = decltype(_treeMappings)::value_type;
+
+		_treeMappings.clear();
+
+		if (a_classIdx < _classMappings.size()) {
+			auto& elem = _classMappings[a_classIdx];
+			auto player = RE::PlayerCharacter::GetSingleton();
+			for (auto& pair : elem.second) {
+				auto avInfoID = pair.first;
+				auto av = pair.second;
+				auto avInfo = RE::TESForm::LookupByID<RE::ActorValueInfo>(avInfoID);
+				if (avInfo && !avInfo->name.empty()) {
+					std::string name(avInfo->name);
+					SanitizeString(name);
+
+					auto baseVal = static_cast<UInt32>(player->GetActorValueBase(av));
+
+					name += " (";
+					name += std::to_string(baseVal);
+					name += ')';
+
+					_treeMappings.push_back({ std::move(name), avInfoID });
+				}
+			}
+		}
+
+		std::sort(_treeMappings.begin(), _treeMappings.end(), [](const value_type& a_lhs, const value_type& a_rhs) -> bool
+		{
+			return a_lhs.text < a_rhs.text;
+		});
+	}
+
+
+	void StatsMenuEx::UpdatePerks(std::size_t a_treeIdx)
+	{
+		using value_type = decltype(_perkMappings)::value_type;
+
+		_perkMappings.clear();
+
+		if (a_treeIdx < _treeMappings.size()) {
+			auto& elem = _treeMappings[a_treeIdx];
+			auto av = RE::TESForm::LookupByID<RE::ActorValueInfo>(elem.avInfoID);
+			auto player = RE::PlayerCharacter::GetSingleton();
+			BFSOnPerkTree(av, [&](RE::BGSSkillPerkTreeNode* a_node) -> bool
+			{
+				auto perk = a_node->perk;
+				if (perk && !perk->name.empty()) {
+					std::string name(perk->name);
+					SanitizeString(name);
+
+					UInt32 level = 0;
+					bool incomplete = false;
+					for (auto rank = perk; rank; rank = rank->nextPerk) {
+						level = GetPerkLvlReq(rank).value_or(level);
+						if (!player->HasPerk(rank)) {
+							incomplete = true;
+							name += " (";
+							name += std::to_string(level);
+							name += ')';
+							break;
+						}
+					}
+
+					if (!incomplete) {
+						level = value_type::kInvalid;
+					}
+
+					_perkMappings.push_back({ std::move(name), perk->formID, level });
+				}
+				return true;
+			});
+		}
+
+		std::stable_sort(_perkMappings.begin(), _perkMappings.end(), [](const value_type& a_lhs, const value_type& a_rhs) -> bool
+		{
+			return a_lhs.level < a_rhs.level;
+		});
+	}
+
+
+	void StatsMenuEx::UpdateRanks(std::size_t a_perkIdx)
+	{
+		_rankMappings.clear();
+
+		if (a_perkIdx < _perkMappings.size()) {
+			auto& elem = _perkMappings[a_perkIdx];
+			auto perk = RE::TESForm::LookupByID<RE::BGSPerk>(elem.perkID);
+			std::size_t idx = 1;
+			std::string name;
+			UInt32 reqRank = 0;
+			while (perk) {
+				name = std::to_string(idx++);
+				reqRank = GetPerkLvlReq(perk).value_or(reqRank);
+
+				name += " (";
+				name += std::to_string(reqRank);
+				name += ')';
+
+				_rankMappings.push_back({ std::move(name), perk->formID });
+				perk = perk->nextPerk;
+			}
+		}
 	}
 
 

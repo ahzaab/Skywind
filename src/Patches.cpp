@@ -60,6 +60,21 @@ namespace Patches
 
 			_MESSAGE("Disabled temper string");
 		}
+
+
+		void PatchEra()
+		{
+			// , 4E %d
+			constexpr std::uintptr_t OFFSET = 0x01647510;	// 1_5_80
+
+			REL::Offset<std::uintptr_t> target(OFFSET);
+			constexpr UInt8 NEW_STR[] = ", 3E %d";
+			for (std::size_t i = 0; i < std::extent<decltype(NEW_STR)>::value; ++i) {
+				SafeWrite8(target.GetAddress() + i, NEW_STR[i]);
+			}
+
+			_MESSAGE("Patched era");
+		}
 	}
 
 
@@ -67,6 +82,7 @@ namespace Patches
 	{
 		DisableTemperString();
 		DisableLegendaryPrompt();
+		PatchEra();
 		_MESSAGE("Installed all patches");
 	}
 }

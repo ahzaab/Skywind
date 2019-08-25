@@ -39,6 +39,12 @@ namespace
 				return EventResult::kContinue;
 			}
 
+			auto mm = RE::MenuManager::GetSingleton();
+			auto uiStr = RE::UIStringHolder::GetSingleton();
+			if (mm->IsMenuOpen(uiStr->console)) {
+				return EventResult::kContinue;
+			}
+
 			for (auto event = *a_event; event; event = event->next) {
 				if (event->eventType != RE::InputEvent::EventType::kButton) {
 					continue;
