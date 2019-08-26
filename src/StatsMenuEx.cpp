@@ -574,7 +574,7 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::OnLeadPress(std::vector<TextPerk>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx)
+	void StatsMenuEx::OnLeadPress(std::vector<TextPerkLevel>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx)
 	{
 		if (a_leadIdx >= a_lead.size()) {
 			return;
@@ -720,50 +720,8 @@ namespace Scaleform
 			BFSOnPerkTree(av, [&](RE::BGSSkillPerkTreeNode* a_node) -> bool
 			{
 				if (a_node->perk && a_node->perk->formID == perkIDToFind) {
-					std::string name;
-					bool disabled;
-					RE::BSTArray<RE::BGSSkillPerkTreeNode*>* srcArr = 0;
-					std::vector<TextPerk>* dstArr = 0;
-					HeaderList* headerList = 0;
-
-					for (std::size_t i = 0; i < 2; ++i) {
-						switch (i) {
-						case 0:
-							srcArr = &a_node->parents;
-							dstArr = &_requisiteMappings;
-							headerList = &_desc.requisites;
-							break;
-						case 1:
-							srcArr = &a_node->children;
-							dstArr = &_unlockMappings;
-							headerList = &_desc.unlocks;
-							break;
-						default:
-							assert(false);
-							break;
-						}
-
-						disabled = true;
-						for (auto& node : *srcArr) {
-							if (node->perk && !node->perk->name.empty()) {
-								disabled = false;
-								name = node->perk->name;
-								SanitizeString(name);
-								dstArr->push_back({ name, node->perk->formID });
-							}
-						}
-
-						CLIK::Array arr(view);
-						CLIK::Object str;
-						for (auto& elem : *dstArr) {
-							str = elem.text;
-							arr.Push(str);
-						}
-
-						headerList->list.DataProvider(arr);
-						headerList->list.Disabled(disabled);
-					}
-
+					UpdateLead(_requisiteMappings, a_node->parents, _desc.requisites);
+					UpdateLead(_unlockMappings, a_node->children, _desc.unlocks);
 					return false;
 				}
 				return true;
@@ -775,6 +733,48 @@ namespace Scaleform
 			_desc.unlocks.list.DataProvider(arr);
 			_desc.unlocks.list.Disabled(true);
 		}
+	}
+
+
+	void StatsMenuEx::UpdateLead(std::vector<TextPerkLevel>& a_lead, RE::BSTArray<RE::BGSSkillPerkTreeNode*>& a_srcArr, HeaderList& a_headerList)
+	{
+		using value_type = std::decay_t<decltype(a_lead)>::value_type;
+
+		bool disabled = true;
+		auto player = RE::PlayerCharacter::GetSingleton();
+
+		for (auto& node : a_srcArr) {
+			if (node->perk && !node->perk->name.empty()) {
+				disabled = false;
+				std::string name(node->perk->name);
+				SanitizeString(name);
+
+				UInt32 level = value_type::kInvalid;
+				if (!player->HasPerk(node->perk)) {
+					level = GetPerkLvlReq(node->perk).value_or(0);
+					name += " (";
+					name += std::to_string(level);
+					name += ')';
+				}
+
+				a_lead.push_back({ std::move(name), node->perk->formID, level });
+			}
+		}
+
+		std::stable_sort(a_lead.begin(), a_lead.end(), [](const value_type& a_lhs, const value_type& a_rhs) -> bool
+		{
+			return a_lhs.level < a_rhs.level;
+		});
+
+		CLIK::Array arr(view);
+		CLIK::Object str;
+		for (auto& elem : a_lead) {
+			str = elem.text;
+			arr.Push(str);
+		}
+
+		a_headerList.list.DataProvider(arr);
+		a_headerList.list.Disabled(disabled);
 	}
 
 

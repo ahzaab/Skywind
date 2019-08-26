@@ -106,20 +106,20 @@ namespace Scaleform
 		};
 
 
-		struct Perk
+		struct Rank
+		{
+			std::string text;
+			BGSPerkID perkID;
+		};
+
+
+		struct TextPerkLevel
 		{
 			enum : UInt32 { kInvalid = static_cast<UInt32>(-1) };
 
 			std::string text;
 			BGSPerkID perkID;
 			UInt32 level;
-		};
-
-
-		struct TextPerk
-		{
-			std::string text;
-			BGSPerkID perkID;
 		};
 	}
 
@@ -169,12 +169,13 @@ namespace Scaleform
 		void OnRankPress(std::size_t a_rankIdx, std::size_t a_treeIdx);
 		void OnRequisitePress(std::size_t a_requisiteIdx, std::size_t a_treeIdx);
 		void OnUnlockPress(std::size_t a_unlockIdx, std::size_t a_treeIdx);
-		void OnLeadPress(std::vector<TextPerk>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx);
+		void OnLeadPress(std::vector<TextPerkLevel>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx);
 
 		void UpdateTrees(std::size_t a_classIdx);
 		void UpdatePerks(std::size_t a_treeIdx);
 		void UpdateRanks(std::size_t a_perkIdx);
 		void UpdateLeads(std::size_t a_rankIdx, std::size_t a_treeIdx);
+		void UpdateLead(std::vector<TextPerkLevel>& a_lead, RE::BSTArray<RE::BGSSkillPerkTreeNode*>& a_srcArr, HeaderList& a_headerList);
 
 		void InvalidateTrees();
 		void InvalidatePerks();
@@ -196,10 +197,10 @@ namespace Scaleform
 		Stats _stats;
 		ClassMap _classMappings;
 		std::vector<Tree> _treeMappings;
-		std::vector<Perk> _perkMappings;
-		std::vector<TextPerk> _rankMappings;
-		std::vector<TextPerk> _requisiteMappings;
-		std::vector<TextPerk> _unlockMappings;
+		std::vector<TextPerkLevel> _perkMappings;
+		std::vector<Rank> _rankMappings;
+		std::vector<TextPerkLevel> _requisiteMappings;
+		std::vector<TextPerkLevel> _unlockMappings;
 	};
 
 
