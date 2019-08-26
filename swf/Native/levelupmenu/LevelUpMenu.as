@@ -66,7 +66,8 @@ dynamic class LevelUpMenu extends MovieClip
 		var attributeIDs: Array = [STRENGTH_ATTR, INTELLIGENCE_ATTR, WILLPOWER_ATTR, AGILITY_ATTR, SPEED_ATTR, ENDURANCE_ATTR, PERSONALITY_ATTR, LUCK_ATTR];
 		var attributeMods: Array = [STRENGTH_MOD, INTELLIGENCE_MOD, WILLPOWER_MOD, AGILITY_MOD, SPEED_MOD, ENDURANCE_MOD, PERSONALITY_MOD, LUCK_MOD];
 
-		for (var i: Number = 0; i < _attributeMCs.length; ++i) {
+		var len: Number = _attributeMCs.length;
+		for (var i: Number = 0; i < len; ++i) {
 			var attribute: AttributeMovieClip = _attributeMCs[i];
 			attribute.setPressCallback(this, "onPressedAttribute");
 			attribute.setRollOverCallback(this, "onButtonGainFocus");
@@ -122,7 +123,8 @@ dynamic class LevelUpMenu extends MovieClip
 	public function closeCallback(a_event: Object): Void
 	{
 		playSound("UIMenuOK");
-		for (var i: Number = 0; i < _attributeMCs.length; ++i) {
+		var len: Number = _attributeMCs.length;
+		for (var i: Number = 0; i < len; ++i) {
 			var attribute: AttributeMovieClip = _attributeMCs[i];
 			attribute.onClose();
 		}
