@@ -159,6 +159,7 @@ namespace Scaleform
 		void OnMenuOpen();
 		void OnMenuClose();
 
+		void InitExtensions();
 		void SetClasses();
 		void UnlockPerk(std::size_t a_rankIdx, std::size_t a_perkIdx, std::size_t a_treeIdx);
 

@@ -161,6 +161,7 @@ namespace Scaleform
 			std::abort();
 		}
 
+		InitExtensions();
 		view->SetVisible(false);
 	}
 
@@ -374,6 +375,17 @@ namespace Scaleform
 	void StatsMenuEx::OnMenuClose()
 	{
 		return;
+	}
+
+
+	void StatsMenuEx::InitExtensions()
+	{
+		RE::GFxValue boolean(true);
+		bool success;
+		success = view->SetVariable("_global.gfxExtensions", boolean);
+		assert(success);
+		success = view->SetVariable("_global.noInvisibleAdvance", boolean);
+		assert(success);
 	}
 
 
