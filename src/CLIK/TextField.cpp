@@ -9,12 +9,22 @@ namespace CLIK
 
 
 	TextField::TextField(const TextField& a_rhs) :
-		super(a_rhs._instance)
+		super(a_rhs)
 	{}
 
 
 	TextField::TextField(TextField&& a_rhs) :
-		super(std::move(a_rhs._instance))
+		super(std::move(a_rhs))
+	{}
+
+
+	TextField::TextField(const Object& a_rhs) :
+		super(a_rhs)
+	{}
+
+
+	TextField::TextField(Object&& a_rhs) :
+		super(std::move(a_rhs))
 	{}
 
 
@@ -34,14 +44,28 @@ namespace CLIK
 
 	TextField& TextField::operator=(const TextField& a_rhs)
 	{
-		_instance = a_rhs._instance;
+		super::operator=(a_rhs);
 		return *this;
 	}
 
 
 	TextField& TextField::operator=(TextField&& a_rhs)
 	{
-		_instance = std::move(a_rhs._instance);
+		super::operator=(std::move(a_rhs));
+		return *this;
+	}
+
+
+	TextField& TextField::operator=(const Object& a_rhs)
+	{
+		super::operator=(a_rhs);
+		return *this;
+	}
+
+
+	TextField& TextField::operator=(Object&& a_rhs)
+	{
+		super::operator=(std::move(a_rhs));
 		return *this;
 	}
 
@@ -72,13 +96,13 @@ namespace CLIK
 	}
 
 
-	std::string TextField::AntiAliasType() const
+	std::string_view TextField::AntiAliasType() const
 	{
 		return GetString("antiAliasType");
 	}
 
 
-	void TextField::AntiAliasType(const char* a_antiAliasType)
+	void TextField::AntiAliasType(std::string_view a_antiAliasType)
 	{
 		SetString("antiAliasType", a_antiAliasType);
 	}
@@ -174,13 +198,13 @@ namespace CLIK
 	}
 
 
-	std::string TextField::GridFitType() const
+	std::string_view TextField::GridFitType() const
 	{
 		return GetString("gridFitType");
 	}
 
 
-	void TextField::GridFitType(const char* a_gridFitType)
+	void TextField::GridFitType(std::string_view a_gridFitType)
 	{
 		SetString("gridFitType", a_gridFitType);
 	}
@@ -234,13 +258,13 @@ namespace CLIK
 	}
 
 
-	std::string TextField::HTMLText() const
+	std::string_view TextField::HTMLText() const
 	{
 		return GetString("htmlText");
 	}
 
 
-	void TextField::HTMLText(const char* a_htmlText)
+	void TextField::HTMLText(std::string_view a_htmlText)
 	{
 		SetString("htmlText", a_htmlText);
 	}
@@ -300,13 +324,13 @@ namespace CLIK
 	}
 
 
-	std::string TextField::Name() const
+	std::string_view TextField::Name() const
 	{
 		return GetString("_name");
 	}
 
 
-	void TextField::Name(const char* a_name)
+	void TextField::Name(std::string_view a_name)
 	{
 		SetString("_name", a_name);
 	}
@@ -324,25 +348,25 @@ namespace CLIK
 	}
 
 
-	std::string TextField::Quality() const
+	std::string_view TextField::Quality() const
 	{
 		return GetString("_quality");
 	}
 
 
-	void TextField::Quality(const char* a_quality)
+	void TextField::Quality(std::string_view a_quality)
 	{
 		SetString("_quality", a_quality);
 	}
 
 
-	std::string TextField::Restrict() const
+	std::string_view TextField::Restrict() const
 	{
 		return GetString("restrict");
 	}
 
 
-	void TextField::Restrict(const char* a_restrict)
+	void TextField::Restrict(std::string_view a_restrict)
 	{
 		SetString("restrict", a_restrict);
 	}
@@ -432,19 +456,19 @@ namespace CLIK
 	}
 
 
-	std::string TextField::Target() const
+	std::string_view TextField::Target() const
 	{
 		return GetString("_target");
 	}
 
 
-	std::string TextField::Text() const
+	std::string_view TextField::Text() const
 	{
 		return GetString("text");
 	}
 
 
-	void TextField::Text(const char* a_text)
+	void TextField::Text(std::string_view a_text)
 	{
 		SetString("text", a_text);
 	}
@@ -498,31 +522,31 @@ namespace CLIK
 	}
 
 
-	std::string TextField::Type() const
+	std::string_view TextField::Type() const
 	{
 		return GetString("type");
 	}
 
 
-	void TextField::Type(const char* a_type)
+	void TextField::Type(std::string_view a_type)
 	{
 		SetString("type", a_type);
 	}
 
 
-	std::string TextField::URL() const
+	std::string_view TextField::URL() const
 	{
 		return GetString("_url");
 	}
 
 
-	std::string TextField::Variable() const
+	std::string_view TextField::Variable() const
 	{
 		return GetString("variable");
 	}
 
 
-	void TextField::Variable(const char* a_variable)
+	void TextField::Variable(std::string_view a_variable)
 	{
 		SetString("variable", a_variable);
 	}
@@ -621,5 +645,617 @@ namespace CLIK
 	void TextField::YScale(double a_yScale)
 	{
 		SetNumber("_yscale", a_yScale);
+	}
+
+
+	bool TextField::AddListener(Object& a_listener)
+	{
+		enum
+		{
+			kListener,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kListener] = a_listener.GetInstance();
+		assert(args[kListener].IsObject());
+		
+		RE::GFxValue boolean;
+		auto success = _instance.Invoke("addListener", &boolean, args, kNumArgs);
+		assert(success);
+
+		return boolean.GetBool();
+	}
+
+
+	double TextField::GetDepth()
+	{
+		RE::GFxValue number;
+		auto success = _instance.Invoke("getDepth", &number);
+		assert(success);
+
+		return number.GetNumber();
+	}
+
+
+	bool TextField::RemoveListener(Object& a_listener)
+	{
+		enum
+		{
+			kListener,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kListener] = a_listener.GetInstance();
+		assert(args[kListener].IsObject());
+
+		RE::GFxValue boolean;
+		auto success = _instance.Invoke("removeListener", &boolean, args, kNumArgs);
+		assert(success);
+
+		return boolean.GetBool();
+	}
+
+
+	void TextField::RemoveTextField()
+	{
+		auto success = _instance.Invoke("removeTextField");
+		assert(success);
+	}
+
+
+	void TextField::ReplaceSel(std::string_view a_newText)
+	{
+		enum
+		{
+			kNewText,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kNewText] = a_newText;
+		assert(args[kNewText].IsString());
+
+		auto success = _instance.Invoke("replaceSel", 0, args, kNumArgs);
+		assert(success);
+	}
+
+
+	void TextField::ReplaceText(double a_beginIndex, double a_endIndex, std::string_view a_newText)
+	{
+		enum
+		{
+			kBeginIndex,
+			kEndIndex,
+			kNewText,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kBeginIndex] = a_beginIndex;
+		assert(args[kBeginIndex].IsNumber());
+
+		args[kEndIndex] = a_endIndex;
+		assert(args[kEndIndex].IsNumber());
+
+		args[kNewText] = a_newText;
+		assert(args[kNewText].IsString());
+
+		auto success = _instance.Invoke("replaceText", 0, args, kNumArgs);
+		assert(success);
+	}
+
+
+	bool TextField::AutoFit() const
+	{
+		return GetBoolean("autoFit");
+	}
+
+
+	void TextField::AutoFit(bool a_autoFit)
+	{
+		SetBoolean("autoFit", a_autoFit);
+	}
+
+
+	double TextField::CaretIndex() const
+	{
+		return GetNumber("caretIndex");
+	}
+
+
+	void TextField::CaretIndex(double a_caretIndex)
+	{
+		SetNumber("caretIndex", a_caretIndex);
+	}
+
+
+	double TextField::FocusGroup() const
+	{
+		return GetNumber("focusGroup");
+	}
+
+
+	void TextField::FocusGroup(double a_focusGroup)
+	{
+		SetNumber("focusGroup", a_focusGroup);
+	}
+
+
+	bool TextField::HitTestDisable() const
+	{
+		return GetBoolean("hitTestDisable");
+	}
+
+
+	void TextField::HitTestDisable(bool a_hitTestDisable)
+	{
+		SetBoolean("hitTestDisable", a_hitTestDisable);
+	}
+
+
+	bool TextField::NoTranslate() const
+	{
+		return GetBoolean("noTranslate");
+	}
+
+
+	void TextField::NoTranslate(bool a_noTranslate)
+	{
+		SetBoolean("noTranslate", a_noTranslate);
+	}
+
+
+	double TextField::NumLines() const
+	{
+		return GetNumber("numLines");
+	}
+
+
+	void TextField::NumLines(double a_numLines)
+	{
+		SetNumber("numLines", a_numLines);
+	}
+
+
+	bool TextField::TopmostLevel() const
+	{
+		return GetBoolean("topmostLevel");
+	}
+
+
+	void TextField::TopmostLevel(bool a_topmostLevel)
+	{
+		SetBoolean("topmostLevel", a_topmostLevel);
+	}
+
+
+	double TextField::InactiveSelectionBkgColor() const
+	{
+		return GetNumber("inactiveSelectionBkgColor");
+	}
+
+
+	void TextField::InactiveSelectionBkgColor(double a_inactiveSelectionBkgColor)
+	{
+		SetNumber("inactiveSelectionBkgColor", a_inactiveSelectionBkgColor);
+	}
+
+
+	bool TextField::AlwaysShowSelection() const
+	{
+		return GetBoolean("alwaysShowSelection");
+	}
+
+
+	void TextField::AlwaysShowSelection(bool a_alwaysShowSelection)
+	{
+		SetBoolean("alwaysShowSelection", a_alwaysShowSelection);
+	}
+
+
+	bool TextField::NoAutoSelection() const
+	{
+		return GetBoolean("noAutoSelection");
+	}
+
+
+	void TextField::NoAutoSelection(bool a_noAutoSelection)
+	{
+		SetBoolean("noAutoSelection", a_noAutoSelection);
+	}
+
+
+	double TextField::SelectionBeginIndex() const
+	{
+		return GetNumber("selectionBeginIndex");
+	}
+
+
+	void TextField::SelectionBeginIndex(double a_selectionBeginIndex)
+	{
+		SetNumber("selectionBeginIndex", a_selectionBeginIndex);
+	}
+
+
+	double TextField::SelectionEndIndex() const
+	{
+		return GetNumber("selectionEndIndex");
+	}
+
+
+	void TextField::SelectionEndIndex(double a_selectionEndIndex)
+	{
+		SetNumber("selectionEndIndex", a_selectionEndIndex);
+	}
+
+
+	double TextField::SelectionBkgColor() const
+	{
+		return GetNumber("selectionBkgColor");
+	}
+
+
+	void TextField::SelectionBkgColor(double a_selectionBkgColor)
+	{
+		SetNumber("selectionBkgColor", a_selectionBkgColor);
+	}
+
+
+	double TextField::SelectionTextColor() const
+	{
+		return GetNumber("selectionTextColor");
+	}
+
+
+	void TextField::SelectionTextColor(double a_selectionTextColor)
+	{
+		SetNumber("selectionTextColor", a_selectionTextColor);
+	}
+
+
+	bool TextField::UseRichTextClipboard() const
+	{
+		return GetBoolean("useRichTextClipboard");
+	}
+
+
+	void TextField::UseRichTextClipboard(bool a_useRichTextClipboard)
+	{
+		SetBoolean("useRichTextClipboard", a_useRichTextClipboard);
+	}
+
+
+	double TextField::InactiveSelectionTextColor() const
+	{
+		return GetNumber("inactiveSelectionTextColor");
+	}
+
+
+	void TextField::InactiveSelectionTextColor(double a_inactiveSelectionTextColor)
+	{
+		SetNumber("inactiveSelectionTextColor", a_inactiveSelectionTextColor);
+	}
+
+
+	double TextField::FontScaleFactor() const
+	{
+		return GetNumber("fontScaleFactor");
+	}
+
+
+	void TextField::FontScaleFactor(double a_fontScaleFactor)
+	{
+		SetNumber("fontScaleFactor", a_fontScaleFactor);
+	}
+
+
+	std::string_view TextField::TextAutoSize() const
+	{
+		return GetString("textAutoSize");
+	}
+
+
+	void TextField::TextAutoSize(std::string_view a_textAutoSize)
+	{
+		SetString("textAutoSize", a_textAutoSize);
+	}
+
+
+	std::string_view TextField::VerticalAlign() const
+	{
+		return GetString("verticalAlign");
+	}
+
+
+	void TextField::VerticalAlign(std::string_view a_verticalAlign)
+	{
+		SetString("verticalAlign", a_verticalAlign);
+	}
+
+
+	std::string_view TextField::VerticalAutoSize() const
+	{
+		return GetString("verticalAutoSize");
+	}
+
+
+	void TextField::VerticalAutoSize(std::string_view a_verticalAutoSize)
+	{
+		SetString("verticalAutoSize", a_verticalAutoSize);
+	}
+
+
+	void TextField::AppendText(std::string_view a_newText)
+	{
+		enum
+		{
+			kNewText,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kNewText] = a_newText;
+		assert(args[kNewText].IsString());
+
+		auto success = _instance.Invoke("appendText", 0, args, kNumArgs);
+		assert(success);
+	}
+
+
+	void TextField::AppendHtml(std::string_view a_newHtml)
+	{
+		enum
+		{
+			kNewHtml,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kNewHtml] = a_newHtml;
+		assert(args[kNewHtml].IsString());
+
+		auto success = _instance.Invoke("appendHtml", 0, args, kNumArgs);
+		assert(success);
+	}
+
+
+	double TextField::GetCharIndexAtPoint(double a_x, double a_y)
+	{
+		enum
+		{
+			kX,
+			kY,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kX] = a_x;
+		assert(args[kX].IsNumber());
+
+		args[kY] = a_y;
+		assert(args[kY].IsNumber());
+
+		RE::GFxValue number;
+		auto success = _instance.Invoke("getCharIndexAtPoint", &number, args, kNumArgs);
+		assert(success);
+
+		return number.GetNumber();
+	}
+
+
+	double TextField::GetFirstCharInParagraph(double a_charIndex)
+	{
+		enum
+		{
+			kCharIndex,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kCharIndex] = a_charIndex;
+		assert(args[kCharIndex].IsNumber());
+
+		RE::GFxValue number;
+		auto success = _instance.Invoke("getFirstCharInParagraph", &number, args, kNumArgs);
+		assert(success);
+
+		return number.GetNumber();
+	}
+
+
+	double TextField::GetLineIndexAtPoint(double a_x, double a_y)
+	{
+		enum
+		{
+			kX,
+			kY,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kX] = a_x;
+		assert(args[kX].IsNumber());
+
+		args[kY] = a_y;
+		assert(args[kY].IsNumber());
+
+		RE::GFxValue number;
+		auto success = _instance.Invoke("getLineIndexAtPoint", &number, args, kNumArgs);
+		assert(success);
+
+		return number.GetNumber();
+	}
+
+
+	double TextField::GetLineLength(double a_lineIndex)
+	{
+		enum
+		{
+			kLineIndex,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kLineIndex] = a_lineIndex;
+		assert(args[kLineIndex].IsNumber());
+
+		RE::GFxValue number;
+		auto success = _instance.Invoke("getLineLength", &number, args, kNumArgs);
+		assert(success);
+
+		return number.GetNumber();
+	}
+
+
+	Object TextField::GetLineMetrics(double a_lineIndex)
+	{
+		enum
+		{
+			kLineIndex,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kLineIndex] = a_lineIndex;
+		assert(args[kLineIndex].IsNumber());
+
+		RE::GFxValue object;
+		auto success = _instance.Invoke("getLineMetrics", &object, args, kNumArgs);
+		assert(success);
+
+		return Object(object);
+	}
+
+
+	double TextField::GetLineOffset(double a_lineIndex)
+	{
+		enum
+		{
+			kLineIndex,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kLineIndex] = a_lineIndex;
+		assert(args[kLineIndex].IsNumber());
+
+		RE::GFxValue number;
+		auto success = _instance.Invoke("getLineOffset", &number, args, kNumArgs);
+		assert(success);
+
+		return number.GetNumber();
+	}
+
+
+	std::string_view TextField::GetLineText(double a_lineIndex)
+	{
+		enum
+		{
+			kLineIndex,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kLineIndex] = a_lineIndex;
+		assert(args[kLineIndex].IsNumber());
+
+		RE::GFxValue str;
+		auto success = _instance.Invoke("getLineText", &str, args, kNumArgs);
+		assert(success);
+
+		return str.GetString();
+	}
+
+
+	void TextField::CopyToClipboard(bool a_richClipboard, double a_startIndex, double a_endIndex)
+	{
+		enum
+		{
+			kRichClipboard,
+			kStartIndex,
+			kEndIndex,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kRichClipboard] = a_richClipboard;
+		assert(args[kRichClipboard].IsBool());
+
+		args[kStartIndex] = a_startIndex;
+		assert(args[kStartIndex].IsNumber());
+
+		args[kEndIndex] = a_endIndex;
+		assert(args[kEndIndex].IsNumber());
+
+		auto success = _instance.Invoke("copyToClipboard", 0, args, kNumArgs);
+		assert(success);
+	}
+
+
+	void TextField::CutToClipboard(bool a_richClipboard, double a_startIndex, double a_endIndex)
+	{
+		enum
+		{
+			kRichClipboard,
+			kStartIndex,
+			kEndIndex,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kRichClipboard] = a_richClipboard;
+		assert(args[kRichClipboard].IsBool());
+
+		args[kStartIndex] = a_startIndex;
+		assert(args[kStartIndex].IsNumber());
+
+		args[kEndIndex] = a_endIndex;
+		assert(args[kEndIndex].IsNumber());
+
+		auto success = _instance.Invoke("cutToClipboard", 0, args, kNumArgs);
+		assert(success);
+	}
+
+
+	void TextField::PasteFromClipboard(bool a_richClipboard, double a_startIndex, double a_endIndex)
+	{
+		enum
+		{
+			kRichClipboard,
+			kStartIndex,
+			kEndIndex,
+			kNumArgs
+		};
+
+		RE::GFxValue args[kNumArgs];
+
+		args[kRichClipboard] = a_richClipboard;
+		assert(args[kRichClipboard].IsBool());
+
+		args[kStartIndex] = a_startIndex;
+		assert(args[kStartIndex].IsNumber());
+
+		args[kEndIndex] = a_endIndex;
+		assert(args[kEndIndex].IsNumber());
+
+		auto success = _instance.Invoke("pasteFromClipboard", 0, args, kNumArgs);
+		assert(success);
 	}
 }

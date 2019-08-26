@@ -18,12 +18,16 @@ namespace CLIK
 				ScrollingList();
 				ScrollingList(const ScrollingList& a_rhs);
 				ScrollingList(ScrollingList&& a_rhs);
+				ScrollingList(const CoreList& a_rhs);
+				ScrollingList(CoreList&& a_rhs);
 				explicit ScrollingList(const RE::GFxValue& a_val);
 				explicit ScrollingList(RE::GFxValue&& a_val);
 				~ScrollingList();
 
 				ScrollingList& operator=(const ScrollingList& a_rhs);
 				ScrollingList& operator=(ScrollingList&& a_rhs);
+				ScrollingList& operator=(const CoreList& a_rhs);
+				ScrollingList& operator=(CoreList&& a_rhs);
 				ScrollingList& operator=(const RE::GFxValue& a_rhs);
 				ScrollingList& operator=(RE::GFxValue&& a_rhs);
 
@@ -53,7 +57,7 @@ namespace CLIK
 
 				double AvailableWidth() const;
 
-				std::string ToString();
+				std::string_view ToString();
 			};
 		}
 	}

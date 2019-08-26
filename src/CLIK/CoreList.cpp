@@ -15,12 +15,22 @@ namespace CLIK
 
 
 			CoreList::CoreList(const CoreList& a_rhs) :
-				super(a_rhs._instance)
+				super(a_rhs)
 			{}
 
 
 			CoreList::CoreList(CoreList&& a_rhs) :
-				super(std::move(a_rhs._instance))
+				super(std::move(a_rhs))
+			{}
+
+
+			CoreList::CoreList(const Core::UIComponent& a_rhs) :
+				super(a_rhs)
+			{}
+
+
+			CoreList::CoreList(Core::UIComponent&& a_rhs) :
+				super(std::move(a_rhs))
 			{}
 
 
@@ -40,14 +50,28 @@ namespace CLIK
 
 			CoreList& CoreList::operator=(const CoreList& a_rhs)
 			{
-				_instance = a_rhs._instance;
+				super::operator=(a_rhs);
 				return *this;
 			}
 
 
 			CoreList& CoreList::operator=(CoreList&& a_rhs)
 			{
-				_instance = std::move(a_rhs._instance);
+				super::operator=(std::move(a_rhs));
+				return *this;
+			}
+
+
+			CoreList& CoreList::operator=(const Core::UIComponent& a_rhs)
+			{
+				super::operator=(a_rhs);
+				return *this;
+			}
+
+
+			CoreList& CoreList::operator=(Core::UIComponent&& a_rhs)
+			{
+				super::operator=(std::move(a_rhs));
 				return *this;
 			}
 
@@ -66,13 +90,13 @@ namespace CLIK
 			}
 
 
-			std::string CoreList::ItemRenderer() const
+			std::string_view CoreList::ItemRenderer() const
 			{
 				return GetString("itemRenderer");
 			}
 
 
-			void CoreList::ItemRenderer(const char* a_itemRenderer)
+			void CoreList::ItemRenderer(std::string_view a_itemRenderer)
 			{
 				SetString("itemRenderer", a_itemRenderer);
 			}
@@ -120,19 +144,19 @@ namespace CLIK
 			}
 
 
-			std::string CoreList::LabelField() const
+			std::string_view CoreList::LabelField() const
 			{
 				return GetString("labelField");
 			}
 
 
-			void CoreList::LabelField(const char* a_labelField)
+			void CoreList::LabelField(std::string_view a_labelField)
 			{
 				SetString("labelField", a_labelField);
 			}
 
 
-			std::string CoreList::ItemToLabel(Object& a_item)
+			std::string_view CoreList::ItemToLabel(Object& a_item)
 			{
 				enum
 				{
@@ -190,19 +214,19 @@ namespace CLIK
 			}
 
 
-			std::string CoreList::RendererInstanceName() const
+			std::string_view CoreList::RendererInstanceName() const
 			{
 				return GetString("rendererInstanceName");
 			}
 
 
-			void CoreList::RendererInstanceName(const char* a_rendererInstanceName)
+			void CoreList::RendererInstanceName(std::string_view a_rendererInstanceName)
 			{
 				SetString("rendererInstanceName", a_rendererInstanceName);
 			}
 
 
-			std::string CoreList::ToString()
+			std::string_view CoreList::ToString()
 			{
 				RE::GFxValue str;
 				auto success = _instance.Invoke("toString", &str);

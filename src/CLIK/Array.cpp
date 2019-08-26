@@ -9,12 +9,22 @@ namespace CLIK
 
 
 	Array::Array(const Array& a_rhs) :
-		super(a_rhs._instance)
+		super(a_rhs)
 	{}
 
 
 	Array::Array(Array&& a_rhs) :
-		super(std::move(a_rhs._instance))
+		super(std::move(a_rhs))
+	{}
+
+
+	Array::Array(const Object& a_rhs) :
+		super(a_rhs)
+	{}
+
+
+	Array::Array(Object&& a_rhs) :
+		super(std::move(a_rhs))
 	{}
 
 
@@ -54,14 +64,28 @@ namespace CLIK
 
 	Array& Array::operator=(const Array& a_rhs)
 	{
-		_instance = a_rhs._instance;
+		super::operator=(a_rhs);
 		return *this;
 	}
 
 
 	Array& Array::operator=(Array&& a_rhs)
 	{
-		_instance = std::move(a_rhs._instance);
+		super::operator=(std::move(a_rhs));
+		return *this;
+	}
+
+
+	Array& Array::operator=(const Object& a_rhs)
+	{
+		super::operator=(a_rhs);
+		return *this;
+	}
+
+
+	Array& Array::operator=(Object&& a_rhs)
+	{
+		super::operator=(std::move(a_rhs));
 		return *this;
 	}
 
@@ -121,7 +145,7 @@ namespace CLIK
 	}
 
 
-	std::string Array::Join(std::optional<const char*> a_delimiter)
+	std::string_view Array::Join(std::optional<std::string_view> a_delimiter)
 	{
 		RE::GFxValue str;
 

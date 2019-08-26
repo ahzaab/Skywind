@@ -25,30 +25,44 @@ class GlobalListener extends MovieClip
 	{
 		var classes: ScrollingList = _root.classes;
 		if (classes != undefined) {
-			classes.addEventListener(EventTypes.ITEM_PRESS, this, "handleClassPress");
+			classes.addEventListener(EventTypes.ITEM_PRESS, this, "handleClassesPress");
 		} else {
 			log("could not get classes");
 		}
 
 		_trees = _root.trees;
 		if (_trees != undefined) {
-			_trees.addEventListener(EventTypes.ITEM_PRESS, this, "handleTreePress");
+			_trees.addEventListener(EventTypes.ITEM_PRESS, this, "handleTreesPress");
 		} else {
 			log("could not get trees");
 		}
 
 		_perks = _root.perks;
 		if (_perks != undefined) {
-			_perks.addEventListener(EventTypes.ITEM_PRESS, this, "handlePerkPress");
+			_perks.addEventListener(EventTypes.ITEM_PRESS, this, "handlePerksPress");
 		} else {
 			log("could not get perks");
 		}
 
 		_ranks = _root.ranks;
 		if (_ranks != undefined) {
-			_ranks.addEventListener(EventTypes.ITEM_PRESS, this, "handleRankPress");
+			_ranks.addEventListener(EventTypes.ITEM_PRESS, this, "handleRanksPress");
 		} else {
 			log("could not get ranks");
+		}
+
+		var requisites: ScrollingList = _root.requisites;
+		if (requisites != undefined) {
+			requisites.addEventListener(EventTypes.ITEM_PRESS, this, "handleRequisitesPress");
+		} else {
+			log("could not get requisites");
+		}
+
+		var unlocks: ScrollingList = _root.unlocks;
+		if (unlocks != undefined) {
+			unlocks.addEventListener(EventTypes.ITEM_PRESS, this, "handleUnlocksPress");
+		} else {
+			log("could not get unlocks");
 		}
 
 		var unlock: Button = _root.unlock;
@@ -62,32 +76,48 @@ class GlobalListener extends MovieClip
 
 	/* PRIVATE FUNCTIONS */
 
-	private function handleClassPress(a_event: Object): Void
+	private function handleClassesPress(a_event: Object): Void
 	{
 		var index: Number = a_event.index;
 		GameDelegate.call("OnClassPress", [index]);
 	}
 
 
-	private function handleTreePress(a_event: Object): Void
+	private function handleTreesPress(a_event: Object): Void
 	{
 		var index: Number = a_event.index;
 		GameDelegate.call("OnTreePress", [index]);
 	}
 
 
-	private function handlePerkPress(a_event: Object): Void
+	private function handlePerksPress(a_event: Object): Void
 	{
 		var index: Number = a_event.index;
 		GameDelegate.call("OnPerkPress", [index]);
 	}
 
 
-	private function handleRankPress(a_event: Object): Void
+	private function handleRanksPress(a_event: Object): Void
 	{
 		var rankIndex: Number = a_event.index;
 		var treeIndex: Number = _trees.selectedIndex;
 		GameDelegate.call("OnRankPress", [rankIndex, treeIndex]);
+	}
+
+
+	private function handleRequisitesPress(a_event: Object): Void
+	{
+		var requisiteIndex: Number = a_event.index;
+		var treeIndex: Number = _trees.selectedIndex;
+		GameDelegate.call("OnRequisitePress", [requisiteIndex, treeIndex]);
+	}
+
+
+	private function handleUnlocksPress(a_event: Object): Void
+	{
+		var unlockIndex: Number = a_event.index;
+		var treeIndex: Number = _trees.selectedIndex;
+		GameDelegate.call("OnUnlockPress", [unlockIndex, treeIndex]);
 	}
 
 

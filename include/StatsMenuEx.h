@@ -84,6 +84,21 @@ namespace Scaleform
 		};
 
 
+		struct Stats
+		{
+		public:
+			void Update();
+
+			CLIK::TextField perkPoints;
+			CLIK::TextField magicka;
+			CLIK::TextField health;
+			CLIK::TextField stamina;
+
+		private:
+			std::string BuildStatString(RE::ActorValue a_av);
+		};
+
+
 		struct Tree
 		{
 			std::string text;
@@ -101,7 +116,7 @@ namespace Scaleform
 		};
 
 
-		struct Rank
+		struct TextPerk
 		{
 			std::string text;
 			BGSPerkID perkID;
@@ -137,23 +152,28 @@ namespace Scaleform
 		static void OnTreePress(const RE::FxDelegateArgs& a_params);
 		static void OnPerkPress(const RE::FxDelegateArgs& a_params);
 		static void OnRankPress(const RE::FxDelegateArgs& a_params);
+		static void OnRequisitePress(const RE::FxDelegateArgs& a_params);
+		static void OnUnlockPress(const RE::FxDelegateArgs& a_params);
 		static void UnlockPerk(const RE::FxDelegateArgs& a_params);
 
 		void OnMenuOpen();
 		void OnMenuClose();
 
 		void SetClasses();
-		void SetLeads(std::size_t a_rankIdx, std::size_t a_treeIdx);
 		void UnlockPerk(std::size_t a_rankIdx, std::size_t a_perkIdx, std::size_t a_treeIdx);
 
 		void OnClassPress(std::size_t a_classIdx);
 		void OnTreePress(std::size_t a_treeIdx);
 		void OnPerkPress(std::size_t a_perkIdx);
 		void OnRankPress(std::size_t a_rankIdx, std::size_t a_treeIdx);
+		void OnRequisitePress(std::size_t a_requisiteIdx, std::size_t a_treeIdx);
+		void OnUnlockPress(std::size_t a_unlockIdx, std::size_t a_treeIdx);
+		void OnLeadPress(std::vector<TextPerk>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx);
 
 		void UpdateTrees(std::size_t a_classIdx);
 		void UpdatePerks(std::size_t a_treeIdx);
 		void UpdateRanks(std::size_t a_perkIdx);
+		void UpdateLeads(std::size_t a_rankIdx, std::size_t a_treeIdx);
 
 		void InvalidateTrees();
 		void InvalidatePerks();
@@ -172,10 +192,13 @@ namespace Scaleform
 		CLIK::GFx::Controls::ScrollingList _perks;
 		CLIK::GFx::Controls::ScrollingList _ranks;
 		Description _desc;
+		Stats _stats;
 		ClassMap _classMappings;
 		std::vector<Tree> _treeMappings;
 		std::vector<Perk> _perkMappings;
-		std::vector<Rank> _rankMappings;
+		std::vector<TextPerk> _rankMappings;
+		std::vector<TextPerk> _requisiteMappings;
+		std::vector<TextPerk> _unlockMappings;
 	};
 
 

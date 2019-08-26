@@ -14,6 +14,8 @@ namespace CLIK
 		Array();
 		Array(const Array& a_rhs);
 		Array(Array&& a_rhs);
+		Array(const Object& a_rhs);
+		Array(Object&& a_rhs);
 		explicit Array(RE::GPtr<RE::GFxMovieView>& a_view);
 		explicit Array(RE::GFxMovieView* a_view);
 		explicit Array(const RE::GFxValue& a_val);
@@ -22,6 +24,8 @@ namespace CLIK
 
 		Array& operator=(const Array& a_rhs);
 		Array& operator=(Array&& a_rhs);
+		Array& operator=(const Object& a_rhs);
+		Array& operator=(Object&& a_rhs);
 		Array& operator=(const RE::GFxValue& a_rhs);
 		Array& operator=(RE::GFxValue&& a_rhs);
 
@@ -40,7 +44,7 @@ namespace CLIK
 		// methods
 		Array Concat(std::optional<std::reference_wrapper<Object>> a_value);
 
-		std::string Join(std::optional<const char*> a_delimiter);
+		std::string_view Join(std::optional<std::string_view> a_delimiter);
 
 		Object Pop();
 

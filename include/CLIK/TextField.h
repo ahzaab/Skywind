@@ -1,5 +1,7 @@
 #pragma once
 
+#undef ReplaceText
+
 #include "CLIK/Object.h"
 
 
@@ -14,12 +16,16 @@ namespace CLIK
 		TextField();
 		TextField(const TextField& a_rhs);
 		TextField(TextField&& a_rhs);
+		TextField(const Object& a_rhs);
+		TextField(Object&& a_rhs);
 		explicit TextField(const RE::GFxValue& a_val);
 		explicit TextField(RE::GFxValue&& a_val);
 		~TextField();
 
 		TextField& operator=(const TextField& a_rhs);
 		TextField& operator=(TextField&& a_rhs);
+		TextField& operator=(const Object& a_rhs);
+		TextField& operator=(Object&& a_rhs);
 		TextField& operator=(const RE::GFxValue& a_rhs);
 		TextField& operator=(RE::GFxValue&& a_rhs);
 
@@ -27,8 +33,8 @@ namespace CLIK
 		double Alpha() const;
 		void Alpha(double a_alpha);
 
-		std::string AntiAliasType() const;
-		void AntiAliasType(const char* a_antiAliasType);
+		std::string_view AntiAliasType() const;
+		void AntiAliasType(std::string_view a_antiAliasType);
 
 		Object AutoSize() const;
 		void AutoSize(const Object& a_autoSize);
@@ -56,8 +62,8 @@ namespace CLIK
 		//Array Filters() const;
 		//void Filters(Array& a_filters);
 
-		std::string GridFitType() const;
-		void GridFitType(const char* a_gridFitType);
+		std::string_view GridFitType() const;
+		void GridFitType(std::string_view a_gridFitType);
 
 		double Height() const;
 		void Height(double a_height);
@@ -71,8 +77,8 @@ namespace CLIK
 		bool HTML() const;
 		void HTML(bool a_html);
 
-		std::string HTMLText() const;
-		void HTMLText(const char* a_htmlText);
+		std::string_view HTMLText() const;
+		void HTMLText(std::string_view a_htmlText);
 
 		double Length() const;
 
@@ -91,8 +97,8 @@ namespace CLIK
 		bool Multiline() const;
 		void Multiline(bool a_multiline);
 
-		std::string Name() const;
-		void Name(const char* a_name);
+		std::string_view Name() const;
+		void Name(std::string_view a_name);
 
 		//MovieClip Parent() const;
 		//void Parent(const MovieClip& a_parent);
@@ -100,11 +106,11 @@ namespace CLIK
 		bool Password() const;
 		void Password(bool a_password);
 
-		std::string Quality() const;
-		void Quality(const char* a_quality);
+		std::string_view Quality() const;
+		void Quality(std::string_view a_quality);
 
-		std::string Restrict() const;
-		void Restrict(const char* a_restrict);
+		std::string_view Restrict() const;
+		void Restrict(std::string_view a_restrict);
 
 		double Rotation() const;
 		void Rotation(double a_rotation);
@@ -130,10 +136,10 @@ namespace CLIK
 		double TabIndex() const;
 		void TabIndex(double a_tabIndex);
 
-		std::string Target() const;
+		std::string_view Target() const;
 
-		std::string Text() const;
-		void Text(const char* a_text);
+		std::string_view Text() const;
+		void Text(std::string_view a_text);
 
 		double TextColor() const;
 		void TextColor(double a_textColor);
@@ -147,13 +153,13 @@ namespace CLIK
 		double Thickness() const;
 		void Thickness(double a_thickness);
 
-		std::string Type() const;
-		void Type(const char* a_type);
+		std::string_view Type() const;
+		void Type(std::string_view a_type);
 
-		std::string URL() const;
+		std::string_view URL() const;
 
-		std::string Variable() const;
-		void Variable(const char* a_variable);
+		std::string_view Variable() const;
+		void Variable(std::string_view a_variable);
 
 		bool Visible() const;
 		void Visible(bool a_visible);
@@ -179,5 +185,106 @@ namespace CLIK
 
 		double YScale() const;
 		void YScale(double a_yScale);
+
+		// methods
+		bool AddListener(Object& a_listener);
+
+		double GetDepth();
+
+		//TextFormat GetNewTextFormat();
+		//TextFormat GetTextFormat(std::optional<double> a_beginIndex, std::optional<double> a_endIndex);
+
+		bool RemoveListener(Object& a_listener);
+
+		void RemoveTextField();
+
+		void ReplaceSel(std::string_view a_newText);
+		void ReplaceText(double a_beginIndex, double a_endIndex, std::string_view a_newText);
+
+		//void SetNewTextFormat(TextFormat& a_tf);
+
+		//void SetTextFormat(std::optional<double> a_beginIndex, std::optional<double> a_endIndex, TextFormat& a_textFormat);;
+
+		// gfx properties
+		bool AutoFit() const;
+		void AutoFit(bool a_autoFit);
+
+		double CaretIndex() const;
+		void CaretIndex(double a_caretIndex);
+
+		double FocusGroup() const;
+		void FocusGroup(double a_focusGroup);
+
+		bool HitTestDisable() const;
+		void HitTestDisable(bool a_hitTestDisable);
+
+		bool NoTranslate() const;
+		void NoTranslate(bool a_noTranslate);
+
+		double NumLines() const;
+		void NumLines(double a_numLines);
+
+		bool TopmostLevel() const;
+		void TopmostLevel(bool a_topmostLevel);
+
+		double InactiveSelectionBkgColor() const;
+		void InactiveSelectionBkgColor(double a_inactiveSelectionBkgColor);
+
+		bool AlwaysShowSelection() const;
+		void AlwaysShowSelection(bool a_alwaysShowSelection);
+
+		bool NoAutoSelection() const;
+		void NoAutoSelection(bool a_noAutoSelection);
+
+		double SelectionBeginIndex() const;
+		void SelectionBeginIndex(double a_selectionBeginIndex);
+
+		double SelectionEndIndex() const;
+		void SelectionEndIndex(double a_selectionEndIndex);
+
+		double SelectionBkgColor() const;
+		void SelectionBkgColor(double a_selectionBkgColor);
+
+		double SelectionTextColor() const;
+		void SelectionTextColor(double a_selectionTextColor);
+
+		bool UseRichTextClipboard() const;
+		void UseRichTextClipboard(bool a_useRichTextClipboard);
+
+		double InactiveSelectionTextColor() const;
+		void InactiveSelectionTextColor(double a_inactiveSelectionTextColor);
+
+		double FontScaleFactor() const;
+		void FontScaleFactor(double a_fontScaleFactor);
+
+		std::string_view TextAutoSize() const;
+		void TextAutoSize(std::string_view a_textAutoSize);
+
+		std::string_view VerticalAlign() const;
+		void VerticalAlign(std::string_view a_verticalAlign);
+
+		std::string_view VerticalAutoSize() const;
+		void VerticalAutoSize(std::string_view a_verticalAutoSize);
+
+		// gfx methods
+		void AppendText(std::string_view a_newText);
+		void AppendHtml(std::string_view a_newHtml);
+
+		//Rectangle GetCharBoundaries(double a_charIndex);
+		//Rectangle GetExactCharBoundaries(double a_charIndex);
+
+		double GetCharIndexAtPoint(double a_x, double a_y);
+
+		double GetFirstCharInParagraph(double a_charIndex);
+
+		double GetLineIndexAtPoint(double a_x, double a_y);
+		double GetLineLength(double a_lineIndex);
+		Object GetLineMetrics(double a_lineIndex);
+		double GetLineOffset(double a_lineIndex);
+		std::string_view GetLineText(double a_lineIndex);
+
+		void CopyToClipboard(bool a_richClipboard, double a_startIndex, double a_endIndex);
+		void CutToClipboard(bool a_richClipboard, double a_startIndex, double a_endIndex);
+		void PasteFromClipboard(bool a_richClipboard, double a_startIndex, double a_endIndex);
 	};
 }

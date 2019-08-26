@@ -13,12 +13,22 @@ namespace CLIK
 
 
 			Button::Button(const Button& a_rhs) :
-				super(a_rhs._instance)
+				super(a_rhs)
 			{}
 
 
 			Button::Button(Button&& a_rhs) :
-				super(std::move(a_rhs._instance))
+				super(std::move(a_rhs))
+			{}
+
+
+			Button::Button(const Core::UIComponent& a_rhs) :
+				super(a_rhs)
+			{}
+
+
+			Button::Button(Core::UIComponent&& a_rhs) :
+				super(std::move(a_rhs))
 			{}
 
 
@@ -38,14 +48,28 @@ namespace CLIK
 
 			Button& Button::operator=(const Button& a_rhs)
 			{
-				_instance = a_rhs._instance;
+				super::operator=(a_rhs);
 				return *this;
 			}
 
 
 			Button& Button::operator=(Button&& a_rhs)
 			{
-				_instance = std::move(a_rhs._instance);
+				super::operator=(std::move(a_rhs));
+				return *this;
+			}
+
+
+			Button& Button::operator=(const Core::UIComponent& a_rhs)
+			{
+				super::operator=(a_rhs);
+				return *this;
+			}
+
+
+			Button& Button::operator=(Core::UIComponent&& a_rhs)
+			{
+				super::operator=(std::move(a_rhs));
 				return *this;
 			}
 
@@ -64,25 +88,25 @@ namespace CLIK
 			}
 
 
-			std::string Button::LabelID() const
+			std::string_view Button::LabelID() const
 			{
 				return GetString("labelID");
 			}
 
 
-			void Button::LabelID(const char* a_labelID)
+			void Button::LabelID(std::string_view a_labelID)
 			{
 				SetString("labelID", a_labelID);
 			}
 
 
-			std::string Button::Label() const
+			std::string_view Button::Label() const
 			{
 				return GetString("label");
 			}
 
 
-			void Button::Label(const char* a_label)
+			void Button::Label(std::string_view a_label)
 			{
 				SetString("label", a_label);
 			}
@@ -112,13 +136,13 @@ namespace CLIK
 			}
 
 
-			std::string Button::GroupName() const
+			std::string_view Button::GroupName() const
 			{
 				return GetString("groupName");
 			}
 
 
-			void Button::GroupName(const char* a_groupName)
+			void Button::GroupName(std::string_view a_groupName)
 			{
 				SetString("groupName", a_groupName);
 			}
@@ -160,13 +184,13 @@ namespace CLIK
 			}
 
 
-			std::string Button::AutoSize() const
+			std::string_view Button::AutoSize() const
 			{
 				return GetString("autoSize");
 			}
 
 
-			void Button::AutoSize(const char* a_autoSize)
+			void Button::AutoSize(std::string_view a_autoSize)
 			{
 				SetString("autoSize", a_autoSize);
 			}
@@ -194,7 +218,7 @@ namespace CLIK
 			}
 
 
-			std::string Button::ToString()
+			std::string_view Button::ToString()
 			{
 				RE::GFxValue str;
 				auto success = _instance.Invoke("toString", &str);

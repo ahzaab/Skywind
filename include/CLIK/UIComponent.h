@@ -18,12 +18,16 @@ namespace CLIK
 				UIComponent();
 				UIComponent(const UIComponent& a_rhs);
 				UIComponent(UIComponent&& a_rhs);
+				UIComponent(const MovieClip& a_rhs);
+				UIComponent(MovieClip&& a_rhs);
 				explicit UIComponent(const RE::GFxValue& a_val);
 				explicit UIComponent(RE::GFxValue&& a_val);
 				~UIComponent();
 
 				UIComponent& operator=(const UIComponent& a_rhs);
 				UIComponent& operator=(UIComponent&& a_rhs);
+				UIComponent& operator=(const MovieClip& a_rhs);
+				UIComponent& operator=(MovieClip&& a_rhs);
 				UIComponent& operator=(const RE::GFxValue& a_rhs);
 				UIComponent& operator=(RE::GFxValue&& a_rhs);
 
@@ -52,7 +56,7 @@ namespace CLIK
 				void Invalidate();
 				void ValidateNow();
 
-				std::string ToString();
+				std::string_view ToString();
 
 				void DispatchEventToGame(Object& a_event);
 			};

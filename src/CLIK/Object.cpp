@@ -28,12 +28,12 @@ namespace CLIK
 	{}
 
 
-	Object::Object(const char* a_val) :
+	Object::Object(std::string_view a_val) :
 		_instance(a_val)
 	{}
 
 
-	Object::Object(const wchar_t* a_val) :
+	Object::Object(std::wstring_view a_val) :
 		_instance(a_val)
 	{}
 
@@ -84,14 +84,14 @@ namespace CLIK
 	}
 
 
-	Object& Object::operator=(const char* a_val)
+	Object& Object::operator=(std::string_view a_val)
 	{
 		_instance = a_val;
 		return *this;
 	}
 
 
-	Object& Object::operator=(const wchar_t* a_val)
+	Object& Object::operator=(std::wstring_view a_val)
 	{
 		_instance = a_val;
 		return *this;
@@ -144,7 +144,7 @@ namespace CLIK
 	}
 
 
-	bool Object::HasOwnProperty(const char* a_name)
+	bool Object::HasOwnProperty(std::string_view a_name)
 	{
 		enum
 		{
@@ -165,7 +165,7 @@ namespace CLIK
 	}
 
 
-	bool Object::IsPropertyEnumerable(const char* a_name)
+	bool Object::IsPropertyEnumerable(std::string_view a_name)
 	{
 		enum
 		{
@@ -207,7 +207,7 @@ namespace CLIK
 	}
 
 
-	bool Object::Unwatch(const char* a_name)
+	bool Object::Unwatch(std::string_view a_name)
 	{
 		enum
 		{
@@ -273,7 +273,7 @@ namespace CLIK
 	}
 
 
-	std::string Object::GetString(const char* a_path) const
+	std::string_view Object::GetString(const char* a_path) const
 	{
 		RE::GFxValue str;
 		auto success = _instance.GetMember(a_path, &str);
@@ -305,7 +305,7 @@ namespace CLIK
 	}
 
 
-	void Object::SetString(const char* a_path, const char* a_string)
+	void Object::SetString(const char* a_path, std::string_view a_string)
 	{
 		RE::GFxValue str(a_string);
 		auto success = _instance.SetMember(a_path, str);

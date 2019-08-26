@@ -13,12 +13,22 @@ namespace CLIK
 
 
 			ScrollingList::ScrollingList(const ScrollingList& a_rhs) :
-				super(a_rhs._instance)
+				super(a_rhs)
 			{}
 
 
 			ScrollingList::ScrollingList(ScrollingList&& a_rhs) :
-				super(std::move(a_rhs._instance))
+				super(std::move(a_rhs))
+			{}
+
+
+			ScrollingList::ScrollingList(const CoreList& a_rhs) :
+				super(a_rhs)
+			{}
+
+
+			ScrollingList::ScrollingList(CoreList&& a_rhs) :
+				super(std::move(a_rhs))
 			{}
 
 
@@ -38,14 +48,28 @@ namespace CLIK
 
 			ScrollingList& ScrollingList::operator=(const ScrollingList& a_rhs)
 			{
-				_instance = a_rhs._instance;
+				super::operator=(a_rhs);
 				return *this;
 			}
 
 
 			ScrollingList& ScrollingList::operator=(ScrollingList&& a_rhs)
 			{
-				_instance = std::move(a_rhs._instance);
+				super::operator=(std::move(a_rhs));
+				return *this;
+			}
+
+
+			ScrollingList& ScrollingList::operator=(const CoreList& a_rhs)
+			{
+				super::operator=(a_rhs);
+				return *this;
+			}
+
+
+			ScrollingList& ScrollingList::operator=(CoreList&& a_rhs)
+			{
+				super::operator=(std::move(a_rhs));
 				return *this;
 			}
 
@@ -167,7 +191,7 @@ namespace CLIK
 			}
 
 
-			std::string ScrollingList::ToString()
+			std::string_view ScrollingList::ToString()
 			{
 				RE::GFxValue str;
 				auto success = _instance.Invoke("toString", &str);

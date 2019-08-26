@@ -15,12 +15,22 @@ namespace CLIK
 
 
 			UIComponent::UIComponent(const UIComponent& a_rhs) :
-				super(a_rhs._instance)
+				super(a_rhs)
 			{}
 
 
 			UIComponent::UIComponent(UIComponent&& a_rhs) :
-				super(std::move(a_rhs._instance))
+				super(std::move(a_rhs))
+			{}
+
+
+			UIComponent::UIComponent(const MovieClip& a_rhs) :
+				super(a_rhs)
+			{}
+
+
+			UIComponent::UIComponent(MovieClip&& a_rhs) :
+				super(std::move(a_rhs))
 			{}
 
 
@@ -40,14 +50,28 @@ namespace CLIK
 
 			UIComponent& UIComponent::operator=(const UIComponent& a_rhs)
 			{
-				_instance = a_rhs._instance;
+				super::operator=(a_rhs);
 				return *this;
 			}
 
 
 			UIComponent& UIComponent::operator=(UIComponent&& a_rhs)
 			{
-				_instance = std::move(a_rhs._instance);
+				super::operator=(std::move(a_rhs));
+				return *this;
+			}
+
+
+			UIComponent& UIComponent::operator=(const MovieClip& a_rhs)
+			{
+				super::operator=(a_rhs);
+				return *this;
+			}
+
+
+			UIComponent& UIComponent::operator=(MovieClip&& a_rhs)
+			{
+				super::operator=(std::move(a_rhs));
 				return *this;
 			}
 
@@ -174,7 +198,7 @@ namespace CLIK
 			}
 
 
-			std::string UIComponent::ToString()
+			std::string_view UIComponent::ToString()
 			{
 				RE::GFxValue str;
 				auto success = _instance.Invoke("toString", &str);

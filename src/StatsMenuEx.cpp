@@ -76,6 +76,55 @@ namespace Scaleform
 			unlocks.Visible(a_visible);
 			unlock.Visible(a_visible);
 		}
+
+
+		void Stats::Update()
+		{
+			auto player = RE::PlayerCharacter::GetSingleton();
+			std::string text;
+
+			text = "Perk Points: ";
+			text += std::to_string(player->numPerkPoints);
+			perkPoints.HTMLText(text);
+			
+			text = "Magicka: ";
+			text += BuildStatString(RE::ActorValue::kMagicka);
+			magicka.HTMLText(text);
+
+			text = "Health: ";
+			text += BuildStatString(RE::ActorValue::kHealth);
+			health.HTMLText(text);
+
+			text = "Stamina: ";
+			text += BuildStatString(RE::ActorValue::kStamina);
+			stamina.HTMLText(text);
+		}
+
+
+		std::string Stats::BuildStatString(RE::ActorValue a_av)
+		{
+			auto player = RE::PlayerCharacter::GetSingleton();
+			auto fBase = player->GetActorValueBase(a_av);
+			auto fCur = player->GetActorValueMaximum(a_av);
+
+			auto base = static_cast<SInt32>(fBase);
+			auto mod = static_cast<SInt32>(fCur - fBase);
+
+			std::string text;
+			text = std::to_string(base);
+			if (mod != 0) {
+				text += " (";
+				if (mod > 0) {
+					text += '+';
+				} else {
+					text += '-';
+				}
+				text += std::to_string(std::abs(mod));
+				text += ')';
+			}
+
+			return text;
+		}
 	}
 
 
@@ -85,10 +134,13 @@ namespace Scaleform
 		_perks(),
 		_ranks(),
 		_desc(),
+		_stats(),
 		_classMappings(),
 		_treeMappings(),
 		_perkMappings(),
-		_rankMappings()
+		_rankMappings(),
+		_requisiteMappings(),
+		_unlockMappings()
 	{
 		using ScaleModeType = RE::GFxMovieView::ScaleModeType;
 		using Context = RE::InputMappingManager::Context;
@@ -120,6 +172,8 @@ namespace Scaleform
 		a_processor->Process("OnTreePress", OnTreePress);
 		a_processor->Process("OnPerkPress", OnPerkPress);
 		a_processor->Process("OnRankPress", OnRankPress);
+		a_processor->Process("OnRequisitePress", OnRequisitePress);
+		a_processor->Process("OnUnlockPress", OnUnlockPress);
 		a_processor->Process("UnlockPerk", UnlockPerk);
 	}
 
@@ -230,6 +284,32 @@ namespace Scaleform
 	}
 
 
+	void StatsMenuEx::OnRequisitePress(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 2);
+		assert(a_params[0].IsNumber());
+		assert(a_params[1].IsNumber());
+
+		auto menu = static_cast<StatsMenuEx*>(a_params.GetHandler());
+		auto requisiteIndex = a_params[0].GetUInt();
+		auto treeIndex = a_params[1].GetUInt();
+		menu->OnRequisitePress(requisiteIndex, treeIndex);
+	}
+
+
+	void StatsMenuEx::OnUnlockPress(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 2);
+		assert(a_params[0].IsNumber());
+		assert(a_params[1].IsNumber());
+
+		auto menu = static_cast<StatsMenuEx*>(a_params.GetHandler());
+		auto unlockIndex = a_params[0].GetUInt();
+		auto treeIndex = a_params[1].GetUInt();
+		menu->OnUnlockPress(unlockIndex, treeIndex);
+	}
+
+
 	void StatsMenuEx::UnlockPerk(const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 3);
@@ -262,6 +342,10 @@ namespace Scaleform
 		toGet.push_back(std::make_pair(&_desc.unlocks.header, "unlocksHeader"));
 		toGet.push_back(std::make_pair(&_desc.unlocks.list, "unlocks"));
 		toGet.push_back(std::make_pair(&_desc.unlock, "unlock"));
+		toGet.push_back(std::make_pair(&_stats.perkPoints, "perkPoints"));
+		toGet.push_back(std::make_pair(&_stats.magicka, "magicka"));
+		toGet.push_back(std::make_pair(&_stats.health, "health"));
+		toGet.push_back(std::make_pair(&_stats.stamina, "stamina"));
 		RE::GFxValue var;
 		for (auto& elem : toGet) {
 			success = view->GetVariable(&var, elem.second.c_str());
@@ -281,6 +365,7 @@ namespace Scaleform
 		_desc.Visible(false);
 
 		_desc.Init();
+		_stats.Update();
 
 		SetClasses();
 	}
@@ -302,73 +387,11 @@ namespace Scaleform
 		CLIK::Array arr(view);
 		CLIK::Object elem;
 		for (auto& name : names) {
-			elem = name.c_str();
+			elem = name;
 			arr.Push(elem);
 		}
 
 		_classes.DataProvider(arr);
-	}
-
-
-	void StatsMenuEx::SetLeads(std::size_t a_rankIdx, std::size_t a_treeIdx)
-	{
-		if (a_rankIdx == 0) {
-			_desc.requisites.list.SelectedIndex(-1);
-			_desc.unlocks.list.SelectedIndex(-1);
-			auto perkIDToFind = _rankMappings[0].perkID;
-			auto av = RE::TESForm::LookupByID<RE::ActorValueInfo>(_treeMappings[a_treeIdx].avInfoID);
-			BFSOnPerkTree(av, [&](RE::BGSSkillPerkTreeNode* a_node) -> bool
-			{
-				if (a_node->perk && a_node->perk->formID == perkIDToFind) {
-					std::string name;
-					CLIK::Object str;
-					bool disabled;
-					RE::BSTArray<RE::BGSSkillPerkTreeNode*>* srcArr = 0;
-					HeaderList* headerList = 0;
-
-					for (std::size_t i = 0; i < 2; ++i) {
-						CLIK::Array dstArr(view);
-
-						switch (i) {
-						case 0:
-							srcArr = &a_node->parents;
-							headerList = &_desc.requisites;
-							break;
-						case 1:
-							srcArr = &a_node->children;
-							headerList = &_desc.unlocks;
-							break;
-						default:
-							assert(false);
-							break;
-						}
-
-						disabled = true;
-						for (auto& node : *srcArr) {
-							if (node->perk && !node->perk->name.empty()) {
-								disabled = false;
-								name = node->perk->name;
-								SanitizeString(name);
-								str = name.c_str();
-								dstArr.Push(str);
-							}
-						}
-
-						headerList->list.DataProvider(dstArr);
-						headerList->list.Disabled(disabled);
-					}
-
-					return false;
-				}
-				return true;
-			});
-		} else {
-			CLIK::Array arr(view);
-			_desc.requisites.list.DataProvider(arr);
-			_desc.requisites.list.Disabled(true);
-			_desc.unlocks.list.DataProvider(arr);
-			_desc.unlocks.list.Disabled(true);
-		}
 	}
 
 
@@ -388,6 +411,7 @@ namespace Scaleform
 
 		auto player = RE::PlayerCharacter::GetSingleton();
 		player->AddPerk(perk);
+		player->numPerkPoints -= 1;
 
 		auto idToFind = _perkMappings[a_perkIdx].perkID;
 		UpdatePerks(a_treeIdx);
@@ -395,7 +419,7 @@ namespace Scaleform
 		CLIK::Array arr(view);
 		CLIK::Object str;
 		for (auto& perk : _perkMappings) {
-			str = perk.text.c_str();
+			str = perk.text;
 			arr.Push(str);
 		}
 
@@ -407,6 +431,8 @@ namespace Scaleform
 				break;
 			}
 		}
+
+		_stats.Update();
 	}
 
 
@@ -418,7 +444,7 @@ namespace Scaleform
 		if (!_treeMappings.empty()) {
 			CLIK::Object str;
 			for (auto& tree : _treeMappings) {
-				str = tree.text.c_str();
+				str = tree.text;
 				arr.Push(str);
 			}
 			_trees.Visible(true);
@@ -439,7 +465,7 @@ namespace Scaleform
 		if (!_perkMappings.empty()) {
 			CLIK::Object str;
 			for (auto& perk : _perkMappings) {
-				str = perk.text.c_str();
+				str = perk.text;
 				arr.Push(str);
 			}
 			_perks.Visible(true);
@@ -460,7 +486,7 @@ namespace Scaleform
 		if (!_rankMappings.empty()) {
 			CLIK::Object str;
 			for (auto& rank : _rankMappings) {
-				str = rank.text.c_str();
+				str = rank.text;
 				arr.Push(str);
 			}
 			_ranks.Visible(true);
@@ -487,11 +513,11 @@ namespace Scaleform
 
 		_desc.Visible(true);
 		_desc.header.Text("Description");
-		_desc.text.Text(desc.c_str());
+		_desc.text.Text(desc);
 		_desc.unlock.Label("Unlock");
 
 		auto player = RE::PlayerCharacter::GetSingleton();
-		bool disabled = player->HasPerk(perk) || !perk->conditions.Run(player, player);
+		bool disabled = player->numPerkPoints == 0 || player->HasPerk(perk) || !perk->conditions.Run(player, player);
 		
 #if 0
 		// this second check might be unnecessary, the vanilla game seems to base perk eligibility on the previous check
@@ -520,7 +546,45 @@ namespace Scaleform
 #endif
 
 		_desc.unlock.Disabled(disabled);
-		SetLeads(a_rankIdx, a_treeIdx);
+		UpdateLeads(a_rankIdx, a_treeIdx);
+	}
+
+
+	void StatsMenuEx::OnRequisitePress(std::size_t a_requisiteIdx, std::size_t a_treeIdx)
+	{
+		OnLeadPress(_requisiteMappings, a_requisiteIdx, a_treeIdx);
+	}
+
+
+	void StatsMenuEx::OnUnlockPress(std::size_t a_unlockIdx, std::size_t a_treeIdx)
+	{
+		OnLeadPress(_unlockMappings, a_unlockIdx, a_treeIdx);
+	}
+
+
+	void StatsMenuEx::OnLeadPress(std::vector<TextPerk>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx)
+	{
+		if (a_leadIdx >= a_lead.size()) {
+			return;
+		}
+
+		auto& lead = a_lead[a_leadIdx];
+		for (std::size_t i = 0; i < _perkMappings.size(); ++i) {
+			if (_perkMappings[i].perkID == lead.perkID) {
+				_perks.SelectedIndex(i);
+				UpdateRanks(i);
+				CLIK::Array arr(view);
+				CLIK::Object str;
+				for (auto& rank : _rankMappings) {
+					str = rank.text;
+					arr.Push(str);
+				}
+				_ranks.DataProvider(arr);
+				_ranks.SelectedIndex(0);
+				OnRankPress(0, a_treeIdx);
+				break;
+			}
+		}
 	}
 
 
@@ -631,6 +695,77 @@ namespace Scaleform
 	}
 
 
+	void StatsMenuEx::UpdateLeads(std::size_t a_rankIdx, std::size_t a_treeIdx)
+	{
+		_requisiteMappings.clear();
+		_unlockMappings.clear();
+
+		if (a_rankIdx == 0) {
+			_desc.requisites.list.SelectedIndex(-1);
+			_desc.unlocks.list.SelectedIndex(-1);
+			auto perkIDToFind = _rankMappings[0].perkID;
+			auto av = RE::TESForm::LookupByID<RE::ActorValueInfo>(_treeMappings[a_treeIdx].avInfoID);
+			BFSOnPerkTree(av, [&](RE::BGSSkillPerkTreeNode* a_node) -> bool
+			{
+				if (a_node->perk && a_node->perk->formID == perkIDToFind) {
+					std::string name;
+					bool disabled;
+					RE::BSTArray<RE::BGSSkillPerkTreeNode*>* srcArr = 0;
+					std::vector<TextPerk>* dstArr = 0;
+					HeaderList* headerList = 0;
+
+					for (std::size_t i = 0; i < 2; ++i) {
+						switch (i) {
+						case 0:
+							srcArr = &a_node->parents;
+							dstArr = &_requisiteMappings;
+							headerList = &_desc.requisites;
+							break;
+						case 1:
+							srcArr = &a_node->children;
+							dstArr = &_unlockMappings;
+							headerList = &_desc.unlocks;
+							break;
+						default:
+							assert(false);
+							break;
+						}
+
+						disabled = true;
+						for (auto& node : *srcArr) {
+							if (node->perk && !node->perk->name.empty()) {
+								disabled = false;
+								name = node->perk->name;
+								SanitizeString(name);
+								dstArr->push_back({ name, node->perk->formID });
+							}
+						}
+
+						CLIK::Array arr(view);
+						CLIK::Object str;
+						for (auto& elem : *dstArr) {
+							str = elem.text;
+							arr.Push(str);
+						}
+
+						headerList->list.DataProvider(arr);
+						headerList->list.Disabled(disabled);
+					}
+
+					return false;
+				}
+				return true;
+			});
+		} else {
+			CLIK::Array arr(view);
+			_desc.requisites.list.DataProvider(arr);
+			_desc.requisites.list.Disabled(true);
+			_desc.unlocks.list.DataProvider(arr);
+			_desc.unlocks.list.Disabled(true);
+		}
+	}
+
+
 	void StatsMenuEx::InvalidateTrees()
 	{
 		_trees.Visible(false);
@@ -679,8 +814,8 @@ namespace Scaleform
 				break;
 			}
 			for (auto& child : node->children) {
-				if (visited.find(child->index) == visited.end()) {
-					visited.insert(child->index);
+				auto result = visited.insert(child->index);
+				if (result.second) {
 					q.push(child);
 				}
 			}
