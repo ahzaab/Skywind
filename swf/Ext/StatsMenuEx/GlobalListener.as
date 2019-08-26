@@ -92,8 +92,9 @@ class GlobalListener extends MovieClip
 
 	private function handlePerksPress(a_event: Object): Void
 	{
-		var index: Number = a_event.index;
-		GameDelegate.call("OnPerkPress", [index]);
+		var perkIndex: Number = a_event.index;
+		var treeIndex: Number = _trees.selectedIndex;
+		GameDelegate.call("OnPerkPress", [perkIndex, treeIndex]);
 	}
 
 

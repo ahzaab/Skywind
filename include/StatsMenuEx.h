@@ -28,7 +28,7 @@ namespace Scaleform
 
 		enum : ActorValueInfoID
 		{
-			kAVOneHanded = 0x0000044C,	// Dragonborn
+			kAVOneHanded = 0x0000044C,
 			kAVTwoHanded = 0x0000044D,
 			kAVMarksman = 0x0000044E,
 			kAVBlock = 0x0000044F,
@@ -47,9 +47,11 @@ namespace Scaleform
 			kAVRestoration = 0x0000045C,
 			kAVEnchanting = 0x0000045D,
 
-			kAVMagickaRateMod = 0x00000646,	// Vampire
+			kAVMagickaRateMod = 0x00000646,
+			kVampireAVID = kAVMagickaRateMod,
 
-			kAVHealRatePowerMod = 0x00000645,	// Werewolf
+			kAVHealRatePowerMod = 0x00000645,
+			kWerewolfAVID = kAVHealRatePowerMod
 		};
 
 
@@ -59,6 +61,13 @@ namespace Scaleform
 			using Base = std::vector<std::pair<std::string, std::vector<std::pair<ActorValueInfoID, RE::ActorValue>>>>;
 
 			ClassMap();
+		};
+
+
+		class Logger : public RE::GFxLog
+		{
+		public:
+			virtual void LogMessageVarg(LogMessageType a_messageType, const char* a_fmt, va_list a_argList) override;
 		};
 
 
@@ -87,7 +96,23 @@ namespace Scaleform
 		struct Stats
 		{
 		public:
+			enum class State
+			{
+				kDefault,
+				kVampire,
+				kWerewolf
+			};
+
+			Stats();
+			~Stats() = default;
+
 			void Update();
+			void SetDefault();
+			void SetVampire();
+			void SetWerewolf();
+			bool IsBeastMode() const;
+			UInt32 GetPerkPoints() const;
+			void DecPerkPoints() const;
 
 			CLIK::TextField perkPoints;
 			CLIK::TextField magicka;
@@ -95,7 +120,9 @@ namespace Scaleform
 			CLIK::TextField stamina;
 
 		private:
-			std::string BuildStatString(RE::ActorValue a_av);
+			std::string BuildStatString(RE::ActorValue a_av) const;
+
+			State _state;
 		};
 
 
@@ -163,13 +190,13 @@ namespace Scaleform
 		void SetClasses();
 		void UnlockPerk(std::size_t a_rankIdx, std::size_t a_perkIdx, std::size_t a_treeIdx);
 
-		void OnClassPress(std::size_t a_classIdx);
-		void OnTreePress(std::size_t a_treeIdx);
-		void OnPerkPress(std::size_t a_perkIdx);
-		void OnRankPress(std::size_t a_rankIdx, std::size_t a_treeIdx);
-		void OnRequisitePress(std::size_t a_requisiteIdx, std::size_t a_treeIdx);
-		void OnUnlockPress(std::size_t a_unlockIdx, std::size_t a_treeIdx);
-		void OnLeadPress(std::vector<TextPerkLevel>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx);
+		bool OnClassPress(std::size_t a_classIdx);
+		bool OnTreePress(std::size_t a_treeIdx);
+		bool OnPerkPress(std::size_t a_perkIdx, std::size_t a_treeIdx);
+		bool OnRankPress(std::size_t a_rankIdx, std::size_t a_treeIdx);
+		bool OnRequisitePress(std::size_t a_requisiteIdx, std::size_t a_treeIdx);
+		bool OnUnlockPress(std::size_t a_unlockIdx, std::size_t a_treeIdx);
+		bool OnLeadPress(std::vector<TextPerkLevel>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx);
 
 		void UpdateTrees(std::size_t a_classIdx);
 		void UpdatePerks(std::size_t a_treeIdx);

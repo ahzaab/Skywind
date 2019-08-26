@@ -42,13 +42,24 @@ namespace Scaleform
 
 			key = VAMPIRE;
 			value.clear();
-			value.push_back(std::make_pair(kAVMagickaRateMod, AV::kMagickaRate));
+			value.push_back(std::make_pair(kAVMagickaRateMod, AV::kNone));
 			push_back(std::make_pair(key, value));
 
 			key = WEREWOLF;
 			value.clear();
-			value.push_back(std::make_pair(kAVHealRatePowerMod, AV::kHealRateMult));
+			value.push_back(std::make_pair(kAVHealRatePowerMod, AV::kNone));
 			push_back(std::make_pair(key, value));
+		}
+
+
+		void Logger::LogMessageVarg(LogMessageType a_messageType, const char* a_fmt, va_list a_argList)
+		{
+			va_list args;
+			va_copy(args, a_argList);
+			std::vector<char> buf(std::vsnprintf(0, 0, a_fmt, a_argList) + 1);
+			std::vsnprintf(buf.data(), buf.size(), a_fmt, args);
+			va_end(args);
+			_MESSAGE("%", StatsMenuEx::Name().data(), buf.data());
 		}
 
 
@@ -78,13 +89,21 @@ namespace Scaleform
 		}
 
 
+		Stats::Stats() :
+			perkPoints(),
+			magicka(),
+			health(),
+			stamina(),
+			_state(State::kDefault)
+		{}
+
+
 		void Stats::Update()
 		{
-			auto player = RE::PlayerCharacter::GetSingleton();
 			std::string text;
 
 			text = "Perk Points: ";
-			text += std::to_string(player->numPerkPoints);
+			text += std::to_string(GetPerkPoints());
 			perkPoints.HTMLText(text);
 			
 			text = "Magicka: ";
@@ -101,7 +120,93 @@ namespace Scaleform
 		}
 
 
-		std::string Stats::BuildStatString(RE::ActorValue a_av)
+		void Stats::SetDefault()
+		{
+			_state = State::kDefault;
+		}
+
+
+		void Stats::SetVampire()
+		{
+			_state = State::kVampire;
+		}
+
+
+		void Stats::SetWerewolf()
+		{
+			_state = State::kWerewolf;
+		}
+
+
+		bool Stats::IsBeastMode() const
+		{
+			switch (_state) {
+			case State::kVampire:
+			case State::kWerewolf:
+				return true;
+			case State::kDefault:
+			default:
+				return false;
+			}
+		}
+
+
+		UInt32 Stats::GetPerkPoints() const
+		{
+			using Object = RE::BGSDefaultObjectManager::DefaultObjects;
+
+			std::size_t obj;
+			switch (_state) {
+			case State::kVampire:
+				obj = Object::kDLC1VampirePerkPoints;
+				break;
+			case State::kWerewolf:
+				obj = Object::kDLC1WerewolfPerkPoints;
+				break;
+			case State::kDefault:
+			default:
+				{
+					auto player = RE::PlayerCharacter::GetSingleton();
+					return player->numPerkPoints;
+				}
+				break;
+			}
+
+			auto dobj = RE::BGSDefaultObjectManager::GetSingleton();
+			auto global = dobj->GetObject<RE::TESGlobal>(obj);
+			return static_cast<UInt32>(global->value);
+		}
+
+
+		void Stats::DecPerkPoints() const
+		{
+			using Object = RE::BGSDefaultObjectManager::DefaultObjects;
+
+			std::size_t obj;
+			switch (_state) {
+			case State::kVampire:
+				obj = Object::kDLC1VampirePerkPoints;
+				break;
+			case State::kWerewolf:
+				obj = Object::kDLC1WerewolfPerkPoints;
+				break;
+			case State::kDefault:
+			default:
+				{
+					auto player = RE::PlayerCharacter::GetSingleton();
+					player->numPerkPoints -= 1;
+					return;
+				}
+				break;
+			}
+
+			auto dobj = RE::BGSDefaultObjectManager::GetSingleton();
+			auto global = dobj->GetObject<RE::TESGlobal>(obj);
+			global->value -= 1;
+		}
+
+
+		std::string Stats::BuildStatString(RE::ActorValue a_av) const
 		{
 			auto player = RE::PlayerCharacter::GetSingleton();
 			auto fBase = player->GetActorValueBase(a_av);
@@ -263,12 +368,14 @@ namespace Scaleform
 
 	void StatsMenuEx::OnPerkPress(const RE::FxDelegateArgs& a_params)
 	{
-		assert(a_params.GetArgCount() == 1);
+		assert(a_params.GetArgCount() == 2);
 		assert(a_params[0].IsNumber());
+		assert(a_params[1].IsNumber());
 
 		auto menu = static_cast<StatsMenuEx*>(a_params.GetHandler());
-		auto num = a_params[0].GetUInt();
-		menu->OnPerkPress(num);
+		auto perkIndex = a_params[0].GetUInt();
+		auto treeIndex = a_params[1].GetUInt();
+		menu->OnPerkPress(perkIndex, treeIndex);
 	}
 
 
@@ -382,10 +489,16 @@ namespace Scaleform
 	{
 		RE::GFxValue boolean(true);
 		bool success;
+
 		success = view->SetVariable("_global.gfxExtensions", boolean);
 		assert(success);
 		success = view->SetVariable("_global.noInvisibleAdvance", boolean);
 		assert(success);
+
+		using StateType = RE::GFxState::StateType;
+		auto logger = new Logger();
+		view->SetState(StateType::kLog, logger);
+		logger->Release();
 	}
 
 
@@ -423,7 +536,7 @@ namespace Scaleform
 
 		auto player = RE::PlayerCharacter::GetSingleton();
 		player->AddPerk(perk);
-		player->numPerkPoints -= 1;
+		_stats.DecPerkPoints();
 
 		auto idToFind = _perkMappings[a_perkIdx].perkID;
 		UpdatePerks(a_treeIdx);
@@ -448,7 +561,7 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::OnClassPress(std::size_t a_classIdx)
+	bool StatsMenuEx::OnClassPress(std::size_t a_classIdx)
 	{
 		CLIK::Array arr(view);
 		UpdateTrees(a_classIdx);
@@ -463,13 +576,15 @@ namespace Scaleform
 			InvalidatePerks();
 			_trees.DataProvider(arr);
 			_trees.SelectedIndex(-1);
+			return true;
 		} else {
 			InvalidateTrees();
+			return false;
 		}
 	}
 
 
-	void StatsMenuEx::OnTreePress(std::size_t a_treeIdx)
+	bool StatsMenuEx::OnTreePress(std::size_t a_treeIdx)
 	{
 		CLIK::Array arr(view);
 		UpdatePerks(a_treeIdx);
@@ -484,13 +599,15 @@ namespace Scaleform
 			InvalidateRanks();
 			_perks.DataProvider(arr);
 			_perks.SelectedIndex(-1);
+			return true;
 		} else {
 			InvalidatePerks();
+			return false;
 		}
 	}
 
 
-	void StatsMenuEx::OnPerkPress(std::size_t a_perkIdx)
+	bool StatsMenuEx::OnPerkPress(std::size_t a_perkIdx, std::size_t a_treeIdx)
 	{
 		CLIK::Array arr(view);
 		UpdateRanks(a_perkIdx);
@@ -505,17 +622,22 @@ namespace Scaleform
 			InvalidateDesc();
 			_ranks.DataProvider(arr);
 			_ranks.SelectedIndex(-1);
+			if (OnRankPress(0, a_treeIdx)) {
+				_ranks.SelectedIndex(0);
+			}
+			return true;
 		} else {
 			InvalidateRanks();
+			return false;
 		}
 	}
 
 
-	void StatsMenuEx::OnRankPress(std::size_t a_rankIdx, std::size_t a_treeIdx)
+	bool StatsMenuEx::OnRankPress(std::size_t a_rankIdx, std::size_t a_treeIdx)
 	{
 		if (a_rankIdx >= _rankMappings.size()) {
 			InvalidateDesc();
-			return;
+			return false;
 		}
 
 		auto& elem = _rankMappings[a_rankIdx];
@@ -529,7 +651,7 @@ namespace Scaleform
 		_desc.unlock.Label("Unlock");
 
 		auto player = RE::PlayerCharacter::GetSingleton();
-		bool disabled = player->numPerkPoints == 0 || player->HasPerk(perk) || !perk->conditions.Run(player, player);
+		bool disabled = _stats.GetPerkPoints() == 0 || player->HasPerk(perk) || !perk->conditions.Run(player, player);
 		
 #if 0
 		// this second check might be unnecessary, the vanilla game seems to base perk eligibility on the previous check
@@ -559,25 +681,26 @@ namespace Scaleform
 
 		_desc.unlock.Disabled(disabled);
 		UpdateLeads(a_rankIdx, a_treeIdx);
+		return true;
 	}
 
 
-	void StatsMenuEx::OnRequisitePress(std::size_t a_requisiteIdx, std::size_t a_treeIdx)
+	bool StatsMenuEx::OnRequisitePress(std::size_t a_requisiteIdx, std::size_t a_treeIdx)
 	{
-		OnLeadPress(_requisiteMappings, a_requisiteIdx, a_treeIdx);
+		return OnLeadPress(_requisiteMappings, a_requisiteIdx, a_treeIdx);
 	}
 
 
-	void StatsMenuEx::OnUnlockPress(std::size_t a_unlockIdx, std::size_t a_treeIdx)
+	bool StatsMenuEx::OnUnlockPress(std::size_t a_unlockIdx, std::size_t a_treeIdx)
 	{
-		OnLeadPress(_unlockMappings, a_unlockIdx, a_treeIdx);
+		return OnLeadPress(_unlockMappings, a_unlockIdx, a_treeIdx);
 	}
 
 
-	void StatsMenuEx::OnLeadPress(std::vector<TextPerkLevel>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx)
+	bool StatsMenuEx::OnLeadPress(std::vector<TextPerkLevel>& a_lead, std::size_t a_leadIdx, std::size_t a_treeIdx)
 	{
 		if (a_leadIdx >= a_lead.size()) {
-			return;
+			return false;
 		}
 
 		auto& lead = a_lead[a_leadIdx];
@@ -597,6 +720,8 @@ namespace Scaleform
 				break;
 			}
 		}
+
+		return true;
 	}
 
 
@@ -605,23 +730,34 @@ namespace Scaleform
 		using value_type = decltype(_treeMappings)::value_type;
 
 		_treeMappings.clear();
+		_stats.SetDefault();
 
 		if (a_classIdx < _classMappings.size()) {
 			auto& elem = _classMappings[a_classIdx];
 			auto player = RE::PlayerCharacter::GetSingleton();
 			for (auto& pair : elem.second) {
 				auto avInfoID = pair.first;
+				switch (avInfoID) {
+				case kVampireAVID:
+					_stats.SetVampire();
+					break;
+				case kWerewolfAVID:
+					_stats.SetWerewolf();
+					break;
+				}
+
 				auto av = pair.second;
 				auto avInfo = RE::TESForm::LookupByID<RE::ActorValueInfo>(avInfoID);
 				if (avInfo && !avInfo->name.empty()) {
 					std::string name(avInfo->name);
 					SanitizeString(name);
 
-					auto baseVal = static_cast<UInt32>(player->GetActorValueBase(av));
-
-					name += " (";
-					name += std::to_string(baseVal);
-					name += ')';
+					if (av != RE::ActorValue::kNone) {
+						auto baseVal = static_cast<UInt32>(player->GetActorValueBase(av));
+						name += " (";
+						name += std::to_string(baseVal);
+						name += ')';
+					}
 
 					_treeMappings.push_back({ std::move(name), avInfoID });
 				}
@@ -632,6 +768,8 @@ namespace Scaleform
 		{
 			return a_lhs.text < a_rhs.text;
 		});
+
+		_stats.Update();
 	}
 
 
@@ -654,14 +792,16 @@ namespace Scaleform
 
 					UInt32 level = 0;
 					bool incomplete = false;
-					for (auto rank = perk; rank; rank = rank->nextPerk) {
-						level = GetPerkLvlReq(rank).value_or(level);
-						if (!player->HasPerk(rank)) {
-							incomplete = true;
-							name += " (";
-							name += std::to_string(level);
-							name += ')';
-							break;
+					if (!_stats.IsBeastMode()) {
+						for (auto rank = perk; rank; rank = rank->nextPerk) {
+							level = GetPerkLvlReq(rank).value_or(level);
+							if (!player->HasPerk(rank)) {
+								incomplete = true;
+								name += " (";
+								name += std::to_string(level);
+								name += ')';
+								break;
+							}
 						}
 					}
 
@@ -694,11 +834,13 @@ namespace Scaleform
 			UInt32 reqRank = 0;
 			while (perk) {
 				name = std::to_string(idx++);
-				reqRank = GetPerkLvlReq(perk).value_or(reqRank);
 
-				name += " (";
-				name += std::to_string(reqRank);
-				name += ')';
+				if (!_stats.IsBeastMode()) {
+					reqRank = GetPerkLvlReq(perk).value_or(reqRank);
+					name += " (";
+					name += std::to_string(reqRank);
+					name += ')';
+				}
 
 				_rankMappings.push_back({ std::move(name), perk->formID });
 				perk = perk->nextPerk;
@@ -750,7 +892,7 @@ namespace Scaleform
 				SanitizeString(name);
 
 				UInt32 level = value_type::kInvalid;
-				if (!player->HasPerk(node->perk)) {
+				if (!_stats.IsBeastMode() && !player->HasPerk(node->perk)) {
 					level = GetPerkLvlReq(node->perk).value_or(0);
 					name += " (";
 					name += std::to_string(level);
