@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include "CLIK/Array.h"
+#include "Scaleform.h"
 
 
 namespace Scaleform
@@ -49,17 +50,6 @@ namespace Scaleform
 			value.clear();
 			value.push_back(std::make_pair(kAVHealRatePowerMod, AV::kNone));
 			push_back(std::make_pair(key, value));
-		}
-
-
-		void Logger::LogMessageVarg(LogMessageType a_messageType, const char* a_fmt, va_list a_argList)
-		{
-			va_list args;
-			va_copy(args, a_argList);
-			std::vector<char> buf(std::vsnprintf(0, 0, a_fmt, a_argList) + 1);
-			std::vsnprintf(buf.data(), buf.size(), a_fmt, args);
-			va_end(args);
-			_MESSAGE("%", StatsMenuEx::Name().data(), buf.data());
 		}
 
 
@@ -461,7 +451,7 @@ namespace Scaleform
 			*elem.first = var;
 		}
 
-		CLIK::Object obj("scrollBar");
+		CLIK::Object obj("ScrollBar");
 		_classes.ScrollBar(obj);
 		_trees.ScrollBar(obj);
 		_perks.ScrollBar(obj);
@@ -496,7 +486,7 @@ namespace Scaleform
 		assert(success);
 
 		using StateType = RE::GFxState::StateType;
-		auto logger = new Logger();
+		auto logger = new Logger<StatsMenuEx>();
 		view->SetState(StateType::kLog, logger);
 		logger->Release();
 	}

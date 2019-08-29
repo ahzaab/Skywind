@@ -28,7 +28,17 @@ namespace CLIK
 	{}
 
 
+	Object::Object(const char* a_val) :
+		_instance(a_val)
+	{}
+
+
 	Object::Object(std::string_view a_val) :
+		_instance(a_val)
+	{}
+
+
+	Object::Object(const wchar_t* a_val) :
 		_instance(a_val)
 	{}
 
@@ -84,7 +94,21 @@ namespace CLIK
 	}
 
 
+	Object& Object::operator=(const char* a_val)
+	{
+		_instance = a_val;
+		return *this;
+	}
+
+
 	Object& Object::operator=(std::string_view a_val)
+	{
+		_instance = a_val;
+		return *this;
+	}
+
+
+	Object& Object::operator=(const wchar_t* a_val)
 	{
 		_instance = a_val;
 		return *this;

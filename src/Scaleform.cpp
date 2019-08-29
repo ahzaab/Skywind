@@ -2,6 +2,7 @@
 
 #include "BirthSignMenu.h"
 #include "LevelUpMenu.h"
+#include "Spellmaking.h"
 #include "StatsMenuEx.h"
 
 #include "SKSE/API.h"
@@ -19,6 +20,7 @@ namespace Scaleform
 	{
 		BirthSignMenu::Register();
 		LevelUpMenu::Register();
+		Spellmaking::Register();
 		StatsMenuEx::Register();
 
 		_MESSAGE("Registered all scaleform creators");

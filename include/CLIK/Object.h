@@ -17,7 +17,9 @@ namespace CLIK
 		Object(Object&& a_rhs);
 		explicit Object(double a_val);
 		explicit Object(bool a_val);
+		explicit Object(const char* a_val);
 		explicit Object(std::string_view a_val);
+		explicit Object(const wchar_t* a_val);
 		explicit Object(std::wstring_view a_val);
 		explicit Object(const RE::GFxValue& a_val);
 		explicit Object(RE::GFxValue&& a_val);
@@ -27,7 +29,9 @@ namespace CLIK
 		Object& operator=(Object&& a_rhs);
 		Object& operator=(double a_val);
 		Object& operator=(bool a_val);
+		Object& operator=(const char* a_val);
 		Object& operator=(std::string_view a_val);
+		Object& operator=(const wchar_t* a_val);
 		Object& operator=(std::wstring_view a_val);
 		Object& operator=(const RE::GFxValue& a_rhs);
 		Object& operator=(RE::GFxValue&& a_rhs);

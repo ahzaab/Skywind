@@ -49,6 +49,15 @@
     <ClCompile Include="src\CLIK\Array.cpp">
       <Filter>src\CLIK</Filter>
     </ClCompile>
+    <ClCompile Include="src\Spellmaking.cpp">
+      <Filter>src\Scaleform</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CLIK\DropdownMenu.cpp">
+      <Filter>src\CLIK\GFx\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CLIK\Slider.cpp">
+      <Filter>src\CLIK\GFx\Controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\version.h">
@@ -98,6 +107,15 @@
     </ClInclude>
     <ClInclude Include="include\CLIK\TextField.h">
       <Filter>include\CLIK</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Spellmaking.h">
+      <Filter>include\Scaleform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CLIK\DropdownMenu.h">
+      <Filter>include\CLIK\GFx\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CLIK\Slider.h">
+      <Filter>include\CLIK\GFx\Controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

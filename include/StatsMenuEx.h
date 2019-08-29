@@ -64,13 +64,6 @@ namespace Scaleform
 		};
 
 
-		class Logger : public RE::GFxLog
-		{
-		public:
-			virtual void LogMessageVarg(LogMessageType a_messageType, const char* a_fmt, va_list a_argList) override;
-		};
-
-
 		struct HeaderList
 		{
 			void Visible(bool a_visible);

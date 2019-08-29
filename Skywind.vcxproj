@@ -156,9 +156,11 @@
     <ClCompile Include="src\CLIK\Array.cpp" />
     <ClCompile Include="src\CLIK\Button.cpp" />
     <ClCompile Include="src\CLIK\CoreList.cpp" />
+    <ClCompile Include="src\CLIK\DropdownMenu.cpp" />
     <ClCompile Include="src\CLIK\MovieClip.cpp" />
     <ClCompile Include="src\CLIK\Object.cpp" />
     <ClCompile Include="src\CLIK\ScrollingList.cpp" />
+    <ClCompile Include="src\CLIK\Slider.cpp" />
     <ClCompile Include="src\CLIK\TextField.cpp" />
     <ClCompile Include="src\CLIK\UIComponent.cpp" />
     <ClCompile Include="src\Events.cpp" />
@@ -167,6 +169,7 @@
     <ClCompile Include="src\Patches.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Scaleform.cpp" />
+    <ClCompile Include="src\Spellmaking.cpp" />
     <ClCompile Include="src\StatsMenuEx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -174,9 +177,11 @@
     <ClInclude Include="include\CLIK\Array.h" />
     <ClInclude Include="include\CLIK\Button.h" />
     <ClInclude Include="include\CLIK\CoreList.h" />
+    <ClInclude Include="include\CLIK\DropdownMenu.h" />
     <ClInclude Include="include\CLIK\MovieClip.h" />
     <ClInclude Include="include\CLIK\Object.h" />
     <ClInclude Include="include\CLIK\ScrollingList.h" />
+    <ClInclude Include="include\CLIK\Slider.h" />
     <ClInclude Include="include\CLIK\TextField.h" />
     <ClInclude Include="include\CLIK\UIComponent.h" />
     <ClInclude Include="include\Events.h" />
@@ -184,6 +189,7 @@
     <ClInclude Include="include\Papyrus.h" />
     <ClInclude Include="include\Patches.h" />
     <ClInclude Include="include\Scaleform.h" />
+    <ClInclude Include="include\Spellmaking.h" />
     <ClInclude Include="include\StatsMenuEx.h" />
     <ClInclude Include="include\version.h" />
   </ItemGroup>
