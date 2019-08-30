@@ -14,6 +14,8 @@ class GlobalListener extends MovieClip
 	private var _selected: RightClickList;
 	private var _range: DropdownMenu;
 	private var _magnitude: Slider;
+	private var _duration: Slider;
+	private var _area: Slider;
 
 
 	/* INITIALIZATION */
@@ -47,12 +49,32 @@ class GlobalListener extends MovieClip
 
 		_magnitude = _root.magnitude;
 		if (_magnitude != undefined) {
-			//_magnitude.addEventListener(EventTypes.CHANGE, this, "handleMagnitudeChange");
+			_magnitude.addEventListener(EventTypes.CHANGE, this, "handleMagnitudeChange");
 			_magnitude.thumb.addEventListener(EventTypes.PRESS, this, "handleMagnitudeDragBegin");
 			_magnitude.thumb.addEventListener(EventTypes.CLICK, this, "handleMagnitudeDragEnd");
 			_magnitude.thumb.addEventListener(EventTypes.RELEASE_OUTSIDE, this, "handleMagnitudeDragEnd");
 		} else {
 			log("could not get magnitude");
+		}
+
+		_duration = _root.duration;
+		if (_duration != undefined) {
+			_duration.addEventListener(EventTypes.CHANGE, this, "handleDurationChange");
+			_duration.thumb.addEventListener(EventTypes.PRESS, this, "handleDurationDragBegin");
+			_duration.thumb.addEventListener(EventTypes.CLICK, this, "handleDurationDragEnd");
+			_duration.thumb.addEventListener(EventTypes.RELEASE_OUTSIDE, this, "handleDurationDragEnd");
+		} else {
+			log("could not get duration");
+		}
+
+		_area = _root.area;
+		if (_area != undefined) {
+			_area.addEventListener(EventTypes.CHANGE, this, "handleAreaChange");
+			_area.thumb.addEventListener(EventTypes.PRESS, this, "handleAreaDragBegin");
+			_area.thumb.addEventListener(EventTypes.CLICK, this, "handleAreaDragEnd");
+			_area.thumb.addEventListener(EventTypes.RELEASE_OUTSIDE, this, "handleAreaDragEnd");
+		} else {
+			log("could not get area");
 		}
 	}
 
@@ -92,6 +114,42 @@ class GlobalListener extends MovieClip
 	private function handleMagnitudeDragEnd(a_event: Object): Void
 	{
 		GameDelegate.call("OnMagnitudeDragEnd", []);
+	}
+
+
+	private function handleDurationChange(a_event: Object): Void
+	{
+		GameDelegate.call("OnDurationChange", []);
+	}
+
+
+	private function handleDurationDragBegin(a_event: Object): Void
+	{
+		GameDelegate.call("OnDurationDragBegin", []);
+	}
+
+
+	private function handleDurationDragEnd(a_event: Object): Void
+	{
+		GameDelegate.call("OnDurationDragEnd", []);
+	}
+
+
+	private function handleAreaChange(a_event: Object): Void
+	{
+		GameDelegate.call("OnAreaChange", []);
+	}
+
+
+	private function handleAreaDragBegin(a_event: Object): Void
+	{
+		GameDelegate.call("OnAreaDragBegin", []);
+	}
+
+
+	private function handleAreaDragEnd(a_event: Object): Void
+	{
+		GameDelegate.call("OnAreaDragEnd", []);
 	}
 
 

@@ -18,10 +18,27 @@ namespace Scaleform
 {
 	namespace
 	{
-		struct TextEffect
+		struct Available
 		{
 			std::string text;
 			RE::FormID effectID;
+		};
+
+
+		struct Selected
+		{
+			std::string text;
+			RE::FormID effectID;
+			UInt32 magnitude;
+			UInt32 area;
+			UInt32 duration;
+		};
+
+
+		struct Range
+		{
+			CLIK::TextField header;
+			CLIK::GFx::Controls::DropdownMenu dropdown;
 		};
 
 
@@ -34,33 +51,35 @@ namespace Scaleform
 		};
 
 
-		struct Range
+		struct Slider
 		{
-			CLIK::TextField header;
-			CLIK::GFx::Controls::DropdownMenu dropdown;
-		};
+		public:
+			Slider();
+			~Slider() = default;
 
-
-		struct Magnitude
-		{
 			void UpdateText();
+			void SetDragging(bool a_isDragging);
+			bool IsDragging() const;
 
 			CLIK::TextField header;
 			CLIK::GFx::Controls::Slider slider;
 			CLIK::TextField text;
+
+		private:
+			bool _isDragging;
 		};
 	}
 
 
-	class Spellmaking : public RE::IMenu
+	class SpellmakingMenu : public RE::IMenu
 	{
 	public:
 		using Base = RE::IMenu;
 		using Result = Base::Result;
 
 
-		Spellmaking();
-		virtual ~Spellmaking() = default;
+		SpellmakingMenu();
+		virtual ~SpellmakingMenu() = default;
 
 		// IMenu
 		virtual void Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor) override;
@@ -76,45 +95,61 @@ namespace Scaleform
 		static RE::IMenu* Create();
 
 	private:
+		enum : std::size_t { kInvalid = static_cast<std::size_t>(-1) };
+
+
 		static void Log(const RE::FxDelegateArgs& a_params);
 		static void OnAvailablePress(const RE::FxDelegateArgs& a_params);
 		static void OnSelectedPress(const RE::FxDelegateArgs& a_params);
 		static void OnMagnitudeDragBegin(const RE::FxDelegateArgs& a_params);
 		static void OnMagnitudeDragEnd(const RE::FxDelegateArgs& a_params);
 		static void OnMagnitudeChange(const RE::FxDelegateArgs& a_params);
+		static void OnDurationDragBegin(const RE::FxDelegateArgs& a_params);
+		static void OnDurationDragEnd(const RE::FxDelegateArgs& a_params);
+		static void OnDurationChange(const RE::FxDelegateArgs& a_params);
+		static void OnAreaDragBegin(const RE::FxDelegateArgs& a_params);
+		static void OnAreaDragEnd(const RE::FxDelegateArgs& a_params);
+		static void OnAreaChange(const RE::FxDelegateArgs& a_params);
 
 		void OnMenuOpen();
 		void OnMenuClose();
 
 		void InitExtensions();
+		void InitEffectInfo();
 		void SetAvailable();
-		void SetRange();
-		void SetMagnitude();
+		void SetEffectInfo();
+		void CommitSelection();
 
 		bool OnAvailablePress(std::size_t a_availIdx);
 		bool OnSelectedPress(std::size_t a_selectedIdx, bool a_remove);
-		bool OnMagnitudeDragChange(bool a_enable);
+		bool OnMagnitudeDragChange(bool a_isDragging);
 		bool OnMagnitudeChange();
+		bool OnDurationDragChange(bool a_isDragging);
+		bool OnDurationChange();
+		bool OnAreaDragChange(bool a_isDragging);
+		bool OnAreaChange();
 
 		void SanitizeString(std::string& a_str);
 
 
-		static constexpr char SWF_NAME[] = "Spellmaking";
-		static constexpr std::size_t MAX_EFFECTS = 8;
+		static constexpr char SWF_NAME[] = "SpellmakingMenu";
+		static constexpr std::size_t MAX_EFFECTS = 4;
 
 		CLIK::GFx::Controls::ScrollingList _available;
 		CLIK::GFx::Controls::ScrollingList _selected;
 		Range _range;
-		Magnitude _magnitude;
-		std::vector<TextEffect> _availableMappings;
-		std::vector<TextEffect> _selectedMappings;
+		Slider _magnitude;
+		Slider _duration;
+		Slider _area;
+		std::vector<Available> _availableMappings;
+		std::vector<Selected> _selectedMappings;
 		std::vector<RangeElem> _rangeMappings;
-		bool _magnitudeDrag;
+		std::size_t _selectedIdx;
 	};
 
 
-	constexpr std::string_view Spellmaking::Name()
+	constexpr std::string_view SpellmakingMenu::Name()
 	{
-		return "Spellmaking";
+		return "SpellmakingMenu";
 	}
 }

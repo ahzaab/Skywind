@@ -169,7 +169,7 @@
     <ClCompile Include="src\Patches.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Scaleform.cpp" />
-    <ClCompile Include="src\Spellmaking.cpp" />
+    <ClCompile Include="src\SpellmakingMenu.cpp" />
     <ClCompile Include="src\StatsMenuEx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -189,7 +189,7 @@
     <ClInclude Include="include\Papyrus.h" />
     <ClInclude Include="include\Patches.h" />
     <ClInclude Include="include\Scaleform.h" />
-    <ClInclude Include="include\Spellmaking.h" />
+    <ClInclude Include="include\SpellmakingMenu.h" />
     <ClInclude Include="include\StatsMenuEx.h" />
     <ClInclude Include="include\version.h" />
   </ItemGroup>
