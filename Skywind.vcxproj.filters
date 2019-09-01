@@ -58,6 +58,9 @@
     <ClCompile Include="src\SpellmakingMenu.cpp">
       <Filter>src\Scaleform</Filter>
     </ClCompile>
+    <ClCompile Include="src\CLIK\TextInput.cpp">
+      <Filter>src\CLIK\GFx\Controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\version.h">
@@ -116,6 +119,9 @@
     </ClInclude>
     <ClInclude Include="include\SpellmakingMenu.h">
       <Filter>include\Scaleform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CLIK\TextInput.h">
+      <Filter>include\CLIK\GFx\Controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

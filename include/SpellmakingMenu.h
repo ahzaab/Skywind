@@ -8,10 +8,12 @@
 
 #include "RE/Skyrim.h"
 
+#include "CLIK/Button.h"
 #include "CLIK/DropdownMenu.h"
 #include "CLIK/ScrollingList.h"
 #include "CLIK/Slider.h"
 #include "CLIK/TextField.h"
+#include "CLIK/TextInput.h"
 
 
 namespace Scaleform
@@ -110,6 +112,7 @@ namespace Scaleform
 		static void OnAreaDragBegin(const RE::FxDelegateArgs& a_params);
 		static void OnAreaDragEnd(const RE::FxDelegateArgs& a_params);
 		static void OnAreaChange(const RE::FxDelegateArgs& a_params);
+		static void CraftSpell(const RE::FxDelegateArgs& a_params);
 
 		void OnMenuOpen();
 		void OnMenuClose();
@@ -119,6 +122,7 @@ namespace Scaleform
 		void SetAvailable();
 		void SetEffectInfo();
 		void CommitSelection();
+		void CraftSpell();
 
 		bool OnAvailablePress(std::size_t a_availIdx);
 		bool OnSelectedPress(std::size_t a_selectedIdx, bool a_remove);
@@ -141,6 +145,8 @@ namespace Scaleform
 		Slider _magnitude;
 		Slider _duration;
 		Slider _area;
+		CLIK::GFx::Controls::TextInput _name;
+		CLIK::GFx::Controls::Button _craft;
 		std::vector<Available> _availableMappings;
 		std::vector<Selected> _selectedMappings;
 		std::vector<RangeElem> _rangeMappings;

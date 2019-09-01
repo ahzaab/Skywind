@@ -17,6 +17,9 @@
   <classpaths>
     <class path="src" />
     <class path="common" />
+    <class path="Ext" />
+    <class path="Native" />
+    <class path="SkyUI" />
   </classpaths>
   <!-- Build options -->
   <build>

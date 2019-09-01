@@ -1,7 +1,9 @@
 import RightClickList;
+import gfx.controls.Button;
 import gfx.controls.DropdownMenu;
 import gfx.controls.ScrollingList;
 import gfx.controls.Slider;
+import gfx.controls.TextInput;
 import gfx.events.EventTypes;
 import gfx.io.GameDelegate;
 
@@ -16,6 +18,8 @@ class GlobalListener extends MovieClip
 	private var _magnitude: Slider;
 	private var _duration: Slider;
 	private var _area: Slider;
+	private var _name: TextInput;
+	private var _craft: Button;
 
 
 	/* INITIALIZATION */
@@ -75,6 +79,20 @@ class GlobalListener extends MovieClip
 			_area.thumb.addEventListener(EventTypes.RELEASE_OUTSIDE, this, "handleAreaDragEnd");
 		} else {
 			log("could not get area");
+		}
+
+		_name = _root.name;
+		if (_name != undefined) {
+			// TODO
+		} else {
+			log("could not get name");
+		}
+
+		_craft = _root.craft;
+		if (_craft != undefined) {
+			_craft.addEventListener(EventTypes.PRESS, this, "handleCraftPress");
+		} else {
+			log("could not get craft");
 		}
 	}
 
@@ -150,6 +168,12 @@ class GlobalListener extends MovieClip
 	private function handleAreaDragEnd(a_event: Object): Void
 	{
 		GameDelegate.call("OnAreaDragEnd", []);
+	}
+
+
+	private function handleCraftPress(a_event: Object): Void
+	{
+		GameDelegate.call("CraftSpell", []);
 	}
 
 
