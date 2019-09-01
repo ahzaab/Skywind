@@ -135,7 +135,9 @@ import gfx.io.GameDelegate;
 	}
 
 
-	public function setMod(a_value: Number): Void
+	/* PRIVATE FUNCTIONS */
+
+	private function setMod(a_value: Number): Void
 	{
 		_mod = a_value;
 		if (_mod == undefined) {
@@ -145,20 +147,11 @@ import gfx.io.GameDelegate;
 	}
 
 
-	public function setBase(a_value: Number): Void
+	private function setBase(a_value: Number): Void
 	{
 		baseMC.htmlText = a_value.toString();
 	}
 
-
-	// @override Object
-	public function toString(): String
-	{
-		return name.text;
-	}
-
-
-	/* PRIVATE FUNCTIONS */
 
 	private function rollOverHandler(a_event: Object): Void
 	{
@@ -188,7 +181,7 @@ import gfx.io.GameDelegate;
 	}
 
 
-	public function getGlobal(a_formID: Number, a_plugin: String): Void
+	private function getGlobal(a_formID: Number, a_plugin: String): Void
 	{
 		if (a_plugin == undefined) {
 			a_plugin = "SkyWind.esm";
@@ -198,7 +191,7 @@ import gfx.io.GameDelegate;
 	}
 
 
-	public function getPlayerAV(a_av: Number): Void
+	private function getPlayerAV(a_av: Number): Void
 	{
 		GameDelegate.call("GetPlayerAV", [a_av], this, "setBase");	// skywind
 	}
@@ -216,8 +209,8 @@ import gfx.io.GameDelegate;
 	}
 
 
-	private function modPlayerAV(a_av: Number, a_newVal: Number): Void
+	private function modPlayerAV(a_av: Number, a_mod: Number): Void
 	{
-		GameDelegate.call("ModPlayerAV", [a_av, a_newVal]);	// skywind
+		GameDelegate.call("ModPlayerAV", [a_av, a_mod]);	// skywind
 	}
 }

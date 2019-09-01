@@ -135,8 +135,9 @@ namespace Scaleform
 		RE::GFxValue retVal;
 		retVal.SetUndefined();
 
+		std::string modName = a_params[1].GetString();
 		auto dataHandler = RE::TESDataHandler::GetSingleton();
-		auto mod = dataHandler->LookupModByName(a_params[1].GetString());
+		auto mod = dataHandler->LookupModByName(modName);
 		if (mod && mod->modIndex != 0xFF) {
 			auto formID = static_cast<RE::FormID>(a_params[0].GetUInt());
 			formID += mod->modIndex << (8 * 3);
@@ -203,7 +204,7 @@ namespace Scaleform
 		assert(a_params[1].IsNumber());
 
 		auto av = static_cast<RE::ActorValue>(a_params[0].GetUInt());
-		auto val = static_cast<float>(a_params[0].GetNumber());
+		auto val = static_cast<float>(a_params[1].GetNumber());
 		auto player = RE::PlayerCharacter::GetSingleton();
 		player->ModActorValueBase(av, val);
 	}
