@@ -96,12 +96,12 @@ import gfx.io.GameDelegate;
 	public function toggle(a_canToggleOn: Boolean): Number
 	{
 		if (!_toggled && a_canToggleOn) {
-			playSound("UIMenuOK");
+			playSoundImpl("UIMenuOK");
 			indicatorMC._alpha = 100;
 			_toggled = true;
 			return TOGGLE_ON;
 		} else if (_toggled) {
-			playSound("UIMenuOK");
+			playSoundImpl("UIMenuOK");
 			indicatorMC._alpha = 50;
 			_toggled = false;
 			return TOGGLE_OFF;
@@ -203,7 +203,7 @@ import gfx.io.GameDelegate;
 	}
 
 
-	private function playSound(a_sound: String): Void
+	private function playSoundImpl(a_sound: String): Void
 	{
 		GameDelegate.call("PlaySound", [a_sound]);	// skywind
 	}

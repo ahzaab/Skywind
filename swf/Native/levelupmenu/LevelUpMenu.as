@@ -59,7 +59,7 @@ dynamic class LevelUpMenu extends MovieClip
 	}
 
 
-	public function InitExtensions(): Void
+	public function init(): Void
 	{
 		ContinueMC.disabled = true;
 
@@ -122,7 +122,7 @@ dynamic class LevelUpMenu extends MovieClip
 
 	public function closeCallback(a_event: Object): Void
 	{
-		playSound("UIMenuOK");
+		playSoundImpl("UIMenuOK");
 		var len: Number = _attributeMCs.length;
 		for (var i: Number = 0; i < len; ++i) {
 			var attribute: AttributeMovieClip = _attributeMCs[i];
@@ -136,7 +136,7 @@ dynamic class LevelUpMenu extends MovieClip
 	public function onButtonGainFocus(a_attribute: AttributeMovieClip): Void
 	{
 		a_attribute.setHighlight();
-		playSound("UIMenuFocus");
+		playSoundImpl("UIMenuFocus");
 	}
 
 
@@ -148,7 +148,7 @@ dynamic class LevelUpMenu extends MovieClip
 
 	public function playFocusSound(a_event: Object): Void
 	{
-		playSound("UIMenuFocus");
+		playSoundImpl("UIMenuFocus");
 	}
 
 
@@ -178,7 +178,7 @@ dynamic class LevelUpMenu extends MovieClip
 	}
 
 
-	private function playSound(a_sound: String): Void
+	private function playSoundImpl(a_sound: String): Void
 	{
 		GameDelegate.call("PlaySound", [a_sound]);	// skywind
 	}

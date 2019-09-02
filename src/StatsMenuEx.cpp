@@ -243,18 +243,16 @@ namespace Scaleform
 
 		flags = Flag::kTryShowCursor;
 		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
-		if (loader->LoadMovie(this, view, SWF_NAME, ScaleModeType::kShowAll, 0.0)) {
-			menuDepth = 5;	// JournalMenu == 5
-			flags |= Flag::kPreventGameLoad | Flag::kHideOther | Flag::kPauseGame;
-			context = Context::kFavor;
-		}
-
-		if (!view) {
+		if (!loader->LoadMovie(this, view, SWF_NAME, ScaleModeType::kShowAll, 0.0)) {
 			assert(false);
 			_FATALERROR("StatsMenuEx did not have a view due to missing dependencies! Aborting process!\n");
 			MessageBoxA(NULL, "StatsMenuEx did not have a view due to missing dependencies!\r\nAborting process!", NULL, MB_OK);
 			std::abort();
 		}
+
+		menuDepth = 5;	// JournalMenu == 5
+		flags |= Flag::kPreventGameLoad | Flag::kHideOther | Flag::kPauseGame;
+		context = Context::kFavor;
 
 		InitExtensions();
 		view->SetVisible(false);

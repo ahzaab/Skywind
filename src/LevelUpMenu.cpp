@@ -1,10 +1,8 @@
 #include "LevelUpMenu.h"
 
-#include "skse64_common/SafeWrite.h"
-
 #include <cassert>
 
-#include "REL/Relocation.h"
+#include "Scaleform.h"
 
 
 namespace Scaleform
@@ -17,24 +15,17 @@ namespace Scaleform
 
 		flags |= Flag::kTryShowCursor;
 		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
-		if (loader->LoadMovie(this, view, SWF_NAME, ScaleModeType::kShowAll, 0.0)) {
-			flags |= Flag::kPauseGame | Flag::kModal | Flag::kPreventGameLoad;
-			context = Context::kMenuMode;
-		}
-
-		if (!view) {
+		if (!loader->LoadMovie(this, view, SWF_NAME, ScaleModeType::kShowAll, 0.0)) {
 			assert(false);
 			_FATALERROR("LevelUpMenu did not have a view due to missing dependencies! Aborting process!\n");
 			MessageBoxA(NULL, "LevelUpMenu did not have a view due to missing dependencies!\r\nAborting process!", NULL, MB_OK);
 			std::abort();
 		}
 
-		auto input = RE::InputManager::GetSingleton();
-		if (input->IsGamepadEnabled()) {
-			RE::GFxValue boolean(true);
-			view->Invoke("Selection.captureFocus", 0, &boolean, 1);
-		}
+		flags |= Flag::kPauseGame | Flag::kModal | Flag::kPreventGameLoad;
+		context = Context::kMenuMode;
 
+		InitExtensions();
 		view->SetVisible(false);
 	}
 
@@ -221,7 +212,19 @@ namespace Scaleform
 
 	void LevelUpMenu::OnMenuOpen()
 	{
+		bool success;
 		view->SetVisible(true);
+
+		std::vector<std::pair<RE::GFxValue*, std::string>> toGet;
+		toGet.push_back(std::make_pair(&_root, "LevelUpMenu_mc"));
+		RE::GFxValue var;
+		for (auto& elem : toGet) {
+			success = view->GetVariable(&var, elem.second.c_str());
+			assert(success);
+			*elem.first = var;
+		}
+
+		_root.Invoke("init");
 	}
 
 
@@ -229,5 +232,33 @@ namespace Scaleform
 	{
 		RE::GFxValue boolean(false);
 		view->Invoke("Selection.captureFocus", 0, &boolean, 1);
+	}
+
+
+	void LevelUpMenu::InitExtensions()
+	{
+		RE::GFxValue boolean(true);
+		bool success;
+
+		auto input = RE::InputManager::GetSingleton();
+		if (input->IsGamepadEnabled()) {
+			view->Invoke("Selection.captureFocus", 0, &boolean, 1);
+		}
+
+		success = view->SetVariable("_global.gfxExtensions", boolean);
+		assert(success);
+		success = view->SetVariable("_global.noInvisibleAdvance", boolean);
+		assert(success);
+		success = view->SetVariable("Selection.alwaysEnableArrowKeys", boolean);
+		assert(success);
+		success = view->SetVariable("Selection.alwaysEnableKeyboardPress", boolean);
+		assert(success);
+		success = view->SetVariable("Selection.disableFocusAutoRelease", boolean);
+		assert(success);
+
+		using StateType = RE::GFxState::StateType;
+		auto logger = new Logger<LevelUpMenu>();
+		view->SetState(StateType::kLog, logger);
+		logger->Release();
 	}
 }

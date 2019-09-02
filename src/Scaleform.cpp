@@ -2,6 +2,7 @@
 
 #include "BirthSignMenu.h"
 #include "LevelUpMenu.h"
+#include "MeterMenu.h"
 #include "SpellmakingMenu.h"
 #include "StatsMenuEx.h"
 
@@ -20,6 +21,7 @@ namespace Scaleform
 	{
 		BirthSignMenu::Register();
 		LevelUpMenu::Register();
+		MeterMenu::Register();
 		SpellmakingMenu::Register();
 		StatsMenuEx::Register();
 

@@ -8,6 +8,7 @@
 
 // TODO
 #include "BirthSignMenu.h"
+#include "MeterMenu.h"
 #include "SpellmakingMenu.h"
 #include "StatsMenuEx.h"
 // TODO
@@ -58,10 +59,10 @@ namespace
 
 				switch (button->keyMask) {
 				case Key::kNum0:
-					Scaleform::SpellmakingMenu::Open();
+					Scaleform::MeterMenu::Open();
 					break;
 				case Key::kNum9:
-					Scaleform::SpellmakingMenu::Close();
+					Scaleform::MeterMenu::Close();
 					break;
 				}
 			}

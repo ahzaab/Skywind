@@ -166,6 +166,7 @@
     <ClCompile Include="src\CLIK\UIComponent.cpp" />
     <ClCompile Include="src\Events.cpp" />
     <ClCompile Include="src\LevelUpMenu.cpp" />
+    <ClCompile Include="src\MeterMenu.cpp" />
     <ClCompile Include="src\Papyrus.cpp" />
     <ClCompile Include="src\Patches.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="include\CLIK\UIComponent.h" />
     <ClInclude Include="include\Events.h" />
     <ClInclude Include="include\LevelUpMenu.h" />
+    <ClInclude Include="include\MeterMenu.h" />
     <ClInclude Include="include\Papyrus.h" />
     <ClInclude Include="include\Patches.h" />
     <ClInclude Include="include\Scaleform.h" />

@@ -39,7 +39,11 @@ namespace Scaleform
 		void OnMenuOpen();
 		void OnMenuClose();
 
+		void InitExtensions();
+
 		static constexpr char SWF_NAME[] = "levelupmenu";
+
+		RE::GFxValue _root;
 	};
 
 
