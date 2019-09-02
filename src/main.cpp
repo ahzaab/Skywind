@@ -59,10 +59,10 @@ namespace
 
 				switch (button->keyMask) {
 				case Key::kNum0:
-					Scaleform::MeterMenu::Open();
+					Scaleform::StatsMenuEx::Open();
 					break;
 				case Key::kNum9:
-					Scaleform::MeterMenu::Close();
+					Scaleform::StatsMenuEx::Close();
 					break;
 				}
 			}

@@ -11,45 +11,57 @@ namespace Scaleform
 {
 	namespace
 	{
-		ClassMap::ClassMap() :
+		RootMap::RootMap() :
 			Base()
 		{
 			using AV = RE::ActorValue;
 
-			Base::value_type::first_type key;
-			Base::value_type::second_type value;
+			std::decay_t<decltype(Root::text)> text;
+			std::decay_t<decltype(Root::info)> info;
 
-			key = DRAGONBORN;
-			value.clear();
-			value.push_back(std::make_pair(kAVOneHanded, AV::kOneHanded));
-			value.push_back(std::make_pair(kAVTwoHanded, AV::kTwoHanded));
-			value.push_back(std::make_pair(kAVMarksman, AV::kArchery));
-			value.push_back(std::make_pair(kAVBlock, AV::kBlock));
-			value.push_back(std::make_pair(kAVSmithing, AV::kSmithing));
-			value.push_back(std::make_pair(kAVHeavyArmor, AV::kHeavyArmor));
-			value.push_back(std::make_pair(kAVLightArmor, AV::kLightArmor));
-			value.push_back(std::make_pair(kAVPickpocket, AV::kPickpocket));
-			value.push_back(std::make_pair(kAVLockpicking, AV::kLockpicking));
-			value.push_back(std::make_pair(kAVSneak, AV::kSneak));
-			value.push_back(std::make_pair(kAVAlchemy, AV::kAlchemy));
-			value.push_back(std::make_pair(kAVSpeechCraft, AV::kSpeech));
-			value.push_back(std::make_pair(kAVAlteration, AV::kAlteration));
-			value.push_back(std::make_pair(kAVConjuration, AV::kConjuration));
-			value.push_back(std::make_pair(kAVDestruction, AV::kDestruction));
-			value.push_back(std::make_pair(kAVMysticism, AV::kIllusion));
-			value.push_back(std::make_pair(kAVRestoration, AV::kRestoration));
-			value.push_back(std::make_pair(kAVEnchanting, AV::kEnchanting));
-			push_back(std::make_pair(key, value));
+			text = DRAGONBORN;
+			info.clear();
+			info.push_back({ kAVOneHanded, AV::kOneHanded });
+			info.push_back({ kAVTwoHanded, AV::kTwoHanded });
+			info.push_back({ kAVMarksman, AV::kArchery });
+			info.push_back({ kAVBlock, AV::kBlock });
+			info.push_back({ kAVSmithing, AV::kSmithing });
+			info.push_back({ kAVHeavyArmor, AV::kHeavyArmor });
+			info.push_back({ kAVLightArmor, AV::kLightArmor });
+			info.push_back({ kAVPickpocket, AV::kPickpocket });
+			info.push_back({ kAVLockpicking, AV::kLockpicking });
+			info.push_back({ kAVSneak, AV::kSneak });
+			info.push_back({ kAVAlchemy, AV::kAlchemy });
+			info.push_back({ kAVSpeechCraft, AV::kSpeech });
+			info.push_back({ kAVAlteration, AV::kAlteration });
+			info.push_back({ kAVConjuration, AV::kConjuration });
+			info.push_back({ kAVDestruction, AV::kDestruction });
+			info.push_back({ kAVMysticism, AV::kIllusion });
+			info.push_back({ kAVRestoration, AV::kRestoration });
+			info.push_back({ kAVEnchanting, AV::kEnchanting });
+			push_back({ text, info, true });
 
-			key = VAMPIRE;
-			value.clear();
-			value.push_back(std::make_pair(kAVMagickaRateMod, AV::kNone));
-			push_back(std::make_pair(key, value));
+			text = VAMPIRE;
+			info.clear();
+			info.push_back({ kAVMagickaRateMod, AV::kNone });
+			push_back({ text, info, true });
 
-			key = WEREWOLF;
-			value.clear();
-			value.push_back(std::make_pair(kAVHealRatePowerMod, AV::kNone));
-			push_back(std::make_pair(key, value));
+			text = WEREWOLF;
+			info.clear();
+			info.push_back({ kAVHealRatePowerMod, AV::kNone });
+			push_back({ text, info, true });
+
+			text = ATTRIBUTES;
+			info.clear();
+			info.push_back({ kAVStrength, AV::kFavorActive });
+			info.push_back({ kAVIntelligence, AV::kFavorsPerDayTimer });
+			info.push_back({ kAVWillpower, AV::kWaitingForPlayer });
+			info.push_back({ kAVAgility, AV::kLastBribedIntimidated });
+			info.push_back({ kAVSpeed, AV::kLastFlattered });
+			info.push_back({ kAVEndurance, AV::kFavorsPerDay });
+			info.push_back({ kAVPersonality, AV::kFame });
+			info.push_back({ kAVLuck, AV::kInfamy });
+			push_back({ text, info, false });
 		}
 
 
@@ -164,7 +176,7 @@ namespace Scaleform
 
 			auto dobj = RE::BGSDefaultObjectManager::GetSingleton();
 			auto global = dobj->GetObject<RE::TESGlobal>(obj);
-			return static_cast<UInt32>(global->value);
+			return global ? static_cast<UInt32>(global->value) : 0;
 		}
 
 
@@ -192,7 +204,9 @@ namespace Scaleform
 
 			auto dobj = RE::BGSDefaultObjectManager::GetSingleton();
 			auto global = dobj->GetObject<RE::TESGlobal>(obj);
-			global->value -= 1;
+			if (global) {
+				global->value -= 1;
+			}
 		}
 
 
@@ -224,13 +238,13 @@ namespace Scaleform
 
 
 	StatsMenuEx::StatsMenuEx() :
-		_classes(),
+		_roots(),
 		_trees(),
 		_perks(),
 		_ranks(),
 		_desc(),
 		_stats(),
-		_classMappings(),
+		_rootMappings(),
 		_treeMappings(),
 		_perkMappings(),
 		_rankMappings(),
@@ -262,7 +276,7 @@ namespace Scaleform
 	void StatsMenuEx::Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
 		a_processor->Process("Log", Log);
-		a_processor->Process("OnClassPress", OnClassPress);
+		a_processor->Process("OnRootPress", OnRootPress);
 		a_processor->Process("OnTreePress", OnTreePress);
 		a_processor->Process("OnPerkPress", OnPerkPress);
 		a_processor->Process("OnRankPress", OnRankPress);
@@ -332,14 +346,14 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::OnClassPress(const RE::FxDelegateArgs& a_params)
+	void StatsMenuEx::OnRootPress(const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 1);
 		assert(a_params[0].IsNumber());
 
 		auto menu = static_cast<StatsMenuEx*>(a_params.GetHandler());
 		auto num = a_params[0].GetUInt();
-		menu->OnClassPress(num);
+		menu->OnRootPress(num);
 	}
 
 
@@ -427,7 +441,7 @@ namespace Scaleform
 		view->SetVisible(true);
 
 		std::vector<std::pair<CLIK::Object*, std::string>> toGet;
-		toGet.push_back(std::make_pair(&_classes, "classes"));
+		toGet.push_back(std::make_pair(&_roots, "roots"));
 		toGet.push_back(std::make_pair(&_trees, "trees"));
 		toGet.push_back(std::make_pair(&_perks, "perks"));
 		toGet.push_back(std::make_pair(&_ranks, "ranks"));
@@ -450,7 +464,7 @@ namespace Scaleform
 		}
 
 		CLIK::Object obj("ScrollBar");
-		_classes.ScrollBar(obj);
+		_roots.ScrollBar(obj);
 		_trees.ScrollBar(obj);
 		_perks.ScrollBar(obj);
 		_ranks.ScrollBar(obj);
@@ -463,7 +477,7 @@ namespace Scaleform
 		_desc.Init();
 		_stats.Update();
 
-		SetClasses();
+		SetRoots();
 	}
 
 
@@ -490,21 +504,16 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::SetClasses()
+	void StatsMenuEx::SetRoots()
 	{
-		std::vector<std::string> names;
-		names.emplace_back(DRAGONBORN);
-		names.emplace_back(VAMPIRE);
-		names.emplace_back(WEREWOLF);
-
 		CLIK::Array arr(view);
 		CLIK::Object elem;
-		for (auto& name : names) {
-			elem = name;
+		for (auto& root : _rootMappings) {
+			elem = root.text;
 			arr.Push(elem);
 		}
 
-		_classes.DataProvider(arr);
+		_roots.DataProvider(arr);
 	}
 
 
@@ -549,7 +558,7 @@ namespace Scaleform
 	}
 
 
-	bool StatsMenuEx::OnClassPress(std::size_t a_classIdx)
+	bool StatsMenuEx::OnRootPress(std::size_t a_classIdx)
 	{
 		CLIK::Array arr(view);
 		UpdateTrees(a_classIdx);
@@ -720,42 +729,42 @@ namespace Scaleform
 		_treeMappings.clear();
 		_stats.SetDefault();
 
-		if (a_classIdx < _classMappings.size()) {
-			auto& elem = _classMappings[a_classIdx];
+		if (a_classIdx < _rootMappings.size()) {
+			auto& elem = _rootMappings[a_classIdx];
 			auto player = RE::PlayerCharacter::GetSingleton();
-			for (auto& pair : elem.second) {
-				auto avInfoID = pair.first;
-				switch (avInfoID) {
-				case kVampireAVID:
+			for (auto& info : elem.info) {
+				switch (info.id) {
+				case kAVVampire:
 					_stats.SetVampire();
 					break;
-				case kWerewolfAVID:
+				case kAVWerewolf:
 					_stats.SetWerewolf();
 					break;
 				}
 
-				auto av = pair.second;
-				auto avInfo = RE::TESForm::LookupByID<RE::ActorValueInfo>(avInfoID);
+				auto avInfo = RE::TESForm::LookupByID<RE::ActorValueInfo>(info.id);
 				if (avInfo && !avInfo->name.empty()) {
 					std::string name(avInfo->name);
 					SanitizeString(name);
 
-					if (av != RE::ActorValue::kNone) {
-						auto baseVal = static_cast<UInt32>(player->GetActorValueBase(av));
+					if (info.av != RE::ActorValue::kNone) {
+						auto baseVal = static_cast<UInt32>(player->GetActorValueBase(info.av));
 						name += " (";
 						name += std::to_string(baseVal);
 						name += ')';
 					}
 
-					_treeMappings.push_back({ std::move(name), avInfoID });
+					_treeMappings.push_back({ std::move(name), info.id });
 				}
 			}
-		}
 
-		std::sort(_treeMappings.begin(), _treeMappings.end(), [](const value_type& a_lhs, const value_type& a_rhs) -> bool
-		{
-			return a_lhs.text < a_rhs.text;
-		});
+			if (elem.sort) {
+				std::sort(_treeMappings.begin(), _treeMappings.end(), [](const value_type& a_lhs, const value_type& a_rhs) -> bool
+				{
+					return a_lhs.text < a_rhs.text;
+				});
+			}
+		}
 
 		_stats.Update();
 	}

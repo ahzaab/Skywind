@@ -24,6 +24,7 @@ namespace Scaleform
 		constexpr char DRAGONBORN[] = "Dragonborn";
 		constexpr char VAMPIRE[] = "Vampire";
 		constexpr char WEREWOLF[] = "Werewolf";
+		constexpr char ATTRIBUTES[] = "Attributes";
 
 
 		enum : ActorValueInfoID
@@ -48,19 +49,51 @@ namespace Scaleform
 			kAVEnchanting = 0x0000045D,
 
 			kAVMagickaRateMod = 0x00000646,
-			kVampireAVID = kAVMagickaRateMod,
+			kAVVampire = kAVMagickaRateMod,
 
 			kAVHealRatePowerMod = 0x00000645,
-			kWerewolfAVID = kAVHealRatePowerMod
+			kAVWerewolf = kAVHealRatePowerMod,
+
+			kAVFavorActive = 0x000005F6,
+			kAVFavorsPerDay = 0x000005F7,
+			kAVFavorsPerDayTimer = 0x000005F8,
+			kAVWaitingForPlayer = 0x00000606,
+			kAVLastBribedIntimidated = 0x00000601,
+			kAVLastFlattered = 0x00000602,
+			kAVFame = 0x000005E3,
+			kAVInfamy = 0x000005E4,
+
+			kAVStrength = kAVFavorActive,
+			kAVEndurance = kAVFavorsPerDay,
+			kAVIntelligence = kAVFavorsPerDayTimer,
+			kAVWillpower = kAVWaitingForPlayer,
+			kAVAgility = kAVLastBribedIntimidated,
+			kAVSpeed = kAVLastFlattered,
+			kAVPersonality = kAVFame,
+			kAVLuck = kAVInfamy
 		};
 
 
-		class ClassMap : public std::vector<std::pair<std::string, std::vector<std::pair<ActorValueInfoID, RE::ActorValue>>>>
+		struct Root
+		{
+			struct AVInfo
+			{
+				ActorValueInfoID id;
+				RE::ActorValue av;
+			};
+
+			std::string text;
+			std::vector<AVInfo> info;
+			bool sort;
+		};
+
+
+		class RootMap : public std::vector<Root>
 		{
 		public:
-			using Base = std::vector<std::pair<std::string, std::vector<std::pair<ActorValueInfoID, RE::ActorValue>>>>;
+			using Base = std::vector<Root>;
 
-			ClassMap();
+			RootMap();
 		};
 
 
@@ -168,7 +201,7 @@ namespace Scaleform
 
 	private:
 		static void Log(const RE::FxDelegateArgs& a_params);
-		static void OnClassPress(const RE::FxDelegateArgs& a_params);
+		static void OnRootPress(const RE::FxDelegateArgs& a_params);
 		static void OnTreePress(const RE::FxDelegateArgs& a_params);
 		static void OnPerkPress(const RE::FxDelegateArgs& a_params);
 		static void OnRankPress(const RE::FxDelegateArgs& a_params);
@@ -180,10 +213,10 @@ namespace Scaleform
 		void OnMenuClose();
 
 		void InitExtensions();
-		void SetClasses();
+		void SetRoots();
 		void UnlockPerk(std::size_t a_rankIdx, std::size_t a_perkIdx, std::size_t a_treeIdx);
 
-		bool OnClassPress(std::size_t a_classIdx);
+		bool OnRootPress(std::size_t a_classIdx);
 		bool OnTreePress(std::size_t a_treeIdx);
 		bool OnPerkPress(std::size_t a_perkIdx, std::size_t a_treeIdx);
 		bool OnRankPress(std::size_t a_rankIdx, std::size_t a_treeIdx);
@@ -209,13 +242,13 @@ namespace Scaleform
 
 		static constexpr char SWF_NAME[] = "StatsMenuEx";
 
-		CLIK::GFx::Controls::ScrollingList _classes;
+		CLIK::GFx::Controls::ScrollingList _roots;
 		CLIK::GFx::Controls::ScrollingList _trees;
 		CLIK::GFx::Controls::ScrollingList _perks;
 		CLIK::GFx::Controls::ScrollingList _ranks;
 		Description _desc;
 		Stats _stats;
-		ClassMap _classMappings;
+		RootMap _rootMappings;
 		std::vector<Tree> _treeMappings;
 		std::vector<TextPerkLevel> _perkMappings;
 		std::vector<Rank> _rankMappings;

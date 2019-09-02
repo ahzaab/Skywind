@@ -17,11 +17,7 @@
   <classpaths>
     <class path="src" />
     <class path="common" />
-    <class path="SkyUI" />
     <class path="Native\levelupmenu" />
-    <class path="Ext\StatsMenuEx" />
-    <class path="Ext\SpellmakingMenu" />
-    <class path="Ext\BirthSignMenu" />
   </classpaths>
   <!-- Build options -->
   <build>
