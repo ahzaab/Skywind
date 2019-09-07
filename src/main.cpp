@@ -59,10 +59,34 @@ namespace
 
 				switch (button->keyMask) {
 				case Key::kNum0:
-					Scaleform::StatsMenuEx::Open();
+					Scaleform::MeterMenu::Open();
 					break;
 				case Key::kNum9:
-					Scaleform::StatsMenuEx::Close();
+					Scaleform::MeterMenu::Close();
+					break;
+				case Key::kNum8:
+					Scaleform::MeterMenu::TweenTo(80);
+					break;
+				case Key::kNum7:
+					Scaleform::MeterMenu::TweenTo(70);
+					break;
+				case Key::kNum6:
+					Scaleform::MeterMenu::TweenTo(60);
+					break;
+				case Key::kNum5:
+					Scaleform::MeterMenu::TweenTo(50);
+					break;
+				case Key::kNum4:
+					Scaleform::MeterMenu::TweenTo(40);
+					break;
+				case Key::kNum3:
+					Scaleform::MeterMenu::TweenTo(30);
+					break;
+				case Key::kNum2:
+					Scaleform::MeterMenu::TweenTo(20);
+					break;
+				case Key::kNum1:
+					Scaleform::MeterMenu::TweenTo(10);
 					break;
 				}
 			}

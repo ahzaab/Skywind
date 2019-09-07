@@ -1,19 +1,36 @@
 #include "BirthSignMenu.h"
 
 #include "Papyrus.h"
+#include "Scaleform.h"
 
 
 namespace Scaleform
 {
-	BirthSignMenu::BirthSignMenu()
+	BirthSignMenu::BirthSignMenu() :
+		MenuBase(),
+		HandlerBase(),
+		_root()
 	{
-		using ScaleModeType = RE::GFxMovieView::ScaleModeType;
 		using Context = RE::InputMappingManager::Context;
 		using Flag = RE::IMenu::Flag;
 
-		flags = Flag::kTryShowCursor;
+		flags |= Flag::kTryShowCursor;
 		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
-		if (!loader->LoadMovie(this, view, SWF_NAME, ScaleModeType::kShowAll, 0.0)) {
+		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		{
+			using StateType = RE::GFxState::StateType;
+
+			fxDelegate.reset(new RE::FxDelegate());
+			fxDelegate->RegisterHandler(this);
+			a_def->SetState(StateType::kExternalInterface, fxDelegate.get());
+			fxDelegate->Release();
+
+			auto logger = new Logger<BirthSignMenu>();
+			a_def->SetState(StateType::kLog, logger);
+			logger->Release();
+		});
+
+		if (!success) {
 			assert(false);
 			_FATALERROR("BirthSignMenu did not have a view due to missing dependencies! Aborting process!\n");
 			MessageBoxA(NULL, "BirthSignMenu did not have a view due to missing dependencies!\r\nAborting process!", NULL, MB_OK);
@@ -143,6 +160,16 @@ namespace Scaleform
 		AdjustScale();
 		SetInputs();
 		view->SetVisible(true);
+
+		bool success;
+		std::vector<std::pair<RE::GFxValue*, std::string>> toGet;
+		toGet.push_back(std::make_pair(&_root, "birthSignList"));
+		RE::GFxValue var;
+		for (auto& elem : toGet) {
+			success = view->GetVariable(&var, elem.second.c_str());
+			assert(success);
+			*elem.first = var;
+		}
 	}
 
 
@@ -158,23 +185,29 @@ namespace Scaleform
 		auto width = def->GetWidth();
 		auto height = def->GetHeight();
 
+		RE::GFxValue root;
 		RE::GFxValue num;
 		bool success = false;
 
+		success = view->GetVariable(&root, "_root");
+		assert(success);
+
+		RE::GFxValue::DisplayInfo displayInfo;
+		success = root.GetDisplayInfo(&displayInfo);
+		assert(success);
+
+		displayInfo.SetX(width * (1.0 - a_scale) / 2);
+		displayInfo.SetY(height * (1.0 - a_scale) / 2);
+
+		success = root.SetDisplayInfo(displayInfo);
+		assert(success);
+
 		num.SetNumber(width * a_scale);
-		success = view->SetVariable("_root._width", num);
+		success = root.SetMember("_width", num);
 		assert(success);
 
 		num.SetNumber(height * a_scale);
-		success = view->SetVariable("_root._height", num);
-		assert(success);
-
-		num.SetNumber(width * (1.0 - a_scale) / 2);
-		success = view->SetVariable("_root._x", num);
-		assert(success);
-
-		num.SetNumber(height * (1.0 - a_scale) / 2);
-		success = view->SetVariable("_root._y", num);
+		success = root.SetMember("_height", num);
 		assert(success);
 	}
 
@@ -182,7 +215,7 @@ namespace Scaleform
 	void BirthSignMenu::SendAcceptEvent()
 	{
 		RE::GFxValue result;
-		bool success = view->Invoke("birthSignList.getCurrentSign", &result, 0, 0);
+		bool success = _root.Invoke("getCurrentSign", &result, 0, 0);
 		assert(success);
 		auto id = result.GetUInt();
 		if (id != 0) {
@@ -228,7 +261,7 @@ namespace Scaleform
 		args[kAcceptIcon].SetNumber(acceptKey);
 		args[kCancelText].SetString(cancelText.c_str());
 		args[kCancelIcon].SetNumber(cancelKey);
-		auto success = view->Invoke("birthSignList.setInputs", 0, args, kNumArgs);
+		auto success = _root.Invoke("setInputs", 0, args, kNumArgs);
 		assert(success);
 	}
 

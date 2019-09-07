@@ -13,6 +13,8 @@ namespace Scaleform
 		public RE::MenuEventHandler
 	{
 	public:
+		using MenuBase = RE::IMenu;
+		using HandlerBase = RE::MenuEventHandler;
 		using Result = RE::IMenu::Result;
 		using GRefCountBaseStatImpl::operator new;
 		using GRefCountBaseStatImpl::operator delete;
@@ -37,10 +39,6 @@ namespace Scaleform
 		static RE::IMenu* Create();
 
 	private:
-		using MenuBase = RE::IMenu;
-		using HandlerBase = RE::MenuEventHandler;
-
-
 		enum : UInt32
 		{
 			kInvalidButton = RE::InputMappingManager::kInvalid,
@@ -83,8 +81,9 @@ namespace Scaleform
 		UInt32 GetGamepadIndex(RE::BSWin32GamepadDevice::Key a_key);
 
 
-
 		static constexpr char SWF_NAME[] = "BirthSignMenu";
+
+		RE::GFxValue _root;
 	};
 
 

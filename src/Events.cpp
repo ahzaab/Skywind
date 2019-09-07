@@ -79,7 +79,7 @@ namespace Events
 
 	void Install()
 	{
-		HitHandler::Sink();
+		//HitHandler::Sink();
 		_MESSAGE("Installed all event sinks");
 	}
 }

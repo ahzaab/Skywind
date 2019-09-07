@@ -4,6 +4,8 @@
 
 #include "Scaleform.h"
 
+#include "SKSE/API.h"
+
 
 namespace Scaleform
 {
@@ -96,126 +98,6 @@ namespace Scaleform
 		}
 
 
-		double Meter::FillDelta() const
-		{
-			return GetNumber("fillDelta");
-		}
-
-
-		void Meter::FillDelta(double a_fillDelta)
-		{
-			SetNumber("fillDelta", a_fillDelta);
-		}
-
-
-		double Meter::EmptyDelta() const
-		{
-			return GetNumber("emptyDelta");
-		}
-
-
-		void Meter::EmptyDelta(double a_emptyDelta)
-		{
-			SetNumber("emptyDelta", a_emptyDelta);
-		}
-
-
-		double Meter::Color() const
-		{
-			return GetNumber("color");
-		}
-
-
-		void Meter::Color(double a_primaryColor)
-		{
-			SetNumber("color", a_primaryColor);
-		}
-
-
-		double Meter::FlashColor() const
-		{
-			return GetNumber("flashColor");
-		}
-
-
-		void Meter::FlashColor(double a_flashColor)
-		{
-			SetNumber("flashColor", a_flashColor);
-		}
-
-
-		std::string_view Meter::FillDirection() const
-		{
-			return GetString("fillDirection");
-		}
-
-
-		void Meter::FillDirection(std::string_view a_fillDirection)
-		{
-			SetString("fillDirection", a_fillDirection);
-		}
-
-
-		double Meter::Percent() const
-		{
-			return GetNumber("percent");
-		}
-
-
-		void Meter::Percent(double a_percent)
-		{
-			SetNumber("percent", a_percent);
-		}
-
-
-		void Meter::SetFillDirection(std::string_view a_fillDirection, bool a_restorePercent)
-		{
-			enum
-			{
-				kFillDirection,
-				kRestorePercent,
-				kNumArgs
-			};
-
-			RE::GFxValue args[kNumArgs];
-
-			args[kFillDirection] = a_fillDirection;
-			assert(args[kFillDirection].IsString());
-
-			args[kRestorePercent] = a_restorePercent;
-			assert(args[kRestorePercent].IsBool());
-
-			auto success = _instance.Invoke("setFillDirection", 0, args, kNumArgs);
-			assert(success);
-		}
-
-
-		void Meter::SetColors(double a_primaryColor, double a_secondaryColor, double a_flashColor)
-		{
-			enum
-			{
-				kPrimaryColor,
-				kSecondaryColor,
-				kFlashColor,
-				kNumArgs
-			};
-
-			RE::GFxValue args[kNumArgs];
-
-			args[kPrimaryColor] = a_primaryColor;
-			assert(args[kPrimaryColor].IsNumber());
-
-			args[kSecondaryColor] = a_secondaryColor;
-			assert(args[kSecondaryColor].IsNumber());
-
-			args[kFlashColor] = a_flashColor;
-			assert(args[kFlashColor].IsNumber());
-
-			auto success = _instance.Invoke("setColors", 0, args, kNumArgs);
-			assert(success);
-		}
-
-
 		void Meter::SetPercent(double a_percent, bool a_force)
 		{
 			enum
@@ -236,42 +118,38 @@ namespace Scaleform
 			auto success = _instance.Invoke("setPercent", 0, args, kNumArgs);
 			assert(success);
 		}
-
-
-		void Meter::StartFlash(bool a_force)
-		{
-			enum
-			{
-				kForce,
-				kNumArgs
-			};
-
-			RE::GFxValue args[kNumArgs];
-
-			args[kForce] = a_force;
-			assert(args[kForce].IsBool());
-
-			auto success = _instance.Invoke("startFlash", 0, args, kNumArgs);
-			assert(success);
-		}
 	}
 
 
-	MeterMenu::MeterMenu()
+	MeterMenu::MeterMenu() :
+		Base(),
+		_meter()
 	{
-		using ScaleModeType = RE::GFxMovieView::ScaleModeType;
 		using Context = RE::InputMappingManager::Context;
 		using Flag = RE::IMenu::Flag;
 
 		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
-		if (!loader->LoadMovie(this, view, SWF_NAME, ScaleModeType::kShowAll, 0.0)) {
+		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		{
+			using StateType = RE::GFxState::StateType;
+
+			fxDelegate.reset(new RE::FxDelegate());
+			fxDelegate->RegisterHandler(this);
+			a_def->SetState(StateType::kExternalInterface, fxDelegate.get());
+			fxDelegate->Release();
+
+			auto logger = new Logger<MeterMenu>();
+			a_def->SetState(StateType::kLog, logger);
+			logger->Release();
+		});
+
+		if (!success) {
 			assert(false);
 			_FATALERROR("MeterMenu did not have a view due to missing dependencies! Aborting process!\n");
 			MessageBoxA(NULL, "MeterMenu did not have a view due to missing dependencies!\r\nAborting process!", NULL, MB_OK);
 			std::abort();
 		}
 
-		flags |= Flag::kModal;
 		context = Context::kGameplay;
 
 		InitExtensions();
@@ -282,6 +160,7 @@ namespace Scaleform
 	void MeterMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg)
 	{
 		a_cbReg->Process("Log", Log);
+		a_cbReg->Process("GetFramerate", GetFramerate);
 	}
 
 
@@ -305,7 +184,7 @@ namespace Scaleform
 
 	void MeterMenu::NextFrame(float a_arg1, UInt32 a_currentTime)
 	{
-		_meter.SetPercent(100, false);
+		_meter.Invalidate();
 		Base::NextFrame(a_arg1, a_currentTime);
 	}
 
@@ -343,12 +222,46 @@ namespace Scaleform
 	}
 
 
+	void MeterMenu::TweenTo(double a_percent)
+	{
+		auto task = SKSE::GetTaskInterface();
+		task->AddUITask([a_percent]()
+		{
+			auto mm = RE::MenuManager::GetSingleton();
+			auto menu = mm->GetMenu<MeterMenu>(Name());
+			if (menu) {
+				menu->SetPercent(a_percent);
+			}
+		});
+	}
+
+
+	void MeterMenu::SetPercent(double a_percent)
+	{
+		_meter.SetPercent(a_percent);
+	}
+
+
 	void MeterMenu::Log(const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 1);
 		assert(a_params[0].IsString());
 
 		_MESSAGE("%s: %s", Name().data(), a_params[0].GetString());
+	}
+
+
+	void MeterMenu::GetFramerate(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 0);
+
+		RE::FxResponseArgs<1> response;
+		RE::GFxValue retVal;
+
+		retVal.SetNumber(a_params.GetMovie()->GetFrameRate());
+
+		response.Add(retVal);
+		a_params.Respond(response);
 	}
 
 
@@ -365,10 +278,6 @@ namespace Scaleform
 			assert(success);
 			*elem.first = var;
 		}
-
-		_meter.FillDirection(Meter::FILL_DIRECTION_RIGHT);
-		_meter.Color(0xFF0000);
-		_meter.FillDelta(0.5);
 	}
 
 
@@ -388,10 +297,5 @@ namespace Scaleform
 		assert(success);
 		success = view->SetVariable("_global.noInvisibleAdvance", boolean);
 		assert(success);
-
-		using StateType = RE::GFxState::StateType;
-		auto logger = new Logger<MeterMenu>();
-		view->SetState(StateType::kLog, logger);
-		logger->Release();
 	}
 }

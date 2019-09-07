@@ -51,13 +51,26 @@ namespace Scaleform
 		_rangeMappings(),
 		_selectedIdx(kInvalid)
 	{
-		using ScaleModeType = RE::GFxMovieView::ScaleModeType;
 		using Context = RE::InputMappingManager::Context;
 		using Flag = RE::IMenu::Flag;
 
-		flags = Flag::kTryShowCursor;
+		flags |= Flag::kTryShowCursor;
 		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
-		if (!loader->LoadMovie(this, view, SWF_NAME, ScaleModeType::kShowAll, 0.0)) {
+		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		{
+			using StateType = RE::GFxState::StateType;
+
+			fxDelegate.reset(new RE::FxDelegate());
+			fxDelegate->RegisterHandler(this);
+			a_def->SetState(StateType::kExternalInterface, fxDelegate.get());
+			fxDelegate->Release();
+
+			auto logger = new Logger<SpellmakingMenu>();
+			a_def->SetState(StateType::kLog, logger);
+			logger->Release();
+		});
+
+		if (!success) {
 			assert(false);
 			_FATALERROR("SpellmakingMenu did not have a view due to missing dependencies! Aborting process!\n");
 			MessageBoxA(NULL, "SpellmakingMenu did not have a view due to missing dependencies!\r\nAborting process!", NULL, MB_OK);
