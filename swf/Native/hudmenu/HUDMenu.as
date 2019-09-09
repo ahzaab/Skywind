@@ -1,11 +1,10 @@
-﻿import gfx.io.GameDelegate;
-import flash.display.BitmapData;
-import Components.BlinkOnDemandMeter;
+﻿import Components.BlinkOnDemandMeter;
 import Components.BlinkOnEmptyMeter;
 import Components.Meter;
-import skyui.util.GlobalFunctions;
 import Shared.ButtonChange;
+import gfx.io.GameDelegate;
 import skyui.defines.Input;
+import skyui.util.GlobalFunctions;
 
 class HUDMenu extends Shared.PlatformChangeUser
 {
@@ -178,7 +177,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 		HudElements.push(FloatingQuestMarker_mc);
 		HudElements.push(LocationLockBase);
 		HudElements.push(TutorialLockInstance);
-		
+
 		Health.All = true;
 		Magica.All = true;
 		Stamina.All = true;
@@ -202,7 +201,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 		StealthMeterInstance.SneakTextHolder.SneakTextClip.SneakTextInstance.All = true;
 		LocationLockBase.All = true;
 		TutorialLockInstance.All = true;
-		
+
 		CrosshairInstance.Favor = true;
 		RolloverText.Favor = true;
 		RolloverInfoText.Favor = true;
@@ -219,30 +218,30 @@ class HUDMenu extends Shared.PlatformChangeUser
 		FloatingQuestMarker_mc.Favor = true;
 		LocationLockBase.Favor = true;
 		TutorialLockInstance.Favor = true;
-		
+
 		MessagesBlock.InventoryMode = true;
 		QuestUpdateBaseInstance.InventoryMode = true;
-		
+
 		MessagesBlock.TweenMode = true;
 		QuestUpdateBaseInstance.TweenMode = true;
-		
+
 		MessagesBlock.BookMode = true;
 		QuestUpdateBaseInstance.BookMode = true;
-		
+
 		QuestUpdateBaseInstance.DialogueMode = true;
 		CompassShoutMeterHolder.DialogueMode = true;
 		MessagesBlock.DialogueMode = true;
-		
+
 		QuestUpdateBaseInstance.BarterMode = true;
 		MessagesBlock.BarterMode = true;
-		
+
 		MessagesBlock.WorldMapMode = true;
-		
+
 		MessagesBlock.MovementDisabled = true;
 		QuestUpdateBaseInstance.MovementDisabled = true;
 		SubtitleTextHolder.MovementDisabled = true;
 		TutorialLockInstance.MovementDisabled = true;
-		
+
 		Health.StealthMode = true;
 		Magica.StealthMode = true;
 		Stamina.StealthMode = true;
@@ -264,7 +263,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 		FloatingQuestMarker_mc.StealthMode = true;
 		LocationLockBase.StealthMode = true;
 		TutorialLockInstance.StealthMode = true;
-		
+
 		Health.Swimming = true;
 		Magica.Swimming = true;
 		Stamina.Swimming = true;
@@ -284,7 +283,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 		FloatingQuestMarker_mc.Swimming = true;
 		LocationLockBase.Swimming = true;
 		TutorialLockInstance.Swimming = true;
-		
+
 		Health.HorseMode = true;
 		Magica.HorseMode = true;
 		CompassShoutMeterHolder.HorseMode = true;
@@ -295,7 +294,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 		FloatingQuestMarker_mc.HorseMode = true;
 		LocationLockBase.HorseMode = true;
 		TutorialLockInstance.HorseMode = true;
-		
+
 		Health.WarHorseMode = true;
 		Magica.WarHorseMode = true;
 		CompassShoutMeterHolder.WarHorseMode = true;
@@ -310,11 +309,11 @@ class HUDMenu extends Shared.PlatformChangeUser
 		Stamina.WarHorseMode = true;
 		RightChargeMeterAnim.WarHorseMode = true;
 		ArrowInfoInstance.WarHorseMode = true;
-		
+
 		MessagesBlock.CartMode = true;
 		SubtitleTextHolder.CartMode = true;
 		TutorialLockInstance.CartMode = true;
-		
+
 		/*
 		All // Normal hud mode
 		Favor
@@ -367,7 +366,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 				newHUDMode = String(HUDModes[HUDModes.length - 1]);
 			}
 		}
-		
+
 		for(var i: Number = 0; i < HudElements.length; i++) {
 			if (HudElements[i] != undefined) {
 				HudElements[i]._visible = HudElements[i].hasOwnProperty(newHUDMode);
@@ -607,7 +606,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 			RolloverText._alpha = 0;
 			Rollover_mc._alpha = 0;
 		}
-		
+
 		var TranslateText: String = "";
 		if (aCost != undefined) {
 			TranslateText = ValueTranslated.text + " <font face=\'$EverywhereBoldFont\' size=\'24\' color=\'#F9EDD5\'>" + Math.round(aCost) + "</font>" + TranslateText;
@@ -625,18 +624,18 @@ class HUDMenu extends Shared.PlatformChangeUser
 		} else {
 			RolloverGrayBar_mc._alpha = 0;
 		}
-		
+
 		RolloverInfoText.htmlText = TranslateText;
 	}
 
 	function RefreshActivateButtonArt(astrButtonName: String): Void
 	{
-		if (astrButtonName == undefined) 
+		if (astrButtonName == undefined)
 		{
 			Rollover_mc._alpha = 0;
 			return;
 		}
-		if (astrButtonName != undefined) 
+		if (astrButtonName != undefined)
 		{
 			if (aPlatform == ButtonChange.PLATFORM_PC)
 				Rollover_mc.gotoAndStop(GlobalFunctions.getMappedKey("Activate", Input.CONTEXT_GAMEPLAY, false));
@@ -665,7 +664,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 			SubtitleText._visible = false;
 			return;
 		}
-		
+
 		if (SubtitleText.htmlText != " ")
 			SubtitleText._visible = true;
 	}
@@ -678,7 +677,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 	function ShowSubtitle(astrText: String): Void
 	{
 		SubtitleText.SetText(astrText, true);
-		if (SubtitleText.enabled) 
+		if (SubtitleText.enabled)
 			SubtitleText._visible = true;
 	}
 
@@ -692,7 +691,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 	{
 		var HideFrame: Number = 15;
 		if (abHide) {
-			if (ArrowInfoInstance._currentframe > HideFrame) 
+			if (ArrowInfoInstance._currentframe > HideFrame)
 				ArrowInfoInstance.gotoAndStop(HideFrame);
 			ArrowInfoInstance.PlayReverse();
 			return;
@@ -719,15 +718,15 @@ class HUDMenu extends Shared.PlatformChangeUser
 		var COMPASS_GOTOANDSTOP: Number = 2;
 		var COMPASS_SCALE: Number = 3;
 		var COMPASS_STRIDE: Number = 4;
-		
+
 		while (CompassMarkerList.length > CompassTargetDataA.length / COMPASS_STRIDE) {
 			CompassMarkerList.pop().movie.removeMovieClip();
 		}
-		
+
 		for (var i: Number = 0; i < CompassTargetDataA.length / COMPASS_STRIDE; i++) {
 			var j: Number = i * COMPASS_STRIDE;
 			if (CompassMarkerList[i].movie == undefined) {
-				markerData = {movie: undefined, heading: 0};
+				var markerData: Object = {movie: undefined, heading: 0};
 				if (CompassTargetDataA[j + COMPASS_GOTOANDSTOP] == CompassMarkerQuest || CompassTargetDataA[j + COMPASS_GOTOANDSTOP] == CompassMarkerQuestDoor) {
 					markerData.movie = CompassRect.QuestHolder.attachMovie("Compass Marker", "CompassMarker" + CompassMarkerList.length, CompassRect.QuestHolder.getNextHighestDepth());
 				} else {
@@ -738,9 +737,9 @@ class HUDMenu extends Shared.PlatformChangeUser
 				var compassMarkerFrame: Number = CompassMarkerList[i].movie._currentframe;
 				if (compassMarkerFrame == CompassMarkerQuest || compassMarkerFrame == CompassMarkerQuestDoor) {
 					if (CompassMarkerList[i].movie._parent == CompassRect.MarkerHolder) {
-						markerData = {movie: undefined, heading: 0};
+						var markerData: Object = {movie: undefined, heading: 0};
 						markerData.movie = CompassRect.QuestHolder.attachMovie("Compass Marker", "CompassMarker" + CompassMarkerList.length, CompassRect.QuestHolder.getNextHighestDepth());
-						aCompassMarkerList = CompassMarkerList.splice(i, 1, markerData);
+						var aCompassMarkerList: Array = CompassMarkerList.splice(i, 1, markerData);
 						aCompassMarkerList[0].movie.removeMovieClip();
 					}
 				} else if (CompassMarkerList[i].movie._parent == CompassRect.QuestHolder) {
@@ -766,7 +765,7 @@ class HUDMenu extends Shared.PlatformChangeUser
 		var angleDeltaRight: Number = aiCenterAngle + angleDelta;
 		var widthDeltaLeft: Number = 0 - CompassRect._x - compassMarkerWidth / 2;
 		var widthDeltaRight: Number = 0 - CompassRect._x + compassMarkerWidth / 2;
-		
+
 		for (var i: Number = 0; i < CompassMarkerList.length; i++) {
 			var heading: Number = CompassMarkerList[i].heading;
 			if (angleDeltaLeft < 0 && heading > 360 - aiCenterAngle - angleDelta) {

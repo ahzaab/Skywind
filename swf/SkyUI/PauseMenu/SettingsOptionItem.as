@@ -1,9 +1,9 @@
-﻿import gfx.controls.OptionStepper;
+﻿import Shared.GlobalFunc;
+import gfx.controls.OptionStepper;
 import gfx.controls.ScrollBar;
-import Shared.GlobalFunc;
+import gfx.io.GameDelegate;
 import gfx.ui.InputDetails;
 import gfx.ui.NavigationCode;
-import gfx.io.GameDelegate;
 
 class SettingsOptionItem extends MovieClip
 {
@@ -45,26 +45,26 @@ class SettingsOptionItem extends MovieClip
 	function set movieType(aiMovieType: Number): Void
 	{
 		iMovieType = aiMovieType;
-		
+
 		ScrollBar_mc.disabled = true;
 		ScrollBar_mc.visible = false;
-		
+
 		OptionStepper_mc.disabled = true;
 		OptionStepper_mc.visible = false;
-		
+
 		CheckBox_mc._visible = false;
-		
+
 		switch (iMovieType) {
 			case 0:
 				ScrollBar_mc.disabled = false;
 				ScrollBar_mc.visible = true;
 				break;
-				
+
 			case 1:
 				OptionStepper_mc.disabled = false;
 				OptionStepper_mc.visible = true;
 				break;
-				
+
 			case 2:
 				CheckBox_mc._visible = true;
 				break;
@@ -84,16 +84,16 @@ class SettingsOptionItem extends MovieClip
 	function get value(): Number
 	{
 		var iFrameValue: Number = undefined;
-		
+
 		switch (iMovieType) {
 			case 0:
 				iFrameValue = ScrollBar_mc.position / 20;
 				break;
-				
+
 			case 1:
 				iFrameValue = OptionStepper_mc.selectedIndex;
 				break;
-				
+
 			case 2:
 				iFrameValue = CheckBox_mc._currentframe - 1;
 				break;
@@ -109,13 +109,13 @@ class SettingsOptionItem extends MovieClip
 				ScrollBar_mc.position = afNewValue * 20;
 				bSendChangeEvent = true;
 				break;
-				
+
 			case 1:
 				bSendChangeEvent = false;
 				OptionStepper_mc.selectedIndex = afNewValue;
 				bSendChangeEvent = true;
 				break;
-				
+
 			case 2:
 				CheckBox_mc.gotoAndStop(afNewValue + 1);
 				break;
@@ -148,7 +148,7 @@ class SettingsOptionItem extends MovieClip
 	function handleInput(details: InputDetails, pathToFocus: Array): Boolean
 	{
 		var bhandledInput: Boolean = false;
-		
+
 		if (GlobalFunc.IsKeyPressed(details)) {
 			switch (iMovieType) {
 				case 0:
@@ -160,13 +160,13 @@ class SettingsOptionItem extends MovieClip
 						bhandledInput = true;
 					}
 					break;
-					
+
 				case 1:
 					if (details.navEquivalent == NavigationCode.LEFT || details.navEquivalent == NavigationCode.RIGHT) {
 						bhandledInput = OptionStepper_mc.handleInput(details, pathToFocus);
 					}
 					break;
-					
+
 				case 2:
 					if (details.navEquivalent == gfx.ui.NavigationCode.ENTER) {
 						ToggleCheckbox();
@@ -187,8 +187,8 @@ class SettingsOptionItem extends MovieClip
 
 	function onMousePress(): Void
 	{
-		var TopMostEntity_mc: Object = Mouse.getTopMostEntity();
-		
+		var TopMostEntity_mc: Object = Mouse["getTopMostEntity"]();
+
 		switch (iMovieType) {
 			case 0:
 				if (TopMostEntity_mc == ScrollBar_mc.thumb) {
@@ -201,7 +201,7 @@ class SettingsOptionItem extends MovieClip
 					ScrollBar_mc.track.onPress();
 				}
 				break;
-				
+
 			case 1:
 				if (TopMostEntity_mc == OptionStepper_mc.nextBtn || TopMostEntity_mc == OptionStepper_mc.textField) {
 					OptionStepper_mc.nextBtn.onPress();
@@ -214,9 +214,9 @@ class SettingsOptionItem extends MovieClip
 
 	function onRelease(): Void
 	{
-	
-		var TopMostEntity_mc: Object = Mouse.getTopMostEntity();
-	
+
+		var TopMostEntity_mc: Object = Mouse["getTopMostEntity"]();
+
 		switch (iMovieType) {
 			case 0:
 				if (TopMostEntity_mc == ScrollBar_mc.thumb) {
@@ -229,7 +229,7 @@ class SettingsOptionItem extends MovieClip
 					ScrollBar_mc.track.onRelease();
 				}
 				break;
-				
+
 			case 1:
 				if (TopMostEntity_mc == OptionStepper_mc.nextBtn || TopMostEntity_mc == OptionStepper_mc.textField) {
 					OptionStepper_mc.nextBtn.onRelease();
@@ -237,7 +237,7 @@ class SettingsOptionItem extends MovieClip
 					OptionStepper_mc.prevBtn.onRelease();
 				}
 				break;
-				
+
 			case 2:
 				if (TopMostEntity_mc._parent == CheckBox_mc) {
 					ToggleCheckbox();

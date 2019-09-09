@@ -1,9 +1,7 @@
-﻿import Components.CrossPlatformButtons;
-import Components.Meter;
+﻿import Components.Meter;
 import gfx.io.GameDelegate;
-
 import skyui.components.ButtonPanel;
-import skyui.defines.Input;
+
 
 class JournalBottomBar extends MovieClip
 {
@@ -36,7 +34,7 @@ class JournalBottomBar extends MovieClip
 		LevelMeterRect.LevelNumberLabel.SetText(arguments[1]);
 		LevelMeter_mc.SetPercent(arguments[2]);
 	}
-	
+
 	public function setPlatform(a_platform: Number, a_bPS3Switch: Boolean): Void
 	{
 		buttonPanel.setPlatform(a_platform, a_bPS3Switch);

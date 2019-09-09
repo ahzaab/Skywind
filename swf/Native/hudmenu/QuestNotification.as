@@ -10,9 +10,9 @@ class QuestNotification extends MovieClip
 	static var SHOUT_UPDATE: Number = 3;
 	static var bPlayerLeveled: Boolean = false;
 	static var PlayerLevel: Number = 0;
-	
+
 	var ShowNotifications: Boolean = true;
-	
+
 	var AnimatedLetter_mc: AnimatedLetter;
 	var LevelMeterBaseInstance: MovieClip;
 	var LevelUpMeter: UniformTimeMeter;
@@ -61,8 +61,9 @@ class QuestNotification extends MovieClip
 	static function DecAnimCount(): Void
 	{
 		--QuestNotification.AnimationCount;
-		if (QuestNotification.AnimationCount == 0) 
+		if (QuestNotification.AnimationCount == 0) {
 			QuestNotification.Instance.ShowObjectives(QuestNotification.Instance.ObjectivesCount);
+		}
 	}
 
 	static function CheckContinue(): Boolean
@@ -79,8 +80,9 @@ class QuestNotification extends MovieClip
 	function ShowNotification(aNotificationText: String, aStatus: String, aSoundID: String, aObjectiveCount: Number, aNotificationType: Number, aLevel: Number, aStartPercent: Number, aEndPercent: Number, aDragonText: String): Void
 	{
 		ShowNotifications = false;
-		if (aSoundID.length > 0)
+		if (aSoundID.length > 0) {
 			gfx.io.GameDelegate.call("PlaySound", [aSoundID]);
+		}
 		EvaluateNotifications();
 		QuestNotification.QuestNotificationIntervalIndex = setInterval(mx.utils.Delegate.create(this, EvaluateNotifications), 30);
 		if (aNotificationType == QuestNotification.QUEST_UPDATE || aNotificationType == undefined) {

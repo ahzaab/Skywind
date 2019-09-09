@@ -28,20 +28,21 @@ class Messages extends MovieClip
 			ShownMessageArray[ShownMessageArray.length - 1].TextFieldClip.tf1.textAutoSize = "shrink";
 			ShownMessageArray[ShownMessageArray.length - 1].TextFieldClip.tf1.htmlText = MessageArray.shift();
 			bAnimating = true;
-			ySpacing = 0;
+			var ySpacing: Number = 0;
 			onEnterFrame = function (): Void
 			{
 				if (ySpacing < Messages.Y_SPACING) {
-					for (var i: Number = 0; i < ShownMessageArray.length - 1; i++) {
-						ShownMessageArray[i]._y = ShownMessageArray[i]._y + 2;
+					for (var i: Number = 0; i < this.ShownMessageArray.length - 1; i++) {
+						this.ShownMessageArray[i]._y = this.ShownMessageArray[i]._y + 2;
 					}
 					++ySpacing;
 					return;
 				}
-				bAnimating = false;
-				if (!bqueuedMessage || ShownCount == Messages.MAX_SHOWN) 
-					ShownMessageArray[0].gotoAndPlay("FadeOut");
-				delete onEnterFrame;
+				this.bAnimating = false;
+				if (!bqueuedMessage || this.ShownCount == Messages.MAX_SHOWN) {
+					this.ShownMessageArray[0].gotoAndPlay("FadeOut");
+				}
+				delete this.onEnterFrame;
 			};
 			++ShownCount;
 		}

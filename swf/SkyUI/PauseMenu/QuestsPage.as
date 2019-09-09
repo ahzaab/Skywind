@@ -1,10 +1,8 @@
-﻿import Components.CrossPlatformButtons;
+﻿import Shared.GlobalFunc;
 import gfx.io.GameDelegate;
-import gfx.ui.InputDetails;
-import Shared.GlobalFunc;
-import gfx.ui.NavigationCode;
 import gfx.managers.FocusHandler;
-import skyui.util.Debug;
+import gfx.ui.InputDetails;
+import gfx.ui.NavigationCode;
 
 class QuestsPage extends MovieClip
 {
@@ -238,7 +236,7 @@ class QuestsPage extends MovieClip
 
 	private function switchFocusToObjectives():Void
 	{
-		FocusHandler.instance.setFocus(ObjectiveList,0);
+		FocusHandler.instance.setFocus(MovieClip(ObjectiveList),0);
 		Divider.gotoAndStop("Left");
 		_toggleActiveButton._alpha = isViewingMiscObjectives() ? 100:50;
 		if ((iPlatform != 0))
@@ -466,7 +464,8 @@ class QuestsPage extends MovieClip
 			else
 			{
 				QuestTitleText.SetText(TitleList.selectedEntry.text);
-				TitleList.selectedEntry.objectives == undefined;
+				// TitleList.selectedEntry.objectives == undefined; ??
+				TitleList.selectedEntry.objectives = undefined;
 				TitleList_mc._visible = true;
 				GameDelegate.call("RequestObjectivesData",[]);
 				ObjectiveList.entryList = TitleList.selectedEntry.objectives;
@@ -476,8 +475,7 @@ class QuestsPage extends MovieClip
 				ObjectivesHeader._visible = ! isViewingMiscObjectives();
 				ObjectiveList.selectedIndex = -1;
 				ObjectiveList.scrollPosition = 0;
-				if ((iPlatform != 0))
-				{
+				if ((iPlatform != 0)) {
 					ObjectiveList.disableSelection = true;
 				}
 

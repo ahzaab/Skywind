@@ -107,7 +107,7 @@ class Meter extends UIComponent
 			_opaqueFrame = _targetFrame;
 		}
 
-		if (_translucentTimer == 0) {
+		if (_translucentTimer == STOPPED) {
 			_translucentTimer = _frameRate;
 		}
 	}
@@ -121,10 +121,10 @@ class Meter extends UIComponent
 		drawOpaque();
 
 		if (_translucentFrame <= _opaqueFrame) {
-			_translucentTimer = 0;
+			_translucentTimer = STOPPED;
 		}
 
-		if (_translucentTimer > 0) {
+		if (_translucentTimer > STOPPED) {
 			--_translucentTimer;
 		} else {
 			drawTranslucent();
@@ -154,9 +154,9 @@ class Meter extends UIComponent
 
 		if (_translucent._currentframe != _translucentFrame) {
 			_translucent.gotoAndStop(_translucentFrame);
-			_translucentTimer = -1;
+			_translucentTimer = ANIMATING;
 		} else {
-			_translucentTimer = 0;
+			_translucentTimer = STOPPED;
 		}
 	}
 

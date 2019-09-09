@@ -7,8 +7,8 @@ class InputMappingArt extends MovieClip
 	private var _keyCodes: Array;
 
 
-	
-	
+
+
 	private var _buttonNameMap: Object = {esc:			1,
 									//1:				2,
 									//2:				3,
@@ -149,41 +149,41 @@ class InputMappingArt extends MovieClip
 										ps3_rt:			281
 										};
 
-	
+
   /* STAGE ELEMENTS */
-	
+
 	public var background: MovieClip;
 	public var textField: TextField;
-	
-	
+
+
   /* PROPERTIES */
-  
+
   	public function set hiddenBackground(a_flag: Boolean)
 	{
 		background._visible = !a_flag;
 	}
-	
+
 	public function get hiddenBackground(): Boolean
 	{
 		return background._visible;
 	}
-	
+
 	public function get width(): Number
 	{
 		return background._width;
 	}
-	
+
 	public function set width(a_value: Number)
 	{
 		background._width = a_value;
 	}
-  
+
   	public var buttonArt: Array;
 
 
   /* INITIALIZATION */
 
-	function MappedButton()
+	function InputMappingArt()
 	{
 		super();
 
@@ -196,7 +196,7 @@ class InputMappingArt extends MovieClip
 		_keyCodes = [];
 
 		textField.textAutoSize = "shrink";
-		
+
 		textField._visible = false;
 		background._visible = false;
 
@@ -236,8 +236,8 @@ class InputMappingArt extends MovieClip
 		_buttonNameMap["360_lt"]	= 280;
 		_buttonNameMap["360_rt"]	= 281;
 	}
-	
-	
+
+
   /* PUBLIC FUNCTIONS */
 
 	public function setButtonName(a_buttonName: String): Void
@@ -266,9 +266,9 @@ class InputMappingArt extends MovieClip
 		var xOffset: Number = 0;
 		for (var i: Number = 0; i < buttonArt.length; i++) {
 			var icon: MovieClip = buttonArt[i];
-			
+
 			if (_keyCodes[i] > 0) {
-				icon._visible = true;			
+				icon._visible = true;
 				icon.gotoAndStop(_keyCodes[i]);
 				icon._x = xOffset;
 				icon._y = 0; //(0 - icon._height) / 2; // Center it
@@ -277,7 +277,7 @@ class InputMappingArt extends MovieClip
 				icon._visible = false;
 			}
 		}
-		
+
 		background._width = xOffset;
 	}
 }

@@ -974,9 +974,8 @@ class SystemPage extends MovieClip
 			case SystemPage.SAVE_LOAD_STATE:
 			case SystemPage.INPUT_MAPPING_STATE:
       case SystemPage.HELP_TEXT_STATE:
-        if(this.iPlatform != SystemPage.CONTROLLER_ORBIS)
-        {
-					SystemDivider.gotoAndStop("Right");
+        if(this.iPlatform != SystemPage.CONTROLLER_ORBIS) {
+			SystemDivider.gotoAndStop("Right");
         }
         break;
 			case SystemPage.OPTIONS_LISTS_STATE:
@@ -1000,8 +999,7 @@ class SystemPage extends MovieClip
 				SystemDivider.gotoAndStop("Right");
 				break;
 		}
-		if (iCurrentState != SystemPage.MAIN_STATE)
-		{
+		if (iCurrentState != SystemPage.MAIN_STATE) {
 			GetPanelForState(iCurrentState).gotoAndPlay("end");
 			iCurrentState = SystemPage.TRANSITIONING;
 		}
@@ -1093,7 +1091,7 @@ class SystemPage extends MovieClip
 				break;
 
 			case SystemPage.HELP_TEXT_STATE:
-				FocusHandler.instance.setFocus(HelpText, 0);
+				FocusHandler.instance.setFocus(HelpText._parent, 0);
 				break;
 		}
 	}

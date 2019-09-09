@@ -1,38 +1,37 @@
-﻿import gfx.controls.RadioButton;
+﻿import Shared.GlobalFunc;
 import gfx.controls.ButtonGroup;
+import gfx.controls.RadioButton;
 import gfx.io.GameDelegate;
-import gfx.ui.InputDetails;
-import Shared.GlobalFunc;
-import gfx.ui.NavigationCode;
 import gfx.managers.FocusHandler;
+import gfx.ui.InputDetails;
+import gfx.ui.NavigationCode;
 
-import skyui.components.ButtonPanel;
 
 class Quest_Journal extends MovieClip
 {
 	#include "../version.as"
-	
+
 	var bTabsDisabled: Boolean;
-	
+
 	var iCurrentTab: Number;
-	
+
 	var BottomBar: MovieClip;
 	var BottomBar_mc: MovieClip;
-	
+
 	var PageArray: Array;
-	
+
 	public var previousTabButton: MovieClip;
 	public var nextTabButton: MovieClip;
-	var TopmostPage: MovieClip;	
+	var TopmostPage: MovieClip;
 	var QuestsFader: MovieClip;
 	var StatsFader: MovieClip;
 	var SystemFader: MovieClip;
-	
+
 	var QuestsTab: RadioButton;
 	var StatsTab: RadioButton;
 	var SystemTab: RadioButton;
 	var TabButtonGroup: ButtonGroup;
-	
+
 	var ConfigPanel: MovieClip;
 
 	public static var QUESTS_TAB: Number = 0;
@@ -52,25 +51,25 @@ class Quest_Journal extends MovieClip
 	{
 		GlobalFunc.SetLockFunction();
 		MovieClip(BottomBar_mc).Lock("B");
-		
+
 		ConfigPanel = _root.ConfigPanelFader.configPanel;
-		
+
 		QuestsTab.disableFocus = true;
 		StatsTab.disableFocus = true;
 		SystemTab.disableFocus = true;
-		
+
 		TabButtonGroup = ButtonGroup(QuestsTab.group);
 		TabButtonGroup.addEventListener("itemClick", this, "onTabClick");
 		TabButtonGroup.addEventListener("change", this, "onTabChange");
-		
+
 		GameDelegate.addCallBack("RestoreSavedSettings", this, "RestoreSavedSettings");
 		GameDelegate.addCallBack("onRightStickInput", this, "onRightStickInput");
 		GameDelegate.addCallBack("HideMenu", this, "DoHideMenu");
 		GameDelegate.addCallBack("ShowMenu", this, "DoShowMenu");
 		GameDelegate.addCallBack("StartCloseMenu", this, "CloseMenu");
-		
+
 		BottomBar_mc.InitBar();
-		
+
 		ConfigPanel.initExtensions();
 	}
 
@@ -89,8 +88,7 @@ class Quest_Journal extends MovieClip
 
 	function SwitchPageToFront(aiTab: Number, abForceFade: Boolean): Void
 	{
-		if (TopmostPage != PageArray[iCurrentTab]._parent) 
-		{
+		if (TopmostPage != PageArray[iCurrentTab]._parent) {
 			TopmostPage.gotoAndStop("hide");
 			PageArray[iCurrentTab]._parent.swapDepths(TopmostPage);
 			TopmostPage = PageArray[iCurrentTab]._parent;
@@ -152,9 +150,9 @@ class Quest_Journal extends MovieClip
 		if (bTabsDisabled) {
 			return;
 		}
-		
+
 		var iOldTab: Number = iCurrentTab;
-		
+
 		if (event.item == QuestsTab) {
 			iCurrentTab = 0;
 		} else if (event.item == StatsTab) {
@@ -200,7 +198,7 @@ class Quest_Journal extends MovieClip
 			}
 		}
 		BottomBar_mc.setPlatform(aiPlatform, abPS3Switch);
-			
+
 		ConfigPanel.setPlatform(aiPlatform, abPS3Switch);
 	}
 
@@ -220,7 +218,7 @@ class Quest_Journal extends MovieClip
 		StatsTab.disabled = abEnable;
 		SystemTab.disabled = abEnable;
 	}
-	
+
 	function ConfigPanelOpen(): Void
 	{
 		DisableTabs(true);
@@ -230,7 +228,7 @@ class Quest_Journal extends MovieClip
 		FocusHandler.instance.setFocus(ConfigPanel, 0);
 		ConfigPanel.startPage();
 	}
-	
+
 	function ConfigPanelClose(): Void
 	{
 		ConfigPanel.endPage();
