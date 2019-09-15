@@ -11,6 +11,8 @@ import gfx.io.GameDelegate;
 	public static var TOGGLE_ON: Number = 1;
 	public static var TOGGLE_OFF: Number = 2;
 
+	private static var MAX_AV: Number = 100;
+	private static var MAX_INCR: Number = 5;
 	private static var DF_INCR: Number = 1;
 	private static var DF_PLUGIN: String = "Skywind.esm";
 
@@ -20,7 +22,8 @@ import gfx.io.GameDelegate;
 	private var _toggled = false;
 	private var _av: Number = 0;
 	private var _modGlobal: Number = 0;
-	private var _modVal: Number = 0;
+	private var _modVal: Number = DF_INCR;
+	private var _decVal: Number = 0;
 	private var _rollOverCallback: Object;
 	private var _rollOutCallback: Object;
 	private var _pressCallback: Object;
@@ -28,7 +31,6 @@ import gfx.io.GameDelegate;
 
 	/* STAGE ELEMENTS */
 
-	public var name: TextField;
 	public var raiseMC: TextField;
 	public var baseMC: TextField;
 	public var indicatorMC: MovieClip;
@@ -40,7 +42,6 @@ import gfx.io.GameDelegate;
 	{
 		super();
 		indicatorMC._alpha = 0;
-		name.htmlText = label;
 	}
 
 
@@ -48,6 +49,10 @@ import gfx.io.GameDelegate;
 
 	public function init(a_av: Number, a_modGlobalFormID: Number): Void
 	{
+		if (!initialized) {
+			onLoad();
+		}
+
 		addEventListener(EventTypes.ROLL_OVER, this, "rollOverHandler");
 		addEventListener(EventTypes.ROLL_OUT, this, "rollOutHandler");
 		addEventListener(EventTypes.PRESS, this, "pressHandler");
@@ -128,10 +133,8 @@ import gfx.io.GameDelegate;
 	{
 		if (_toggled) {
 			modPlayerAV(_av, _modVal);
-			var mod: Number = _modVal - DF_INCR;
-			if (mod > 0) {
-				mod *= -1;
-				modGlobal(_modGlobal, mod);
+			if (_decVal < 0) {
+				modGlobal(_modGlobal, _decVal);
 			}
 		}
 	}
@@ -141,10 +144,13 @@ import gfx.io.GameDelegate;
 
 	private function setMod(a_value: Number): Void
 	{
-		_modVal = a_value;
-		if (_modVal == undefined) {
-			_modVal = DF_INCR;
+		_modVal = DF_INCR;
+		_decVal = 0;
+		if (a_value != undefined && a_value > 0) {
+			_modVal = a_value;
+			_decVal = -1 * a_value;
 		}
+
 		raiseMC.htmlText = "+" + _modVal.toString();
 	}
 
@@ -152,6 +158,10 @@ import gfx.io.GameDelegate;
 	private function setBase(a_value: Number): Void
 	{
 		baseMC.htmlText = a_value.toString();
+
+		if (a_value >= MAX_AV) {
+			disabled = true;
+		}
 	}
 
 
