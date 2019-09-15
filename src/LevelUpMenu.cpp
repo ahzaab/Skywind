@@ -51,6 +51,7 @@ namespace Scaleform
 		a_cbReg->Process("GetPlayerAV", GetPlayerAV);
 		a_cbReg->Process("GetPlayerLevel", GetPlayerLevel);
 		a_cbReg->Process("Log", Log);
+		a_cbReg->Process("ModGlobal", ModGlobal);
 		a_cbReg->Process("ModPlayerAV", ModPlayerAV);
 		a_cbReg->Process("PlaySound", PlaySound);
 	}
@@ -139,18 +140,13 @@ namespace Scaleform
 		RE::GFxValue retVal;
 		retVal.SetUndefined();
 
-		std::string modName = a_params[1].GetString();
-		auto dataHandler = RE::TESDataHandler::GetSingleton();
-		auto mod = dataHandler->LookupModByName(modName);
-		if (mod && mod->modIndex != 0xFF) {
-			auto formID = static_cast<RE::FormID>(a_params[0].GetUInt());
-			formID += mod->modIndex << (8 * 3);
-			formID += mod->lightIndex << ((8 * 1) + (8 / 2));
+		auto baseID = a_params[0].GetUInt();
+		auto pluginName = a_params[1].GetString();
 
-			auto global = RE::TESForm::LookupByID<RE::TESGlobal>(formID);
-			if (global) {
-				retVal.SetNumber(global->value);
-			}
+		auto formID = ResolveFormID(baseID, pluginName);
+		auto global = RE::TESForm::LookupByID<RE::TESGlobal>(formID);
+		if (global) {
+			retVal.SetNumber(global->value);
 		}
 
 		response.Add(retVal);
@@ -201,6 +197,25 @@ namespace Scaleform
 	}
 
 
+	void LevelUpMenu::ModGlobal(const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 3);
+		assert(a_params[0].IsNumber());
+		assert(a_params[1].IsNumber());
+		assert(a_params[2].IsString());
+
+		auto baseID = a_params[0].GetUInt();
+		auto pluginName = a_params[2].GetString();
+
+		auto formID = ResolveFormID(baseID, pluginName);
+		auto global = RE::TESForm::LookupByID<RE::TESGlobal>(formID);
+		if (global) {
+			auto mod = a_params[1].GetNumber();
+			global->value += mod;
+		}
+	}
+
+
 	void LevelUpMenu::ModPlayerAV(const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 2);
@@ -208,9 +223,9 @@ namespace Scaleform
 		assert(a_params[1].IsNumber());
 
 		auto av = static_cast<RE::ActorValue>(a_params[0].GetUInt());
-		auto val = static_cast<float>(a_params[1].GetNumber());
+		auto mod = static_cast<float>(a_params[1].GetNumber());
 		auto player = RE::PlayerCharacter::GetSingleton();
-		player->ModActorValueBase(av, val);
+		player->ModActorValueBase(av, mod);
 	}
 
 
@@ -220,6 +235,24 @@ namespace Scaleform
 		assert(a_params[0].IsString());
 
 		RE::PlaySound(a_params[0].GetString());
+	}
+
+
+	RE::FormID LevelUpMenu::ResolveFormID(RE::FormID a_baseID, std::string a_pluginName)
+	{
+		RE::FormID result;
+
+		auto dataHandler = RE::TESDataHandler::GetSingleton();
+		auto mod = dataHandler->LookupModByName(a_pluginName);
+		if (mod && mod->modIndex != 0xFF) {
+			result = a_baseID;
+			result += mod->modIndex << (8 * 3);
+			result += mod->lightIndex << ((8 * 1) + (8 / 2));
+		} else {
+			result = 0;
+		}
+
+		return result;
 	}
 
 
@@ -236,8 +269,6 @@ namespace Scaleform
 			assert(success);
 			*elem.first = var;
 		}
-
-		_root.Invoke("init");
 	}
 
 
@@ -268,10 +299,5 @@ namespace Scaleform
 		assert(success);
 		success = view->SetVariable("Selection.disableFocusAutoRelease", boolean);
 		assert(success);
-
-		using StateType = RE::GFxState::StateType;
-		auto logger = new Logger<LevelUpMenu>();
-		view->SetState(StateType::kLog, logger);
-		logger->Release();
 	}
 }

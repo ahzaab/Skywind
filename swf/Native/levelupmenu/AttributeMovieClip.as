@@ -1,9 +1,9 @@
-﻿import gfx.events.EventTypes;
+﻿import gfx.controls.Button;
+import gfx.events.EventTypes;
 import gfx.io.GameDelegate;
 
 
-[InspectableList("label")]
- class AttributeMovieClip extends gfx.controls.Button
+ class AttributeMovieClip extends Button
 {
 	/* CONSTANTS */
 
@@ -12,19 +12,15 @@ import gfx.io.GameDelegate;
 	public static var TOGGLE_OFF: Number = 2;
 
 	private static var DF_INCR: Number = 1;
-
-
-	/* PROPERTIES */
-
-	[Inspectable(type="String", defaultValue="attributeName")]
-	public var label;
+	private static var DF_PLUGIN: String = "Skywind.esm";
 
 
 	/* PRIVATE VARIABLES */
 
 	private var _toggled = false;
 	private var _av: Number = 0;
-	private var _mod: Number = 0;
+	private var _modGlobal: Number = 0;
+	private var _modVal: Number = 0;
 	private var _rollOverCallback: Object;
 	private var _rollOutCallback: Object;
 	private var _pressCallback: Object;
@@ -57,9 +53,10 @@ import gfx.io.GameDelegate;
 		addEventListener(EventTypes.PRESS, this, "pressHandler");
 
 		_av = a_av;
+		_modGlobal = a_modGlobalFormID;
 
 		getPlayerAV(_av);
-		getGlobal(a_modGlobalFormID);
+		getGlobal(_modGlobal);
 	}
 
 
@@ -93,7 +90,7 @@ import gfx.io.GameDelegate;
 	}
 
 
-	public function toggle(a_canToggleOn: Boolean): Number
+	public function doToggle(a_canToggleOn: Boolean): Number
 	{
 		if (!_toggled && a_canToggleOn) {
 			playSoundImpl("UIMenuOK");
@@ -130,7 +127,12 @@ import gfx.io.GameDelegate;
 	public function onClose(): Void
 	{
 		if (_toggled) {
-			modPlayerAV(_av, _mod);
+			modPlayerAV(_av, _modVal);
+			var mod: Number = _modVal - DF_INCR;
+			if (mod > 0) {
+				mod *= -1;
+				modGlobal(_modGlobal, mod);
+			}
 		}
 	}
 
@@ -139,11 +141,11 @@ import gfx.io.GameDelegate;
 
 	private function setMod(a_value: Number): Void
 	{
-		_mod = a_value;
-		if (_mod == undefined) {
-			_mod = DF_INCR;
+		_modVal = a_value;
+		if (_modVal == undefined) {
+			_modVal = DF_INCR;
 		}
-		raiseMC.htmlText = "+" + _mod.toString();
+		raiseMC.htmlText = "+" + _modVal.toString();
 	}
 
 
@@ -184,33 +186,43 @@ import gfx.io.GameDelegate;
 	private function getGlobal(a_formID: Number, a_plugin: String): Void
 	{
 		if (a_plugin == undefined) {
-			a_plugin = "SkyWind.esm";
+			a_plugin = DF_PLUGIN;
 		}
 
-		GameDelegate.call("GetGlobal", [a_formID, a_plugin], this, "setMod");	// skywind
+		GameDelegate.call("GetGlobal", [a_formID, a_plugin], this, "setMod");
 	}
 
 
 	private function getPlayerAV(a_av: Number): Void
 	{
-		GameDelegate.call("GetPlayerAV", [a_av], this, "setBase");	// skywind
+		GameDelegate.call("GetPlayerAV", [a_av], this, "setBase");
 	}
 
 
 	private function log(a_str: String): Void
 	{
-		GameDelegate.call("Log", [a_str]);	// skywind
+		GameDelegate.call("Log", [a_str]);
 	}
 
 
-	private function playSoundImpl(a_sound: String): Void
+	private function modGlobal(a_formID: Number, a_mod: Number, a_plugin: String): Void
 	{
-		GameDelegate.call("PlaySound", [a_sound]);	// skywind
+		if (a_plugin == undefined) {
+			a_plugin = DF_PLUGIN;
+		}
+
+		GameDelegate.call("ModGlobal", [a_formID, a_mod, a_plugin]);
 	}
 
 
 	private function modPlayerAV(a_av: Number, a_mod: Number): Void
 	{
-		GameDelegate.call("ModPlayerAV", [a_av, a_mod]);	// skywind
+		GameDelegate.call("ModPlayerAV", [a_av, a_mod]);
+	}
+
+
+	private function playSoundImpl(a_sound: String): Void
+	{
+		GameDelegate.call("PlaySound", [a_sound]);
 	}
 }

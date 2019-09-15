@@ -33,8 +33,11 @@ namespace Scaleform
 		static void GetPlayerAV(const RE::FxDelegateArgs& a_params);
 		static void GetPlayerLevel(const RE::FxDelegateArgs& a_params);
 		static void Log(const RE::FxDelegateArgs& a_params);
+		static void ModGlobal(const RE::FxDelegateArgs& a_params);
 		static void ModPlayerAV(const RE::FxDelegateArgs& a_params);
 		static void PlaySound(const RE::FxDelegateArgs& a_params);
+
+		static RE::FormID ResolveFormID(RE::FormID a_baseID, std::string a_pluginName);
 
 		void OnMenuOpen();
 		void OnMenuClose();

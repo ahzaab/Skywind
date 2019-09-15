@@ -17,7 +17,6 @@
   <classpaths>
     <class path="src" />
     <class path="common" />
-    <class path="Native\levelupmenu" />
   </classpaths>
   <!-- Build options -->
   <build>

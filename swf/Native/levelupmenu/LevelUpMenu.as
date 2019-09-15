@@ -25,7 +25,7 @@ dynamic class LevelUpMenu extends MovieClip
 	public static var AGILITY_MOD: Number = 0x07FEF4;
 	public static var SPEED_MOD: Number = 0x07FEF5;
 	public static var PERSONALITY_MOD: Number = 0x07FEF6;
-	public static var LUCK_MOD: Number = 0x000000;
+	public static var LUCK_MOD: Number = 0x0D01A9;
 
 
 	/* PRIVATE VARIABLES */
@@ -59,7 +59,8 @@ dynamic class LevelUpMenu extends MovieClip
 	}
 
 
-	public function init(): Void
+	// @override MovieClip
+	public function onLoad(): Void
 	{
 		ContinueMC.disabled = true;
 
@@ -103,7 +104,7 @@ dynamic class LevelUpMenu extends MovieClip
 	public function onPressedAttribute(a_attribute: AttributeMovieClip): Void
 	{
 		var canToggleOn: Boolean = _numSelected < MAX_SELECTABLE;
-		var toggleState: Number = a_attribute.toggle(canToggleOn);
+		var toggleState: Number = a_attribute.doToggle(canToggleOn);
 
 		switch (toggleState) {
 			case AttributeMovieClip.TOGGLE_ON:
@@ -156,30 +157,30 @@ dynamic class LevelUpMenu extends MovieClip
 
 	private function advanceLevel(): Void
 	{
-		GameDelegate.call("AdvanceLevel", []);	// skywind
+		GameDelegate.call("AdvanceLevel", []);
 	}
 
 
 	private function closeMenu(): Void
 	{
-		GameDelegate.call("CloseMenu", []);	// skywind
+		GameDelegate.call("CloseMenu", []);
 	}
 
 
 	private function getPlayerLevel(): Void
 	{
-		GameDelegate.call("GetPlayerLevel", [], this, "setLevelText");	// skywind
+		GameDelegate.call("GetPlayerLevel", [], this, "setLevelText");
 	}
 
 
 	private function log(a_str: String): Void
 	{
-		GameDelegate.call("Log", [a_str]);	// skywind
+		GameDelegate.call("Log", [a_str]);
 	}
 
 
 	private function playSoundImpl(a_sound: String): Void
 	{
-		GameDelegate.call("PlaySound", [a_sound]);	// skywind
+		GameDelegate.call("PlaySound", [a_sound]);
 	}
 }

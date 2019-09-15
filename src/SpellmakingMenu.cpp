@@ -352,11 +352,6 @@ namespace Scaleform
 		assert(success);
 		success = view->SetVariable("_global.noInvisibleAdvance", boolean);
 		assert(success);
-
-		using StateType = RE::GFxState::StateType;
-		auto logger = new Logger<SpellmakingMenu>();
-		view->SetState(StateType::kLog, logger);
-		logger->Release();
 	}
 
 
