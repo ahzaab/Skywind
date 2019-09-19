@@ -27,6 +27,15 @@ dynamic class LevelUpMenu extends MovieClip
 	public static var PERSONALITY_MOD: Number = 0x07FEF6;
 	public static var LUCK_MOD: Number = 0x0D01A9;
 
+	public static var STRENGTH_DF: Number = 0x0D0195;
+	public static var ENDURANCE_DF: Number = 0x0D0192;
+	public static var INTELLIGENCE_DF: Number = 0x0D0190;
+	public static var WILLPOWER_DF: Number = 0x0D0196;
+	public static var AGILITY_DF: Number = 0x0D0191;
+	public static var SPEED_DF: Number = 0x0D0194;
+	public static var PERSONALITY_DF: Number = 0x0D0193;
+	public static var LUCK_DF: Number = 0x0D01AA;
+
 
 	/* PRIVATE VARIABLES */
 
@@ -66,6 +75,7 @@ dynamic class LevelUpMenu extends MovieClip
 
 		var attributeIDs: Array = [STRENGTH_ATTR, INTELLIGENCE_ATTR, WILLPOWER_ATTR, AGILITY_ATTR, SPEED_ATTR, ENDURANCE_ATTR, PERSONALITY_ATTR, LUCK_ATTR];
 		var attributeMods: Array = [STRENGTH_MOD, INTELLIGENCE_MOD, WILLPOWER_MOD, AGILITY_MOD, SPEED_MOD, ENDURANCE_MOD, PERSONALITY_MOD, LUCK_MOD];
+		var attributeDefaults: Array = [STRENGTH_DF, INTELLIGENCE_DF, WILLPOWER_DF, AGILITY_DF, SPEED_DF, ENDURANCE_DF, PERSONALITY_DF, LUCK_DF];
 
 		var len: Number = _attributeMCs.length;
 		for (var i: Number = 0; i < len; ++i) {
@@ -73,7 +83,7 @@ dynamic class LevelUpMenu extends MovieClip
 			attribute.setPressCallback(this, "onPressedAttribute");
 			attribute.setRollOverCallback(this, "onButtonGainFocus");
 			attribute.setRollOutCallback(this, "onButtonLoseFocus");
-			attribute.init(attributeIDs[i], attributeMods[i]);
+			attribute.init(attributeIDs[i], attributeMods[i], attributeDefaults[i]);
 		}
 
 		ContinueMC.addEventListener("press", this, "closeCallback");

@@ -23,7 +23,8 @@ import gfx.io.GameDelegate;
 	private var _av: Number = 0;
 	private var _modGlobal: Number = 0;
 	private var _modVal: Number = DF_INCR;
-	private var _decVal: Number = 0;
+	private var _dfIncr: Number = DF_INCR;
+	private var _doDec: Boolean = false;
 	private var _rollOverCallback: Object;
 	private var _rollOutCallback: Object;
 	private var _pressCallback: Object;
@@ -47,7 +48,7 @@ import gfx.io.GameDelegate;
 
 	/* PUBLIC FUNCTIONS */
 
-	public function init(a_av: Number, a_modGlobalFormID: Number): Void
+	public function init(a_av: Number, a_modForm: Number, a_dfIncrForm: Number): Void
 	{
 		if (!initialized) {
 			onLoad();
@@ -58,40 +59,29 @@ import gfx.io.GameDelegate;
 		addEventListener(EventTypes.PRESS, this, "pressHandler");
 
 		_av = a_av;
-		_modGlobal = a_modGlobalFormID;
+		_modGlobal = a_modForm;
 
-		getPlayerAV(_av);
-		getGlobal(_modGlobal);
+		getPlayerAV(_av, "setBase");
+		getGlobal(a_dfIncrForm, DF_PLUGIN, "setDfIncr");
+		getGlobal(_modGlobal, DF_PLUGIN, "setMod");
 	}
 
 
 	public function setRollOverCallback(a_context: Object, a_method: String): Void
 	{
-		if (_rollOverCallback == undefined) {
-			_rollOverCallback = new Object();
-		}
-		_rollOverCallback.context = a_context;
-		_rollOverCallback.method = a_method;
+		setCallback(_rollOverCallback, a_context, a_method);
 	}
 
 
 	public function setRollOutCallback(a_context: Object, a_method: String): Void
 	{
-		if (_rollOutCallback == undefined) {
-			_rollOutCallback = new Object();
-		}
-		_rollOutCallback.context = a_context;
-		_rollOutCallback.method = a_method;
+		setCallback(_rollOutCallback, a_context, a_method);
 	}
 
 
 	public function setPressCallback(a_context: Object, a_method: String): Void
 	{
-		if (_pressCallback == undefined) {
-			_pressCallback = new Object();
-		}
-		_pressCallback.context = a_context;
-		_pressCallback.method = a_method;
+		setCallback(_pressCallback, a_context, a_method);
 	}
 
 
@@ -133,27 +123,14 @@ import gfx.io.GameDelegate;
 	{
 		if (_toggled) {
 			modPlayerAV(_av, _modVal);
-			if (_decVal < 0) {
-				modGlobal(_modGlobal, _decVal);
+			if (_doDec) {
+				modGlobal(_modGlobal, -1 * _modVal, DF_PLUGIN);
 			}
 		}
 	}
 
 
 	/* PRIVATE FUNCTIONS */
-
-	private function setMod(a_value: Number): Void
-	{
-		_modVal = DF_INCR;
-		_decVal = 0;
-		if (a_value != undefined && a_value > 0) {
-			_modVal = a_value;
-			_decVal = -1 * a_value;
-		}
-
-		raiseMC.htmlText = "+" + _modVal.toString();
-	}
-
 
 	private function setBase(a_value: Number): Void
 	{
@@ -162,6 +139,25 @@ import gfx.io.GameDelegate;
 		if (a_value >= MAX_AV) {
 			disabled = true;
 		}
+	}
+
+
+	private function setDfIncr(a_value: Number): Void
+	{
+		_dfIncr = a_value != undefined ? a_value : DF_INCR;
+	}
+
+
+	private function setMod(a_value: Number): Void
+	{
+		_modVal = _dfIncr;
+		_doDec = false;
+		if (a_value != undefined && a_value > 0) {
+			_modVal = Math.min(a_value, MAX_INCR);
+			_doDec = true;
+		}
+
+		raiseMC.htmlText = "+" + _modVal.toString();
 	}
 
 
@@ -183,6 +179,16 @@ import gfx.io.GameDelegate;
 	}
 
 
+	private function setCallback(a_callback: Object, a_context: Object, a_method: String): Void
+	{
+		if (a_callback == undefined) {
+			a_callback = new Object();
+		}
+		a_callback.context = a_context;
+		a_callback.method = a_method;
+	}
+
+
 	private function invokeCallback(a_info: Object): Void
 	{
 		var context: Object = a_info.context;
@@ -193,19 +199,15 @@ import gfx.io.GameDelegate;
 	}
 
 
-	private function getGlobal(a_formID: Number, a_plugin: String): Void
+	private function getGlobal(a_formID: Number, a_plugin: String, a_callback: String): Void
 	{
-		if (a_plugin == undefined) {
-			a_plugin = DF_PLUGIN;
-		}
-
-		GameDelegate.call("GetGlobal", [a_formID, a_plugin], this, "setMod");
+		GameDelegate.call("GetGlobal", [a_formID, a_plugin], this, a_callback);
 	}
 
 
-	private function getPlayerAV(a_av: Number): Void
+	private function getPlayerAV(a_av: Number, a_callback: String): Void
 	{
-		GameDelegate.call("GetPlayerAV", [a_av], this, "setBase");
+		GameDelegate.call("GetPlayerAV", [a_av], this, a_callback);
 	}
 
 
@@ -217,10 +219,6 @@ import gfx.io.GameDelegate;
 
 	private function modGlobal(a_formID: Number, a_mod: Number, a_plugin: String): Void
 	{
-		if (a_plugin == undefined) {
-			a_plugin = DF_PLUGIN;
-		}
-
 		GameDelegate.call("ModGlobal", [a_formID, a_mod, a_plugin]);
 	}
 
