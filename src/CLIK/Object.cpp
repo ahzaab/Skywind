@@ -182,7 +182,7 @@ namespace CLIK
 		assert(args[kName].IsString());
 
 		RE::GFxValue boolean;
-		auto success = _instance.Invoke("hasOwnProperty", &boolean, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("hasOwnProperty", &boolean, args, kNumArgs);
 		assert(success);
 
 		return boolean.GetBool();
@@ -203,7 +203,7 @@ namespace CLIK
 		assert(args[kName].IsString());
 
 		RE::GFxValue boolean;
-		auto success = _instance.Invoke("isPropertyEnumerable", &boolean, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("isPropertyEnumerable", &boolean, args, kNumArgs);
 		assert(success);
 
 		return boolean.GetBool();
@@ -224,7 +224,7 @@ namespace CLIK
 		assert(args[kTheClass].IsObject());
 
 		RE::GFxValue boolean;
-		auto success = _instance.Invoke("isPrototypeOf", &boolean, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("isPrototypeOf", &boolean, args, kNumArgs);
 		assert(success);
 
 		return boolean.GetBool();
@@ -245,7 +245,7 @@ namespace CLIK
 		assert(args[kName].IsString());
 
 		RE::GFxValue boolean;
-		auto success = _instance.Invoke("unwatch", &boolean, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("unwatch", &boolean, args, kNumArgs);
 		assert(success);
 
 		return boolean.GetBool();
@@ -255,7 +255,7 @@ namespace CLIK
 	std::string Object::ToString()
 	{
 		RE::GFxValue str;
-		auto success = _instance.Invoke("toString", &str);
+		[[maybe_unused]] auto success = _instance.Invoke("toString", &str);
 		assert(success);
 		return str.GetString();
 	}
@@ -264,7 +264,7 @@ namespace CLIK
 	Object Object::ValueOf()
 	{
 		RE::GFxValue object;
-		auto success = _instance.Invoke("valueOf", &object);
+		[[maybe_unused]] auto success = _instance.Invoke("valueOf", &object);
 		assert(success);
 		return Object(object);
 	}
@@ -273,7 +273,7 @@ namespace CLIK
 	bool Object::GetBoolean(const char* a_path) const
 	{
 		RE::GFxValue boolean;
-		auto success = _instance.GetMember(a_path, &boolean);
+		[[maybe_unused]] auto success = _instance.GetMember(a_path, &boolean);
 		assert(success);
 		return boolean.GetBool();
 	}
@@ -282,7 +282,7 @@ namespace CLIK
 	double Object::GetNumber(const char* a_path) const
 	{
 		RE::GFxValue number;
-		auto success = _instance.GetMember(a_path, &number);
+		[[maybe_unused]] auto success = _instance.GetMember(a_path, &number);
 		assert(success);
 		return number.GetNumber();
 	}
@@ -291,7 +291,7 @@ namespace CLIK
 	Object Object::GetObject(const char* a_path) const
 	{
 		RE::GFxValue object;
-		auto success = _instance.GetMember(a_path, &object);
+		[[maybe_unused]] auto success = _instance.GetMember(a_path, &object);
 		assert(success);
 		return Object(object);
 	}
@@ -300,7 +300,7 @@ namespace CLIK
 	std::string_view Object::GetString(const char* a_path) const
 	{
 		RE::GFxValue str;
-		auto success = _instance.GetMember(a_path, &str);
+		[[maybe_unused]] auto success = _instance.GetMember(a_path, &str);
 		assert(success);
 		return str.GetString();
 	}
@@ -309,7 +309,7 @@ namespace CLIK
 	void Object::SetBoolean(const char* a_path, bool a_boolean)
 	{
 		RE::GFxValue boolean(a_boolean);
-		auto success = _instance.SetMember(a_path, boolean);
+		[[maybe_unused]] auto success = _instance.SetMember(a_path, boolean);
 		assert(success);
 	}
 
@@ -317,14 +317,14 @@ namespace CLIK
 	void Object::SetNumber(const char* a_path, double a_number)
 	{
 		RE::GFxValue number(a_number);
-		auto success = _instance.SetMember(a_path, number);
+		[[maybe_unused]] auto success = _instance.SetMember(a_path, number);
 		assert(success);
 	}
 
 
 	void Object::SetObject(const char* a_path, const Object& a_object)
 	{
-		auto success = _instance.SetMember(a_path, a_object._instance);
+		[[maybe_unused]] auto success = _instance.SetMember(a_path, a_object._instance);
 		assert(success);
 	}
 
@@ -332,7 +332,7 @@ namespace CLIK
 	void Object::SetString(const char* a_path, std::string_view a_string)
 	{
 		RE::GFxValue str(a_string);
-		auto success = _instance.SetMember(a_path, str);
+		[[maybe_unused]] auto success = _instance.SetMember(a_path, str);
 		assert(success);
 	}
 }

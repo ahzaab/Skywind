@@ -115,7 +115,7 @@ namespace Scaleform
 			args[kForce] = a_force;
 			assert(args[kForce].IsBool());
 
-			auto success = _instance.Invoke("setPercent", 0, args, kNumArgs);
+			[[maybe_unused]] auto success = _instance.Invoke("setPercent", 0, args, kNumArgs);
 			assert(success);
 		}
 	}

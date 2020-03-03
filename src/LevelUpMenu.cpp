@@ -109,7 +109,7 @@ namespace Scaleform
 	}
 
 
-	void LevelUpMenu::AdvanceLevel(const RE::FxDelegateArgs& a_params)
+	void LevelUpMenu::AdvanceLevel([[maybe_unused]] const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 0);
 
@@ -118,7 +118,7 @@ namespace Scaleform
 	}
 
 
-	void LevelUpMenu::CloseMenu(const RE::FxDelegateArgs& a_params)
+	void LevelUpMenu::CloseMenu([[maybe_unused]] const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 0);
 

@@ -660,9 +660,9 @@ namespace CLIK
 
 		args[kListener] = a_listener.GetInstance();
 		assert(args[kListener].IsObject());
-		
+
 		RE::GFxValue boolean;
-		auto success = _instance.Invoke("addListener", &boolean, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("addListener", &boolean, args, kNumArgs);
 		assert(success);
 
 		return boolean.GetBool();
@@ -672,7 +672,7 @@ namespace CLIK
 	double TextField::GetDepth()
 	{
 		RE::GFxValue number;
-		auto success = _instance.Invoke("getDepth", &number);
+		[[maybe_unused]] auto success = _instance.Invoke("getDepth", &number);
 		assert(success);
 
 		return number.GetNumber();
@@ -693,7 +693,7 @@ namespace CLIK
 		assert(args[kListener].IsObject());
 
 		RE::GFxValue boolean;
-		auto success = _instance.Invoke("removeListener", &boolean, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("removeListener", &boolean, args, kNumArgs);
 		assert(success);
 
 		return boolean.GetBool();
@@ -702,7 +702,7 @@ namespace CLIK
 
 	void TextField::RemoveTextField()
 	{
-		auto success = _instance.Invoke("removeTextField");
+		[[maybe_unused]] auto success = _instance.Invoke("removeTextField");
 		assert(success);
 	}
 
@@ -720,7 +720,7 @@ namespace CLIK
 		args[kNewText] = a_newText;
 		assert(args[kNewText].IsString());
 
-		auto success = _instance.Invoke("replaceSel", 0, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("replaceSel", 0, args, kNumArgs);
 		assert(success);
 	}
 
@@ -746,7 +746,7 @@ namespace CLIK
 		args[kNewText] = a_newText;
 		assert(args[kNewText].IsString());
 
-		auto success = _instance.Invoke("replaceText", 0, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("replaceText", 0, args, kNumArgs);
 		assert(success);
 	}
 
@@ -1004,7 +1004,7 @@ namespace CLIK
 		args[kNewText] = a_newText;
 		assert(args[kNewText].IsString());
 
-		auto success = _instance.Invoke("appendText", 0, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("appendText", 0, args, kNumArgs);
 		assert(success);
 	}
 
@@ -1022,7 +1022,7 @@ namespace CLIK
 		args[kNewHtml] = a_newHtml;
 		assert(args[kNewHtml].IsString());
 
-		auto success = _instance.Invoke("appendHtml", 0, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("appendHtml", 0, args, kNumArgs);
 		assert(success);
 	}
 
@@ -1045,7 +1045,7 @@ namespace CLIK
 		assert(args[kY].IsNumber());
 
 		RE::GFxValue number;
-		auto success = _instance.Invoke("getCharIndexAtPoint", &number, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("getCharIndexAtPoint", &number, args, kNumArgs);
 		assert(success);
 
 		return number.GetNumber();
@@ -1066,7 +1066,7 @@ namespace CLIK
 		assert(args[kCharIndex].IsNumber());
 
 		RE::GFxValue number;
-		auto success = _instance.Invoke("getFirstCharInParagraph", &number, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("getFirstCharInParagraph", &number, args, kNumArgs);
 		assert(success);
 
 		return number.GetNumber();
@@ -1091,7 +1091,7 @@ namespace CLIK
 		assert(args[kY].IsNumber());
 
 		RE::GFxValue number;
-		auto success = _instance.Invoke("getLineIndexAtPoint", &number, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("getLineIndexAtPoint", &number, args, kNumArgs);
 		assert(success);
 
 		return number.GetNumber();
@@ -1112,7 +1112,7 @@ namespace CLIK
 		assert(args[kLineIndex].IsNumber());
 
 		RE::GFxValue number;
-		auto success = _instance.Invoke("getLineLength", &number, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("getLineLength", &number, args, kNumArgs);
 		assert(success);
 
 		return number.GetNumber();
@@ -1133,7 +1133,7 @@ namespace CLIK
 		assert(args[kLineIndex].IsNumber());
 
 		RE::GFxValue object;
-		auto success = _instance.Invoke("getLineMetrics", &object, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("getLineMetrics", &object, args, kNumArgs);
 		assert(success);
 
 		return Object(object);
@@ -1154,7 +1154,7 @@ namespace CLIK
 		assert(args[kLineIndex].IsNumber());
 
 		RE::GFxValue number;
-		auto success = _instance.Invoke("getLineOffset", &number, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("getLineOffset", &number, args, kNumArgs);
 		assert(success);
 
 		return number.GetNumber();
@@ -1175,7 +1175,7 @@ namespace CLIK
 		assert(args[kLineIndex].IsNumber());
 
 		RE::GFxValue str;
-		auto success = _instance.Invoke("getLineText", &str, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("getLineText", &str, args, kNumArgs);
 		assert(success);
 
 		return str.GetString();
@@ -1203,7 +1203,7 @@ namespace CLIK
 		args[kEndIndex] = a_endIndex;
 		assert(args[kEndIndex].IsNumber());
 
-		auto success = _instance.Invoke("copyToClipboard", 0, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("copyToClipboard", 0, args, kNumArgs);
 		assert(success);
 	}
 
@@ -1229,7 +1229,7 @@ namespace CLIK
 		args[kEndIndex] = a_endIndex;
 		assert(args[kEndIndex].IsNumber());
 
-		auto success = _instance.Invoke("cutToClipboard", 0, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("cutToClipboard", 0, args, kNumArgs);
 		assert(success);
 	}
 
@@ -1255,7 +1255,7 @@ namespace CLIK
 		args[kEndIndex] = a_endIndex;
 		assert(args[kEndIndex].IsNumber());
 
-		auto success = _instance.Invoke("pasteFromClipboard", 0, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("pasteFromClipboard", 0, args, kNumArgs);
 		assert(success);
 	}
 }

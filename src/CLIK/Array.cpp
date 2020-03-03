@@ -134,10 +134,10 @@ namespace CLIK
 			args[kValue] = a_value->get().GetInstance();
 			assert(args[kValue].IsObject());
 
-			auto success = _instance.Invoke("concat", &arr, args, kNumArgs);
+			[[maybe_unused]] auto success = _instance.Invoke("concat", &arr, args, kNumArgs);
 			assert(success);
 		} else {
-			auto success = _instance.Invoke("concat", &arr, 0, 0);
+			[[maybe_unused]] auto success = _instance.Invoke("concat", &arr, 0, 0);
 			assert(success);
 		}
 
@@ -161,10 +161,10 @@ namespace CLIK
 			args[kDelimiter] = *a_delimiter;
 			assert(args[kDelimiter].IsString());
 
-			auto success = _instance.Invoke("join", &str, args, kNumArgs);
+			[[maybe_unused]] auto success = _instance.Invoke("join", &str, args, kNumArgs);
 			assert(success);
 		} else {
-			auto success = _instance.Invoke("join", &str, 0, 0);
+			[[maybe_unused]] auto success = _instance.Invoke("join", &str, 0, 0);
 			assert(success);
 		}
 
@@ -175,7 +175,7 @@ namespace CLIK
 	Object Array::Pop()
 	{
 		RE::GFxValue object;
-		auto success = _instance.Invoke("pop", &object);
+		[[maybe_unused]] auto success = _instance.Invoke("pop", &object);
 		assert(success);
 		return Object(object);
 	}
@@ -194,7 +194,7 @@ namespace CLIK
 		args[kValue] = a_value.GetInstance();
 
 		RE::GFxValue number;
-		auto success = _instance.Invoke("push", &number, args, kNumArgs);
+		[[maybe_unused]] auto success = _instance.Invoke("push", &number, args, kNumArgs);
 		assert(success);
 
 		return number.GetNumber();
@@ -203,7 +203,7 @@ namespace CLIK
 
 	void Array::Reverse()
 	{
-		auto success = _instance.Invoke("reverse");
+		[[maybe_unused]] auto success = _instance.Invoke("reverse");
 		assert(success);
 	}
 
@@ -211,7 +211,7 @@ namespace CLIK
 	Object Array::Shift()
 	{
 		RE::GFxValue object;
-		auto success = _instance.Invoke("shift", &object);
+		[[maybe_unused]] auto success = _instance.Invoke("shift", &object);
 		assert(success);
 		return Object(object);
 	}

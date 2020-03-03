@@ -197,7 +197,7 @@ namespace CLIK
 				args[kItem] = a_item.GetInstance();
 
 				RE::GFxValue str;
-				auto success = _instance.Invoke("itemToLabel", &str, args, kNumArgs);
+				[[maybe_unused]] auto success = _instance.Invoke("itemToLabel", &str, args, kNumArgs);
 				assert(success);
 
 				return str.GetString();
@@ -206,21 +206,21 @@ namespace CLIK
 
 			void DropdownMenu::Open()
 			{
-				auto success = _instance.Invoke("open");
+				[[maybe_unused]] auto success = _instance.Invoke("open");
 				assert(success);
 			}
 
 
 			void DropdownMenu::Close()
 			{
-				auto success = _instance.Invoke("close");
+				[[maybe_unused]] auto success = _instance.Invoke("close");
 				assert(success);
 			}
 
 
 			void DropdownMenu::InvalidateData()
 			{
-				auto success = _instance.Invoke("invalidateData");
+				[[maybe_unused]] auto success = _instance.Invoke("invalidateData");
 				assert(success);
 			}
 
@@ -242,14 +242,14 @@ namespace CLIK
 				args[kHeight] = a_height;
 				assert(args[kHeight].IsNumber());
 
-				auto success = _instance.Invoke("setSize", 0, args, kNumArgs);
+				[[maybe_unused]] auto success = _instance.Invoke("setSize", 0, args, kNumArgs);
 				assert(success);
 			}
 
 
 			void DropdownMenu::RemoveMovieClip()
 			{
-				auto success = _instance.Invoke("removeMovieClip");
+				[[maybe_unused]] auto success = _instance.Invoke("removeMovieClip");
 				assert(success);
 			}
 
@@ -257,7 +257,7 @@ namespace CLIK
 			std::string_view DropdownMenu::ToString()
 			{
 				RE::GFxValue str;
-				auto success = _instance.Invoke("toString", &str);
+				[[maybe_unused]] auto success = _instance.Invoke("toString", &str);
 				assert(success);
 				return str.GetString();
 			}

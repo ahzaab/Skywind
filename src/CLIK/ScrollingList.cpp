@@ -161,7 +161,7 @@ namespace CLIK
 				args[kIndex] = a_index;
 				assert(args[kIndex].IsNumber());
 
-				auto success = _instance.Invoke("scrollToIndex", 0, args, kNumArgs);
+				[[maybe_unused]] auto success = _instance.Invoke("scrollToIndex", 0, args, kNumArgs);
 				assert(success);
 			}
 
@@ -180,7 +180,7 @@ namespace CLIK
 
 			void ScrollingList::InvalidateData()
 			{
-				auto success = _instance.Invoke("invalidateData");
+				[[maybe_unused]] auto success = _instance.Invoke("invalidateData");
 				assert(success);
 			}
 
@@ -194,7 +194,7 @@ namespace CLIK
 			std::string_view ScrollingList::ToString()
 			{
 				RE::GFxValue str;
-				auto success = _instance.Invoke("toString", &str);
+				[[maybe_unused]] auto success = _instance.Invoke("toString", &str);
 				assert(success);
 				return str.GetString();
 			}

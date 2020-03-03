@@ -212,7 +212,7 @@ namespace Scaleform
 	void BirthSignMenu::SendAcceptEvent()
 	{
 		RE::GFxValue result;
-		bool success = _root.Invoke("getCurrentSign", &result, 0, 0);
+		[[maybe_unused]] auto success = _root.Invoke("getCurrentSign", &result, 0, 0);
 		assert(success);
 		auto id = result.GetUInt();
 		if (id != 0) {
@@ -258,7 +258,7 @@ namespace Scaleform
 		args[kAcceptIcon].SetNumber(acceptKey);
 		args[kCancelText].SetString(cancelText.c_str());
 		args[kCancelIcon].SetNumber(cancelKey);
-		auto success = _root.Invoke("setInputs", 0, args, kNumArgs);
+		[[maybe_unused]] auto success = _root.Invoke("setInputs", 0, args, kNumArgs);
 		assert(success);
 	}
 

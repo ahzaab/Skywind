@@ -213,7 +213,7 @@ namespace CLIK
 				args[kHeight] = a_height;
 				assert(args[kHeight].IsNumber());
 
-				auto success = _instance.Invoke("setSize", 0, args, kNumArgs);
+				[[maybe_unused]] auto success = _instance.Invoke("setSize", 0, args, kNumArgs);
 				assert(success);
 			}
 
@@ -221,7 +221,7 @@ namespace CLIK
 			std::string_view Button::ToString()
 			{
 				RE::GFxValue str;
-				auto success = _instance.Invoke("toString", &str);
+				[[maybe_unused]] auto success = _instance.Invoke("toString", &str);
 				assert(success);
 				return str.GetString();
 			}

@@ -155,7 +155,7 @@ namespace CLIK
 				args[kHeight] = a_height;
 				assert(args[kHeight].IsNumber());
 
-				auto success = _instance.Invoke("setSize", 0, args, kNumArgs);
+				[[maybe_unused]] auto success = _instance.Invoke("setSize", 0, args, kNumArgs);
 				assert(success);
 			}
 
@@ -186,14 +186,14 @@ namespace CLIK
 
 			void UIComponent::Invalidate()
 			{
-				auto success = _instance.Invoke("invalidate");
+				[[maybe_unused]] auto success = _instance.Invoke("invalidate");
 				assert(success);
 			}
 
 
 			void UIComponent::ValidateNow()
 			{
-				auto success = _instance.Invoke("validateNow");
+				[[maybe_unused]] auto success = _instance.Invoke("validateNow");
 				assert(success);
 			}
 
@@ -201,7 +201,7 @@ namespace CLIK
 			std::string_view UIComponent::ToString()
 			{
 				RE::GFxValue str;
-				auto success = _instance.Invoke("toString", &str);
+				[[maybe_unused]] auto success = _instance.Invoke("toString", &str);
 				assert(success);
 				return str.GetString();
 			}
@@ -220,7 +220,7 @@ namespace CLIK
 				args[kEvent] = a_event.GetInstance();
 				assert(args[kEvent].IsObject());
 
-				auto success = _instance.Invoke("dispatchEventToGame", 0, args, kNumArgs);
+				[[maybe_unused]] auto success = _instance.Invoke("dispatchEventToGame", 0, args, kNumArgs);
 				assert(success);
 			}
 		}

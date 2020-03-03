@@ -175,7 +175,7 @@ namespace CLIK
 			std::string_view Slider::ToString()
 			{
 				RE::GFxValue str;
-				auto success = _instance.Invoke("toString", &str);
+				[[maybe_unused]] auto success = _instance.Invoke("toString", &str);
 				assert(success);
 				return str.GetString();
 			}

@@ -185,7 +185,7 @@ namespace CLIK
 				args[kText] = a_text;
 				assert(args[kText].IsString());
 
-				auto success = _instance.Invoke("appendText", 0, args, kNumArgs);
+				[[maybe_unused]] auto success = _instance.Invoke("appendText", 0, args, kNumArgs);
 				assert(success);
 			}
 
@@ -203,7 +203,7 @@ namespace CLIK
 				args[kText] = a_text;
 				assert(args[kText].IsString());
 
-				auto success = _instance.Invoke("appendHtml", 0, args, kNumArgs);
+				[[maybe_unused]] auto success = _instance.Invoke("appendHtml", 0, args, kNumArgs);
 				assert(success);
 			}
 
@@ -217,7 +217,7 @@ namespace CLIK
 			std::string_view TextInput::ToString()
 			{
 				RE::GFxValue str;
-				auto success = _instance.Invoke("toString", &str);
+				[[maybe_unused]] auto success = _instance.Invoke("toString", &str);
 				assert(success);
 				return str.GetString();
 			}
