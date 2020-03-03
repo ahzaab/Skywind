@@ -1,7 +1,5 @@
 #pragma once
 
-#undef ReplaceText
-
 #include "CLIK/Object.h"
 
 

@@ -125,10 +125,10 @@ namespace Scaleform
 		Base(),
 		_meter()
 	{
-		using Context = RE::InputMappingManager::Context;
+		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
 		using Flag = RE::IMenu::Flag;
 
-		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
+		auto loader = RE::BSScaleformManager::GetSingleton();
 		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
@@ -164,53 +164,49 @@ namespace Scaleform
 	}
 
 
-	auto MeterMenu::ProcessMessage(RE::UIMessage* a_message)
+	auto MeterMenu::ProcessMessage(RE::UIMessage& a_message)
 		-> Result
 	{
-		using Message = RE::UIMessage::Message;
+		using Message = RE::UI_MESSAGE_TYPE;
 
-		switch (a_message->message) {
-		case Message::kOpen:
+		switch (a_message.type) {
+		case Message::kShow:
 			OnMenuOpen();
-			return Result::kProcessed;
-		case Message::kClose:
+			return Result::kHandled;
+		case Message::kHide:
 			OnMenuClose();
-			return Result::kProcessed;
+			return Result::kHandled;
 		default:
 			return Base::ProcessMessage(a_message);
 		}
 	}
 
 
-	void MeterMenu::NextFrame(float a_arg1, UInt32 a_currentTime)
+	void MeterMenu::AdvanceMovie(float a_interval, UInt32 a_currentTime)
 	{
 		_meter.Invalidate();
-		Base::NextFrame(a_arg1, a_currentTime);
+		Base::AdvanceMovie(a_interval, a_currentTime);
 	}
 
 
 	void MeterMenu::Open()
 	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kOpen, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kShow, 0);
 	}
 
 
 	void MeterMenu::Close()
 	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kClose, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
 	void MeterMenu::Register()
 	{
-		auto mm = RE::MenuManager::GetSingleton();
-		mm->Register(Name(), Create);
+		auto ui = RE::UI::GetSingleton();
+		ui->Register(Name(), Create);
 
 		_MESSAGE("Registered %s", Name().data());
 	}
@@ -227,8 +223,8 @@ namespace Scaleform
 		auto task = SKSE::GetTaskInterface();
 		task->AddUITask([a_percent]()
 		{
-			auto mm = RE::MenuManager::GetSingleton();
-			auto menu = mm->GetMenu<MeterMenu>(Name());
+			auto ui = RE::UI::GetSingleton();
+			auto menu = ui->GetMenu<MeterMenu>(Name());
 			if (menu) {
 				menu->SetPercent(a_percent);
 			}

@@ -8,13 +8,13 @@ namespace Events
 	class HitHandler : public RE::BSTEventSink<RE::TESHitEvent>
 	{
 	public:
-		using EventResult = RE::EventResult;
+		using EventResult = RE::BSEventNotifyControl;
 
 
 		static HitHandler* GetSingleton();
 		static void Sink();
 
-		virtual	EventResult	ReceiveEvent(RE::TESHitEvent* a_event, RE::BSTEventSource<RE::TESHitEvent>* a_eventSource) override;
+		virtual	EventResult	ProcessEvent(const RE::TESHitEvent* a_event, RE::BSTEventSource<RE::TESHitEvent>* a_eventSource) override;
 
 	private:
 		HitHandler() = default;

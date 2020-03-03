@@ -51,11 +51,11 @@ namespace Scaleform
 		_rangeMappings(),
 		_selectedIdx(kInvalid)
 	{
-		using Context = RE::InputMappingManager::Context;
+		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
 		using Flag = RE::IMenu::Flag;
 
-		flags |= Flag::kTryShowCursor;
-		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
+		flags |= Flag::kUpdateUsesCursor;
+		auto loader = RE::BSScaleformManager::GetSingleton();
 		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
@@ -78,7 +78,7 @@ namespace Scaleform
 		}
 
 		menuDepth = 5;	// JournalMenu == 5
-		flags |= Flag::kPreventGameLoad | Flag::kHideOther | Flag::kPauseGame;
+		flags |= Flag::kDisablePauseMenu | Flag::kTopmostRenderedMenu | Flag::kPausesGame;
 		context = Context::kFavor;
 
 		InitExtensions();
@@ -104,25 +104,25 @@ namespace Scaleform
 	}
 
 
-	auto SpellmakingMenu::ProcessMessage(RE::UIMessage* a_message)
+	auto SpellmakingMenu::ProcessMessage(RE::UIMessage& a_message)
 		-> Result
 	{
-		using Message = RE::UIMessage::Message;
+		using Message = RE::UI_MESSAGE_TYPE;
 
-		switch (a_message->message) {
-		case Message::kOpen:
+		switch (a_message.type) {
+		case Message::kShow:
 			OnMenuOpen();
-			return Result::kProcessed;
-		case Message::kClose:
+			return Result::kHandled;
+		case Message::kHide:
 			OnMenuClose();
-			return Result::kProcessed;
+			return Result::kHandled;
 		default:
 			return Base::ProcessMessage(a_message);
 		}
 	}
 
 
-	void SpellmakingMenu::NextFrame(float a_arg1, UInt32 a_currentTime)
+	void SpellmakingMenu::AdvanceMovie(float a_interval, UInt32 a_currentTime)
 	{
 		if (_magnitude.IsDragging()) {
 			_magnitude.UpdateText();
@@ -136,32 +136,28 @@ namespace Scaleform
 			_area.UpdateText();
 		}
 
-		Base::NextFrame(a_arg1, a_currentTime);
+		Base::AdvanceMovie(a_interval, a_currentTime);
 	}
 
 
 	void SpellmakingMenu::Open()
 	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kOpen, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kShow, 0);
 	}
 
 
 	void SpellmakingMenu::Close()
 	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kClose, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
 	void SpellmakingMenu::Register()
 	{
-		auto mm = RE::MenuManager::GetSingleton();
-		mm->Register(Name(), Create);
+		auto ui = RE::UI::GetSingleton();
+		ui->Register(Name(), Create);
 
 		_MESSAGE("Registered %s", Name().data());
 	}
@@ -394,8 +390,8 @@ namespace Scaleform
 			for (auto& effect : spell->effects) {
 				auto mgef = effect->baseEffect;
 				knownEffects.insert(std::make_pair(mgef->formID, mgef));
-				if (!mgef->name.empty()) {
-					std::string name(mgef->name);
+				if (!mgef->fullName.empty()) {
+					std::string name(mgef->fullName);
 					SanitizeString(name);
 					_availableMappings.push_back({ std::move(name), mgef->formID });
 				}
@@ -422,8 +418,8 @@ namespace Scaleform
 
 		for (auto& effect : knownEffects) {
 			auto mgef = effect.second;
-			if (!mgef->name.empty()) {
-				std::string name(mgef->name);
+			if (!mgef->fullName.empty()) {
+				std::string name(mgef->fullName);
 				SanitizeString(name);
 				_availableMappings.push_back({ std::move(name), mgef->formID });
 			}
@@ -500,19 +496,19 @@ namespace Scaleform
 		}
 
 		//spell->name = _name.Text();
-		spell->name = "Spell of Awesomeness";
-		spell->data.type = RE::MagicItem::MagicType::kSpell;
-		spell->data.castType = RE::MagicItem::CastType::kConcentration;
-		spell->data.targetType = static_cast<RE::MagicItem::TargetType>(static_cast<std::ptrdiff_t>(_area.slider.Value()));
+		spell->fullName = "Spell of Awesomeness";
+		spell->data.spellType = RE::MagicSystem::SpellType::kSpell;
+		spell->data.castingType = RE::MagicSystem::CastingType::kConcentration;
+		spell->data.delivery = static_cast<RE::MagicSystem::Delivery>(static_cast<std::ptrdiff_t>(_area.slider.Value()));
 
-		spell->menuDisplayObject = RE::TESForm::LookupByID<RE::TESObjectSTAT>(0x000A0E7D);	// MAGINVHealSpellArt
+		spell->menuDispObject = RE::TESForm::LookupByID<RE::TESObjectSTAT>(0x000A0E7D);	// MAGINVHealSpellArt
 
-		spell->objectBounds.x1 = 0;
-		spell->objectBounds.y1 = 0;
-		spell->objectBounds.z1 = 0;
-		spell->objectBounds.x2 = 0;
-		spell->objectBounds.y2 = 0;
-		spell->objectBounds.z2 = 0;
+		spell->boundData.boundMin.x = 0;
+		spell->boundData.boundMin.y = 0;
+		spell->boundData.boundMin.z = 0;
+		spell->boundData.boundMax.x = 0;
+		spell->boundData.boundMax.y = 0;
+		spell->boundData.boundMax.z = 0;
 
 		for (auto& selected : _selectedMappings) {
 			auto effect = new RE::Effect();
@@ -524,7 +520,7 @@ namespace Scaleform
 		}
 
 		auto player = RE::PlayerCharacter::GetSingleton();
-		auto cost = spell->GetEffectiveMagickaCost(player);
+		//auto cost = spell->CalculateMagickaCost(player);
 		player->AddSpell(spell);
 	}
 

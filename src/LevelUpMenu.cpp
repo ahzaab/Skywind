@@ -9,11 +9,11 @@ namespace Scaleform
 {
 	LevelUpMenu::LevelUpMenu()
 	{
-		using Context = RE::InputMappingManager::Context;
+		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
 		using Flag = RE::IMenu::Flag;
 
-		flags |= Flag::kTryShowCursor;
-		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
+		flags |= Flag::kUpdateUsesCursor;
+		auto loader = RE::BSScaleformManager::GetSingleton();
 		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
@@ -35,7 +35,7 @@ namespace Scaleform
 			std::abort();
 		}
 
-		flags |= Flag::kPauseGame | Flag::kModal | Flag::kPreventGameLoad;
+		flags |= Flag::kPausesGame | Flag::kModal | Flag::kDisablePauseMenu;
 		context = Context::kMenuMode;
 
 		InitExtensions();
@@ -57,18 +57,18 @@ namespace Scaleform
 	}
 
 
-	auto LevelUpMenu::ProcessMessage(RE::UIMessage* a_message)
+	auto LevelUpMenu::ProcessMessage(RE::UIMessage& a_message)
 		-> Result
 	{
-		using Message = RE::UIMessage::Message;
+		using Message = RE::UI_MESSAGE_TYPE;
 
-		switch (a_message->message) {
-		case Message::kOpen:
+		switch (a_message.type) {
+		case Message::kShow:
 			OnMenuOpen();
-			return Result::kProcessed;
-		case Message::kClose:
+			return Result::kHandled;
+		case Message::kHide:
 			OnMenuClose();
-			return Result::kProcessed;
+			return Result::kHandled;
 		default:
 			return Base::ProcessMessage(a_message);
 		}
@@ -77,30 +77,26 @@ namespace Scaleform
 
 	void LevelUpMenu::Open()
 	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kOpen, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kShow, 0);
 	}
 
 
 	void LevelUpMenu::Close()
 	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kClose, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
 	void LevelUpMenu::Register()
 	{
-		auto mm = RE::MenuManager::GetSingleton();
-		auto it = mm->menuTable.find(Name());
-		if (it != mm->menuTable.end()) {
-			it->second.menuConstructor = Create;
+		auto ui = RE::UI::GetSingleton();
+		auto it = ui->menuMap.find(Name());
+		if (it != ui->menuMap.end()) {
+			it->second.create = Create;
 		} else {
-			mm->Register(Name(), Create);
+			ui->Register(Name(), Create);
 		}
 
 		_MESSAGE("Registered %s", Name().data());
@@ -143,8 +139,8 @@ namespace Scaleform
 		auto baseID = a_params[0].GetUInt();
 		auto pluginName = a_params[1].GetString();
 
-		auto formID = ResolveFormID(baseID, pluginName);
-		auto global = RE::TESForm::LookupByID<RE::TESGlobal>(formID);
+		auto dataHandler = RE::TESDataHandler::GetSingleton();
+		auto global = dataHandler->LookupForm<RE::TESGlobal>(baseID, pluginName);
 		if (global) {
 			retVal.SetNumber(global->value);
 		}
@@ -164,7 +160,7 @@ namespace Scaleform
 
 		auto av = static_cast<RE::ActorValue>(a_params[0].GetUInt());
 		auto player = RE::PlayerCharacter::GetSingleton();
-		auto currentAV = player->GetActorValueCurrent(av);
+		auto currentAV = player->GetActorValue(av);
 		retVal.SetNumber(currentAV);
 
 		response.Add(retVal);
@@ -207,8 +203,8 @@ namespace Scaleform
 		auto baseID = a_params[0].GetUInt();
 		auto pluginName = a_params[2].GetString();
 
-		auto formID = ResolveFormID(baseID, pluginName);
-		auto global = RE::TESForm::LookupByID<RE::TESGlobal>(formID);
+		auto dataHandler = RE::TESDataHandler::GetSingleton();
+		auto global = dataHandler->LookupForm<RE::TESGlobal>(baseID, pluginName);
 		if (global) {
 			auto mod = a_params[1].GetNumber();
 			global->value += mod;
@@ -225,7 +221,7 @@ namespace Scaleform
 		auto av = static_cast<RE::ActorValue>(a_params[0].GetUInt());
 		auto mod = static_cast<float>(a_params[1].GetNumber());
 		auto player = RE::PlayerCharacter::GetSingleton();
-		player->ModActorValueBase(av, mod);
+		player->ModActorValue(av, mod);
 	}
 
 
@@ -235,24 +231,6 @@ namespace Scaleform
 		assert(a_params[0].IsString());
 
 		RE::PlaySound(a_params[0].GetString());
-	}
-
-
-	RE::FormID LevelUpMenu::ResolveFormID(RE::FormID a_baseID, std::string a_pluginName)
-	{
-		RE::FormID result;
-
-		auto dataHandler = RE::TESDataHandler::GetSingleton();
-		auto mod = dataHandler->LookupModByName(a_pluginName);
-		if (mod && mod->modIndex != 0xFF) {
-			result = a_baseID;
-			result += mod->modIndex << (8 * 3);
-			result += mod->lightIndex << ((8 * 1) + (8 / 2));
-		} else {
-			result = 0;
-		}
-
-		return result;
 	}
 
 
@@ -284,7 +262,7 @@ namespace Scaleform
 		RE::GFxValue boolean(true);
 		bool success;
 
-		auto input = RE::InputManager::GetSingleton();
+		auto input = RE::BSInputDeviceManager::GetSingleton();
 		if (input->IsGamepadEnabled()) {
 			view->Invoke("Selection.captureFocus", 0, &boolean, 1);
 		}

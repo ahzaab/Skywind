@@ -40,15 +40,15 @@ namespace Scaleform
 	{
 	public:
 		using Base = RE::IMenu;
-		using Result = RE::IMenu::Result;
+		using Result = RE::UI_MESSAGE_RESULTS;
 
 		MeterMenu();
 		virtual ~MeterMenu() = default;
 
 		// IMenu
 		virtual void Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg) override;
-		virtual Result ProcessMessage(RE::UIMessage* a_message) override;
-		virtual void NextFrame(float a_arg1, UInt32 a_currentTime) override;
+		virtual Result ProcessMessage(RE::UIMessage& a_message) override;
+		virtual void AdvanceMovie(float a_interval, UInt32 a_currentTime) override;
 
 		static void Open();
 		static void Close();

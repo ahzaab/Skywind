@@ -15,7 +15,7 @@ namespace Scaleform
 	public:
 		using MenuBase = RE::IMenu;
 		using HandlerBase = RE::MenuEventHandler;
-		using Result = RE::IMenu::Result;
+		using Result = RE::UI_MESSAGE_RESULTS;
 		using GRefCountBaseStatImpl::operator new;
 		using GRefCountBaseStatImpl::operator delete;
 
@@ -24,7 +24,7 @@ namespace Scaleform
 		virtual ~BirthSignMenu();
 
 		// IMenu
-		virtual Result ProcessMessage(RE::UIMessage* a_message) override;
+		virtual Result ProcessMessage(RE::UIMessage& a_message) override;
 
 		// MenuEventHandler
 		virtual bool CanProcess(RE::InputEvent* a_event) override;
@@ -41,7 +41,7 @@ namespace Scaleform
 	private:
 		enum : UInt32
 		{
-			kInvalidButton = RE::InputMappingManager::kInvalid,
+			kInvalidButton = static_cast<UInt32>(-1),
 
 			kESC = 1,
 			kEnter = 28,

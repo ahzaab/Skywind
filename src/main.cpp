@@ -1,5 +1,4 @@
-﻿#include "skse64_common/BranchTrampoline.h"
-#include "skse64_common/skse_version.h"
+﻿#include <memory>
 
 #include "Events.h"
 #include "Patches.h"
@@ -22,42 +21,44 @@ namespace
 	class InputEventHandler : public RE::BSTEventSink<RE::InputEvent*>
 	{
 	public:
-		using EventResult = RE::EventResult;
+		using EventResult = RE::BSEventNotifyControl;
 
 
 		static InputEventHandler* GetSingleton()
 		{
 			static InputEventHandler singleton;
-			return &singleton;
+			return std::addressof(singleton);
 		}
 
 
-		virtual	EventResult ReceiveEvent(RE::InputEvent** a_event, RE::BSTEventSource<RE::InputEvent*>* a_eventSource) override
+		virtual	EventResult ProcessEvent(RE::InputEvent* const* a_event, [[maybe_unused]] RE::BSTEventSource<RE::InputEvent*>* a_eventSource) override
 		{
+			using Device = RE::INPUT_DEVICE;
+			using Input = RE::INPUT_EVENT_TYPE;
 			using Key = RE::BSKeyboardDevice::Key;
-			using Message = RE::UIMessage::Message;
+			using Message = RE::UI_MESSAGE_TYPE;
 
 			if (!a_event) {
 				return EventResult::kContinue;
 			}
 
-			auto mm = RE::MenuManager::GetSingleton();
-			auto uiStr = RE::UIStringHolder::GetSingleton();
-			if (mm->IsMenuOpen(uiStr->console)) {
+			auto ui = RE::UI::GetSingleton();
+			auto intfcStr = RE::InterfaceStrings::GetSingleton();
+			if (ui->IsMenuOpen(intfcStr->console)) {
 				return EventResult::kContinue;
 			}
 
 			for (auto event = *a_event; event; event = event->next) {
-				if (event->eventType != RE::InputEvent::EventType::kButton) {
+				if (event->eventType != Input::kButton) {
 					continue;
 				}
 
 				auto button = static_cast<RE::ButtonEvent*>(event);
-				if (!button->IsDown() || button->deviceType != RE::DeviceType::kKeyboard) {
+				if (!button->IsDown() || button->device != Device::kKeyboard) {
 					continue;
 				}
 
-				switch (button->keyMask) {
+				switch (button->idCode) {
 				case Key::kNum0:
 					Scaleform::MeterMenu::Open();
 					break;
@@ -112,7 +113,7 @@ namespace
 			{
 				Events::Install();
 
-				auto input = RE::InputManager::GetSingleton();
+				[[maybe_unused]] auto input = RE::BSInputDeviceManager::GetSingleton();
 				//input->AddEventSink(InputEventHandler::GetSingleton());
 
 				Scaleform::RegisterCreators();
@@ -130,6 +131,7 @@ extern "C" {
 		SKSE::Logger::SetPrintLevel(SKSE::Logger::Level::kDebugMessage);
 		SKSE::Logger::SetFlushLevel(SKSE::Logger::Level::kDebugMessage);
 		SKSE::Logger::UseLogStamp(true);
+		SKSE::Logger::TrackTrampolineStats(true);
 		SKSE::Logger::HookPapyrusLog(true);
 		SKSE::Logger::SetPapyrusLogFilter("BirthSign");
 
@@ -144,12 +146,9 @@ extern "C" {
 			return false;
 		}
 
-		switch (a_skse->RuntimeVersion()) {
-		case RUNTIME_VERSION_1_5_73:
-		case RUNTIME_VERSION_1_5_80:
-			break;
-		default:
-			_FATALERROR("Unsupported runtime version %08X!\n", a_skse->RuntimeVersion());
+		auto ver = a_skse->RuntimeVersion();
+		if (ver <= SKSE::RUNTIME_1_5_39) {
+			_FATALERROR("Unsupported runtime version %s!", ver.GetString().c_str());
 			return false;
 		}
 
@@ -165,7 +164,7 @@ extern "C" {
 			return false;
 		}
 
-		if (!SKSE::AllocBranchTrampoline(1024 * 1)) {
+		if (!SKSE::AllocTrampoline(1 << 10)) {
 			return false;
 		}
 

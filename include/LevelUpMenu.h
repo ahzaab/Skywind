@@ -9,14 +9,14 @@ namespace Scaleform
 	{
 	public:
 		using Base = RE::IMenu;
-		using Result = RE::IMenu::Result;
+		using Result = RE::UI_MESSAGE_RESULTS;
 
 		LevelUpMenu();
 		virtual ~LevelUpMenu() = default;
 
 		// IMenu
 		virtual void Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg) override;
-		virtual Result ProcessMessage(RE::UIMessage* a_message) override;
+		virtual Result ProcessMessage(RE::UIMessage& a_message) override;
 
 		static void Open();
 		static void Close();
@@ -36,8 +36,6 @@ namespace Scaleform
 		static void ModGlobal(const RE::FxDelegateArgs& a_params);
 		static void ModPlayerAV(const RE::FxDelegateArgs& a_params);
 		static void PlaySound(const RE::FxDelegateArgs& a_params);
-
-		static RE::FormID ResolveFormID(RE::FormID a_baseID, std::string a_pluginName);
 
 		void OnMenuOpen();
 		void OnMenuClose();

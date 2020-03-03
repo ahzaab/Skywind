@@ -18,14 +18,14 @@ namespace Events
 	}
 
 
-	auto HitHandler::ReceiveEvent(RE::TESHitEvent* a_event, RE::BSTEventSource<RE::TESHitEvent>* a_eventSource)
+	auto HitHandler::ProcessEvent(const RE::TESHitEvent* a_event, [[maybe_unused]] RE::BSTEventSource<RE::TESHitEvent>* a_eventSource)
 		-> EventResult
 	{
-		if (!a_event || !a_event->aggressor || !a_event->aggressor->IsPlayerRef() || !a_event->target || a_event->target->IsNot(RE::FormType::ActorCharacter)) {
+		if (!a_event || !a_event->cause || !a_event->cause->IsPlayerRef() || !a_event->target || a_event->target->IsNot(RE::FormType::ActorCharacter)) {
 			return EventResult::kContinue;
 		}
 
-		auto player = static_cast<RE::PlayerCharacter*>(a_event->aggressor.get());
+		auto player = static_cast<RE::PlayerCharacter*>(a_event->cause.get());
 		auto hand = player->GetAttackingWeapon();
 		bool useLeftHand = hand == player->GetEquippedEntryData(true);
 		if (!hand) {
@@ -33,8 +33,8 @@ namespace Events
 		}
 
 		RE::ExtraHealth* xHealth = 0;
-		if (hand->extraList) {
-			auto& xLists = *hand->extraList;
+		if (hand->extraLists) {
+			auto& xLists = *hand->extraLists;
 			for (auto& xList : xLists) {
 				xHealth = xList->GetByType<RE::ExtraHealth>();
 				if (xHealth) {
@@ -42,7 +42,7 @@ namespace Events
 				}
 			}
 		} else {
-			hand->extraList = new RE::BSSimpleList<RE::BaseExtraList*>();
+			hand->extraLists = new RE::BSSimpleList<RE::ExtraDataList*>();
 		}
 
 		auto gmst = RE::GameSettingCollection::GetSingleton();
@@ -52,9 +52,9 @@ namespace Events
 		auto healthRelMax = healthAbsMax - healthMin;
 
 		if (!xHealth) {
-			auto& xLists = *hand->extraList;
+			auto& xLists = *hand->extraLists;
 			if (xLists.empty()) {
-				auto xList = new RE::BaseExtraList();
+				auto xList = new RE::ExtraDataList();
 				xLists.push_front(xList);
 			}
 
@@ -62,7 +62,7 @@ namespace Events
 			xHealth = new RE::ExtraHealth(healthAbsMax);
 			xList->Add(xHealth);
 		}
-		
+
 		if (xHealth->health > healthMin) {
 			xHealth->health -= healthRelMax * 0.05;
 			if (xHealth->health < healthMin) {

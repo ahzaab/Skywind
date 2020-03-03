@@ -11,11 +11,11 @@ namespace Scaleform
 		HandlerBase(),
 		_root()
 	{
-		using Context = RE::InputMappingManager::Context;
+		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
 		using Flag = RE::IMenu::Flag;
 
-		flags |= Flag::kTryShowCursor;
-		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
+		flags |= Flag::kUpdateUsesCursor;
+		auto loader = RE::BSScaleformManager::GetSingleton();
 		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
@@ -38,7 +38,7 @@ namespace Scaleform
 		}
 
 		menuDepth = 5;	// JournalMenu == 5
-		flags |= Flag::kPreventGameLoad | Flag::kHideOther | Flag::kPauseGame;
+		flags |= Flag::kDisablePauseMenu | Flag::kTopmostRenderedMenu | Flag::kPausesGame;
 		context = Context::kFavor;
 
 		auto mc = RE::MenuControls::GetSingleton();
@@ -54,18 +54,18 @@ namespace Scaleform
 	}
 
 
-	auto BirthSignMenu::ProcessMessage(RE::UIMessage* a_message)
+	auto BirthSignMenu::ProcessMessage(RE::UIMessage& a_message)
 		-> Result
 	{
-		using Message = RE::UIMessage::Message;
+		using Message = RE::UI_MESSAGE_TYPE;
 
-		switch (a_message->message) {
-		case Message::kOpen:
+		switch (a_message.type) {
+		case Message::kShow:
 			OnMenuOpen();
-			return Result::kProcessed;
-		case Message::kClose:
+			return Result::kHandled;
+		case Message::kHide:
 			OnMenuClose();
-			return Result::kProcessed;
+			return Result::kHandled;
 		default:
 			return MenuBase::ProcessMessage(a_message);
 		}
@@ -74,21 +74,20 @@ namespace Scaleform
 
 	bool BirthSignMenu::CanProcess(RE::InputEvent* a_event)
 	{
-		using EventType = RE::InputEvent::EventType;
-		return a_event && a_event->eventType == EventType::kButton;
+		return a_event && a_event->eventType == RE::INPUT_EVENT_TYPE::kButton;
 	}
 
 
 	bool BirthSignMenu::ProcessButton(RE::ButtonEvent* a_event)
 	{
-		using DeviceType = RE::DeviceType;
+		using Device = RE::INPUT_DEVICE;
 
 		for (auto button = a_event; button; button = static_cast<RE::ButtonEvent*>(button->next)) {
-			switch (button->deviceType) {
-			case DeviceType::kKeyboard:
+			switch (button->device) {
+			case Device::kKeyboard:
 				{
 					using Key = RE::BSWin32KeyboardDevice::Key;
-					switch (button->keyMask) {
+					switch (button->idCode) {
 					case Key::kEnter:
 						SendAcceptEvent();
 						break;
@@ -100,10 +99,10 @@ namespace Scaleform
 					}
 				}
 				break;
-			case DeviceType::kGamepad:
+			case Device::kGamepad:
 				{
 					using Key = RE::BSWin32GamepadDevice::Key;
-					switch (button->keyMask) {
+					switch (button->idCode) {
 					case Key::kA:
 						SendAcceptEvent();
 						break;
@@ -126,24 +125,22 @@ namespace Scaleform
 
 	void BirthSignMenu::Open()
 	{
-		using Message = RE::UIMessage::Message;
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kOpen, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kShow, 0);
 	}
 
 
 	void BirthSignMenu::Close()
 	{
-		using Message = RE::UIMessage::Message;
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kClose, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
 	void BirthSignMenu::Register()
 	{
-		auto mm = RE::MenuManager::GetSingleton();
-		mm->Register(Name(), Create);
+		auto ui = RE::UI::GetSingleton();
+		ui->Register(Name(), Create);
 
 		_MESSAGE("Registered %s", Name().data());
 	}
@@ -240,7 +237,7 @@ namespace Scaleform
 		UInt32 acceptKey;
 		UInt32 cancelKey;
 
-		auto input = RE::InputManager::GetSingleton();
+		auto input = RE::BSInputDeviceManager::GetSingleton();
 		if (input->IsGamepadEnabled()) {
 			using Key = RE::BSWin32GamepadDevice::Key;
 			acceptKey = GetGamepadIndex(Key::kA);

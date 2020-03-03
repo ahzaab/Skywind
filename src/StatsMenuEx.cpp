@@ -107,7 +107,7 @@ namespace Scaleform
 			text = "Perk Points: ";
 			text += std::to_string(GetPerkPoints());
 			perkPoints.HTMLText(text);
-			
+
 			text = "Magicka: ";
 			text += BuildStatString(RE::ActorValue::kMagicka);
 			magicka.HTMLText(text);
@@ -155,21 +155,21 @@ namespace Scaleform
 
 		UInt32 Stats::GetPerkPoints() const
 		{
-			using Object = RE::BGSDefaultObjectManager::DefaultObjects;
+			using Object = RE::DEFAULT_OBJECT;
 
 			std::size_t obj;
 			switch (_state) {
 			case State::kVampire:
-				obj = Object::kDLC1VampirePerkPoints;
+				obj = Object::kVampireAvailablePerks;
 				break;
 			case State::kWerewolf:
-				obj = Object::kDLC1WerewolfPerkPoints;
+				obj = Object::kWerewolfAvailablePerks;
 				break;
 			case State::kDefault:
 			default:
 				{
 					auto player = RE::PlayerCharacter::GetSingleton();
-					return player->numPerkPoints;
+					return player->perkCount;
 				}
 				break;
 			}
@@ -182,21 +182,21 @@ namespace Scaleform
 
 		void Stats::DecPerkPoints() const
 		{
-			using Object = RE::BGSDefaultObjectManager::DefaultObjects;
+			using Object = RE::DEFAULT_OBJECT;
 
 			std::size_t obj;
 			switch (_state) {
 			case State::kVampire:
-				obj = Object::kDLC1VampirePerkPoints;
+				obj = Object::kVampireAvailablePerks;
 				break;
 			case State::kWerewolf:
-				obj = Object::kDLC1WerewolfPerkPoints;
+				obj = Object::kWerewolfAvailablePerks;
 				break;
 			case State::kDefault:
 			default:
 				{
 					auto player = RE::PlayerCharacter::GetSingleton();
-					player->numPerkPoints -= 1;
+					player->perkCount -= 1;
 					return;
 				}
 				break;
@@ -213,8 +213,8 @@ namespace Scaleform
 		std::string Stats::BuildStatString(RE::ActorValue a_av) const
 		{
 			auto player = RE::PlayerCharacter::GetSingleton();
-			auto fBase = player->GetActorValueBase(a_av);
-			auto fCur = player->GetActorValueMaximum(a_av);
+			auto fBase = player->GetActorValue(a_av);
+			auto fCur = player->GetPermanentActorValue(a_av);
 
 			auto base = static_cast<SInt32>(fBase);
 			auto mod = static_cast<SInt32>(fCur - fBase);
@@ -252,11 +252,11 @@ namespace Scaleform
 		_requisiteMappings(),
 		_unlockMappings()
 	{
-		using Context = RE::InputMappingManager::Context;
+		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
 		using Flag = RE::IMenu::Flag;
 
-		flags |= Flag::kTryShowCursor;
-		auto loader = RE::BSScaleformMovieLoader::GetSingleton();
+		flags |= Flag::kUpdateUsesCursor;
+		auto loader = RE::BSScaleformManager::GetSingleton();
 		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
@@ -279,7 +279,7 @@ namespace Scaleform
 		}
 
 		menuDepth = 5;	// JournalMenu == 5
-		flags |= Flag::kPreventGameLoad | Flag::kHideOther | Flag::kPauseGame;
+		flags |= Flag::kDisablePauseMenu | Flag::kTopmostRenderedMenu | Flag::kPausesGame;
 		context = Context::kFavor;
 
 		InitExtensions();
@@ -300,18 +300,18 @@ namespace Scaleform
 	}
 
 
-	auto StatsMenuEx::ProcessMessage(RE::UIMessage* a_message)
+	auto StatsMenuEx::ProcessMessage(RE::UIMessage& a_message)
 		-> Result
 	{
-		using Message = RE::UIMessage::Message;
+		using Message = RE::UI_MESSAGE_TYPE;
 
-		switch (a_message->message) {
-		case Message::kOpen:
+		switch (a_message.type) {
+		case Message::kShow:
 			OnMenuOpen();
-			return Result::kProcessed;
-		case Message::kClose:
+			return Result::kHandled;
+		case Message::kHide:
 			OnMenuClose();
-			return Result::kProcessed;
+			return Result::kHandled;
 		default:
 			return Base::ProcessMessage(a_message);
 		}
@@ -320,26 +320,22 @@ namespace Scaleform
 
 	void StatsMenuEx::Open()
 	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kOpen, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kShow, 0);
 	}
 
 
 	void StatsMenuEx::Close()
 	{
-		using Message = RE::UIMessage::Message;
-
-		auto ui = RE::UIManager::GetSingleton();
-		ui->AddMessage(Name(), Message::kClose, 0);
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
 	void StatsMenuEx::Register()
 	{
-		auto mm = RE::MenuManager::GetSingleton();
-		mm->Register(Name(), Create);
+		auto ui = RE::UI::GetSingleton();
+		ui->Register(Name(), Create);
 
 		_MESSAGE("Registered %s", Name().data());
 	}
@@ -549,8 +545,8 @@ namespace Scaleform
 
 		CLIK::Array arr(view);
 		CLIK::Object str;
-		for (auto& perk : _perkMappings) {
-			str = perk.text;
+		for (auto& mappedPerk : _perkMappings) {
+			str = mappedPerk.text;
 			arr.Push(str);
 		}
 
@@ -657,8 +653,8 @@ namespace Scaleform
 		_desc.unlock.Label("Unlock");
 
 		auto player = RE::PlayerCharacter::GetSingleton();
-		bool disabled = _stats.GetPerkPoints() == 0 || player->HasPerk(perk) || !perk->conditions.Run(player, player);
-		
+		bool disabled = _stats.GetPerkPoints() == 0 || player->HasPerk(perk) || !perk->perkConditions.Run(player, player);
+
 #if 0
 		// this second check might be unnecessary, the vanilla game seems to base perk eligibility on the previous check
 		if (!disabled) {
@@ -752,12 +748,12 @@ namespace Scaleform
 				}
 
 				auto avInfo = RE::TESForm::LookupByID<RE::ActorValueInfo>(info.id);
-				if (avInfo && !avInfo->name.empty()) {
-					std::string name(avInfo->name);
+				if (avInfo && !avInfo->fullName.empty()) {
+					std::string name(avInfo->fullName);
 					SanitizeString(name);
 
 					if (info.av != RE::ActorValue::kNone) {
-						auto baseVal = static_cast<UInt32>(player->GetActorValueBase(info.av));
+						auto baseVal = static_cast<UInt32>(player->GetActorValue(info.av));
 						name += " (";
 						name += std::to_string(baseVal);
 						name += ')';
@@ -792,8 +788,8 @@ namespace Scaleform
 			BFSOnPerkTree(av, [&](RE::BGSSkillPerkTreeNode* a_node) -> bool
 			{
 				auto perk = a_node->perk;
-				if (perk && !perk->name.empty()) {
-					std::string name(perk->name);
+				if (perk && !perk->fullName.empty()) {
+					std::string name(perk->fullName);
 					SanitizeString(name);
 
 					UInt32 level = 0;
@@ -892,9 +888,9 @@ namespace Scaleform
 		auto player = RE::PlayerCharacter::GetSingleton();
 
 		for (auto& node : a_srcArr) {
-			if (node->perk && !node->perk->name.empty()) {
+			if (node->perk && !node->perk->fullName.empty()) {
 				disabled = false;
-				std::string name(node->perk->name);
+				std::string name(node->perk->fullName);
 				SanitizeString(name);
 
 				UInt32 level = value_type::kInvalid;
@@ -985,9 +981,9 @@ namespace Scaleform
 
 	std::optional<UInt32> StatsMenuEx::GetPerkLvlReq(RE::BGSPerk* a_perk)
 	{
-		using FunctionID = RE::Condition::FunctionID;
+		using FunctionID = RE::TESCondition::FunctionID;
 
-		for (auto cond = a_perk->conditions.head; cond; cond = cond->next) {
+		for (auto cond = a_perk->perkConditions.head; cond; cond = cond->next) {
 			if (cond->functionID == FunctionID::kGetBaseActorValue) {
 				return std::make_optional(static_cast<UInt32>(cond->comparisonValue));
 			}

@@ -181,7 +181,7 @@ namespace Scaleform
 	{
 	public:
 		using Base = RE::IMenu;
-		using Result = Base::Result;
+		using Result = RE::UI_MESSAGE_RESULTS;
 
 
 		StatsMenuEx();
@@ -189,7 +189,7 @@ namespace Scaleform
 
 		// IMenu
 		virtual void Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor) override;
-		virtual Result ProcessMessage(RE::UIMessage* a_message) override;
+		virtual Result ProcessMessage(RE::UIMessage& a_message) override;
 
 		static void Open();
 		static void Close();

@@ -46,7 +46,7 @@ namespace Scaleform
 
 		struct RangeElem
 		{
-			using Type = RE::MagicItem::TargetType;
+			using Type = RE::MagicSystem::Delivery;
 
 			std::string text;
 			Type type;
@@ -77,7 +77,7 @@ namespace Scaleform
 	{
 	public:
 		using Base = RE::IMenu;
-		using Result = Base::Result;
+		using Result = RE::UI_MESSAGE_RESULTS;
 
 
 		SpellmakingMenu();
@@ -85,8 +85,8 @@ namespace Scaleform
 
 		// IMenu
 		virtual void Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor) override;
-		virtual Result ProcessMessage(RE::UIMessage* a_message) override;
-		virtual void NextFrame(float a_arg1, UInt32 a_currentTime) override;
+		virtual Result ProcessMessage(RE::UIMessage& a_message) override;
+		virtual void AdvanceMovie(float a_interval, UInt32 a_currentTime) override;
 
 		static void Open();
 		static void Close();
