@@ -47,7 +47,7 @@ namespace Patches
 
 		void DisableTemperString()
 		{
-			REL::Offset<std::uintptr_t> target(REL::ID(12786), 0x59);
+			REL::Offset<std::uintptr_t> target(REL::ID(12633), 0x59);
 			auto trampoline = SKSE::GetTrampoline();
 			trampoline->Write5Call(target.GetAddress(), &Hook_GetTemperString);
 

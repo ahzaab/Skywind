@@ -1,12 +1,14 @@
 #include "Events.h"
 
+#include <memory>
+
 
 namespace Events
 {
 	HitHandler* HitHandler::GetSingleton()
 	{
 		static HitHandler singleton;
-		return &singleton;
+		return std::addressof(singleton);
 	}
 
 
