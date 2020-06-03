@@ -11,7 +11,7 @@
 #include "CLIK/Button.h"
 #include "CLIK/ScrollingList.h"
 #include "CLIK/TextField.h"
-
+#include <CommonLibSSE\include\function_ref.h>
 
 namespace Scaleform
 {

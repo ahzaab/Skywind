@@ -66,9 +66,9 @@ namespace Events
 		}
 
 		if (xHealth->health > healthMin) {
-			xHealth->health -= healthRelMax * 0.05;
-			if (xHealth->health < healthMin) {
-				xHealth->health = healthMin;
+			xHealth->health -= healthRelMax * 0.05f;
+			if (xHealth->health < static_cast<float>(healthMin)) {
+				xHealth->health = static_cast<float>(healthMin);
 			}
 		}
 

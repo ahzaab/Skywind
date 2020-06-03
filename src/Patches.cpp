@@ -20,7 +20,7 @@ namespace Patches
 
 				REL::Offset<std::uintptr_t> funcBase = REL::ID(51654);
 				for (auto i = RUN_START; i < RUN_END; ++i) {
-					SKSE::SafeWrite8(funcBase.GetAddress() + i, NOP);
+					SKSE::SafeWrite8(funcBase.address() + i, NOP);
 				}
 			}
 
@@ -31,7 +31,7 @@ namespace Patches
 
 				REL::Offset<std::uintptr_t> funcBase = REL::ID(51647);
 				for (auto i = RUN_START; i < RUN_END; ++i) {
-					SKSE::SafeWrite8(funcBase.GetAddress() + i, NOP);
+					SKSE::SafeWrite8(funcBase.address() + i, NOP);
 				}
 			}
 
@@ -49,7 +49,7 @@ namespace Patches
 		{
 			REL::Offset<std::uintptr_t> target(REL::ID(12633), 0x59);
 			auto trampoline = SKSE::GetTrampoline();
-			trampoline->Write5Call(target.GetAddress(), &Hook_GetTemperString);
+			trampoline->Write5Call(target.address(), &Hook_GetTemperString);
 
 			_MESSAGE("Disabled temper string");
 		}
@@ -60,7 +60,7 @@ namespace Patches
 			REL::Offset<std::uintptr_t> target = REL::ID(259069);
 			constexpr UInt8 NEW_STR[] = ", 3E %d";
 			for (std::size_t i = 0; i < std::extent<decltype(NEW_STR)>::value; ++i) {
-				SKSE::SafeWrite8(target.GetAddress() + i, NEW_STR[i]);
+				SKSE::SafeWrite8(target.address() + i, NEW_STR[i]);
 			}
 
 			_MESSAGE("Patched era");

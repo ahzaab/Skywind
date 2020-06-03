@@ -129,7 +129,7 @@ namespace Scaleform
 		using Flag = RE::IMenu::Flag;
 
 		auto loader = RE::BSScaleformManager::GetSingleton();
-		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		auto success = loader->LoadMovieEx(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
 

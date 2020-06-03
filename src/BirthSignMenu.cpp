@@ -16,7 +16,7 @@ namespace Scaleform
 
 		flags |= Flag::kUpdateUsesCursor;
 		auto loader = RE::BSScaleformManager::GetSingleton();
-		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		auto success = loader->LoadMovieEx(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
 
@@ -214,7 +214,7 @@ namespace Scaleform
 		RE::GFxValue result;
 		[[maybe_unused]] auto success = _root.Invoke("getCurrentSign", &result, 0, 0);
 		assert(success);
-		auto id = result.GetUInt();
+		auto id = static_cast<UInt32>(result.GetUInt());
 		if (id != 0) {
 			auto handler = OnBirthSignAcceptHandler::GetSingleton();
 			handler->QueueEvent(id);

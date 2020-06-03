@@ -257,7 +257,7 @@ namespace Scaleform
 
 		flags |= Flag::kUpdateUsesCursor;
 		auto loader = RE::BSScaleformManager::GetSingleton();
-		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		auto success = loader->LoadMovieEx(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
 
@@ -554,7 +554,7 @@ namespace Scaleform
 
 		for (std::size_t i = 0; i < _perkMappings.size(); ++i) {
 			if (_perkMappings[i].perkID == idToFind) {
-				_perks.SelectedIndex(i);
+				_perks.SelectedIndex(static_cast<double>(i));
 				break;
 			}
 		}
@@ -653,7 +653,7 @@ namespace Scaleform
 		_desc.unlock.Label("Unlock");
 
 		auto player = RE::PlayerCharacter::GetSingleton();
-		bool disabled = _stats.GetPerkPoints() == 0 || player->HasPerk(perk) || !perk->perkConditions.Run(player, player);
+		bool disabled = _stats.GetPerkPoints() == 0 || player->HasPerk(perk) || !perk->perkConditions.IsTrue(player, player);
 
 #if 0
 		// this second check might be unnecessary, the vanilla game seems to base perk eligibility on the previous check
@@ -981,11 +981,11 @@ namespace Scaleform
 
 	std::optional<UInt32> StatsMenuEx::GetPerkLvlReq(RE::BGSPerk* a_perk)
 	{
-		using FunctionID = RE::TESCondition::FunctionID;
+		using FunctionID = RE::FUNCTION_DATA::FunctionID;
 
 		for (auto cond = a_perk->perkConditions.head; cond; cond = cond->next) {
-			if (cond->functionID == FunctionID::kGetBaseActorValue) {
-				return std::make_optional(static_cast<UInt32>(cond->comparisonValue));
+			if (cond->data.functionData.function == FunctionID::kGetBaseActorValue) {
+				return std::make_optional(static_cast<UInt32>(cond->data.comparisonValue.f));
 			}
 		}
 		return std::nullopt;
