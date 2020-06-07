@@ -1,5 +1,17 @@
+#include "SkywindPCH.h"
 #include "Papyrus.h"
+#include "HudmenuExt.h"
 
+namespace Papyrus
+{
+	void Register()
+	{
+		auto papyrus = SKSE::GetPapyrusInterface();
+
+		papyrus->Register(HudMenuExt::RegisterFuncs);
+
+	}
+}
 
 OnBirthSignAcceptHandler* OnBirthSignAcceptHandler::GetSingleton()
 {

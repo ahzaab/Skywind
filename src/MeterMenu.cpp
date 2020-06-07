@@ -1,3 +1,4 @@
+#include "SkywindPCH.h"
 #include "MeterMenu.h"
 
 #include <cassert>
@@ -5,7 +6,6 @@
 #include "Scaleform.h"
 
 #include "SKSE/API.h"
-
 
 namespace Scaleform
 {

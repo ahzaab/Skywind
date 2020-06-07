@@ -1,3 +1,5 @@
+#include "SkywindPCH.h"
+
 #include "StatsMenuEx.h"
 
 #include <queue>
@@ -5,7 +7,6 @@
 
 #include "CLIK/Array.h"
 #include "Scaleform.h"
-
 
 namespace Scaleform
 {
@@ -952,7 +953,7 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::BFSOnPerkTree(RE::ActorValueInfo* a_av, llvm::function_ref<bool(RE::BGSSkillPerkTreeNode*)> a_predicate)
+	void StatsMenuEx::BFSOnPerkTree(RE::ActorValueInfo* a_av, std::function<bool(RE::BGSSkillPerkTreeNode*)> a_predicate)
 	{
 		if (!a_av || !a_av->perkTree) {
 			return;

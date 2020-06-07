@@ -1,3 +1,5 @@
+#include "SkywindPCH.h"
+
 #include "Scaleform.h"
 
 #include "BirthSignMenu.h"

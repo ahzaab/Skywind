@@ -1,3 +1,5 @@
+#include "SkywindPCH.h"
+
 #include "BirthSignMenu.h"
 
 #include "Papyrus.h"

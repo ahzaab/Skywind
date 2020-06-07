@@ -1,3 +1,4 @@
+#include "SkywindPCH.h"
 #include "CLIK/UIComponent.h"
 
 #include <cassert>

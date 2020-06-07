@@ -1,6 +1,6 @@
+#include "SkywindPCH.h"
 #include "Patches.h"
 
-#include "RE/Skyrim.h"
 #include "REL/Relocation.h"
 #include "SKSE/API.h"
 #include "SKSE/SafeWrite.h"

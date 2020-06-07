@@ -1,9 +1,10 @@
+#include "SkywindPCH.h"
 #include "LevelUpMenu.h"
 
 #include <cassert>
 
 #include "Scaleform.h"
-
+#include "SKSE/Logger.h"
 
 namespace Scaleform
 {

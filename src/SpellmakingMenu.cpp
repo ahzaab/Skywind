@@ -1,10 +1,11 @@
+#include "SkywindPCH.h"
+
 #include "SpellmakingMenu.h"
 
 #include <map>
 
 #include "CLIK/Array.h"
 #include "Scaleform.h"
-
 
 namespace Scaleform
 {

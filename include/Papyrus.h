@@ -2,6 +2,10 @@
 
 #include "SKSE/RegistrationSet.h"
 
+namespace Papyrus
+{
+	void Register();
+}
 
 class OnBirthSignAcceptHandler : public SKSE::RegistrationSet<UInt32>
 {

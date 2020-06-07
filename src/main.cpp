@@ -1,4 +1,5 @@
-﻿#include <memory>
+﻿#include "SkywindPCH.h"
+#include <memory>
 
 #include "Events.h"
 #include "Patches.h"
@@ -10,19 +11,20 @@
 #include "MeterMenu.h"
 #include "SpellmakingMenu.h"
 #include "StatsMenuEx.h"
+#include "Papyrus.h"
 // TODO
 
-#include "RE/Skyrim.h"
 #include "SKSE/API.h"
-
 
 namespace
 {
+	static bool isMenuOpen = false;
 	class InputEventHandler : public RE::BSTEventSink<RE::InputEvent*>
 	{
 	public:
 		using EventResult = RE::BSEventNotifyControl;
 
+		
 
 		static InputEventHandler* GetSingleton()
 		{
@@ -59,35 +61,19 @@ namespace
 				}
 
 				switch (button->idCode) {
-				case Key::kNum0:
-					Scaleform::MeterMenu::Open();
+				case Key::kF1:
+					if (!isMenuOpen)
+					{
+						isMenuOpen = true;
+						Scaleform::StatsMenuEx::Open();
+					}
+					else
+					{
+						isMenuOpen = false;
+						Scaleform::StatsMenuEx::Close();
+					}
 					break;
-				case Key::kNum9:
-					Scaleform::MeterMenu::Close();
-					break;
-				case Key::kNum8:
-					Scaleform::MeterMenu::TweenTo(80);
-					break;
-				case Key::kNum7:
-					Scaleform::MeterMenu::TweenTo(70);
-					break;
-				case Key::kNum6:
-					Scaleform::MeterMenu::TweenTo(60);
-					break;
-				case Key::kNum5:
-					Scaleform::MeterMenu::TweenTo(50);
-					break;
-				case Key::kNum4:
-					Scaleform::MeterMenu::TweenTo(40);
-					break;
-				case Key::kNum3:
-					Scaleform::MeterMenu::TweenTo(30);
-					break;
-				case Key::kNum2:
-					Scaleform::MeterMenu::TweenTo(20);
-					break;
-				case Key::kNum1:
-					Scaleform::MeterMenu::TweenTo(10);
+				default:
 					break;
 				}
 			}
@@ -113,8 +99,8 @@ namespace
 			{
 				Events::Install();
 
-				[[maybe_unused]] auto input = RE::BSInputDeviceManager::GetSingleton();
-				//input->AddEventSink(InputEventHandler::GetSingleton());
+				auto input = RE::BSInputDeviceManager::GetSingleton();
+				input->AddEventSink(InputEventHandler::GetSingleton());
 
 				Scaleform::RegisterCreators();
 			}
@@ -160,6 +146,13 @@ extern "C" {
 	{
 		_MESSAGE("Skywind loaded");
 
+		//while (!IsDebuggerPresent())
+		//{
+		//   Sleep(10);
+		//}
+
+		//Sleep(1000 * 2);
+
 		if (!SKSE::Init(a_skse)) {
 			return false;
 		}
@@ -173,7 +166,16 @@ extern "C" {
 			return false;
 		}
 
+
+		auto papyrus = SKSE::GetPapyrusInterface();
+		if (!papyrus){
+			return false;
+		}
+
+		Papyrus::Register();
+
 		Patches::Install();
+
 		Scaleform::RegisterCallbacks();
 
 		return true;

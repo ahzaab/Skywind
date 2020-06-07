@@ -11,7 +11,6 @@
 #include "CLIK/Button.h"
 #include "CLIK/ScrollingList.h"
 #include "CLIK/TextField.h"
-#include <CommonLibSSE\include\function_ref.h>
 
 namespace Scaleform
 {
@@ -235,7 +234,7 @@ namespace Scaleform
 		void InvalidateRanks();
 		void InvalidateDesc();
 
-		void BFSOnPerkTree(RE::ActorValueInfo* a_av, llvm::function_ref<bool(RE::BGSSkillPerkTreeNode*)> a_predicate);
+		void BFSOnPerkTree(RE::ActorValueInfo* a_av, std::function<bool(RE::BGSSkillPerkTreeNode*)> a_predicate);
 		std::optional<UInt32> GetPerkLvlReq(RE::BGSPerk* a_perk);
 		void SanitizeString(std::string& a_str);
 

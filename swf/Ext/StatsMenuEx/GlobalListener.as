@@ -1,4 +1,4 @@
-import gfx.controls.Button;
+﻿import gfx.controls.Button;
 import gfx.controls.ScrollingList;
 import gfx.events.EventTypes;
 import gfx.io.GameDelegate;
@@ -8,9 +8,10 @@ class GlobalListener extends MovieClip
 {
 	/* PRIVATE VARIABLES */
 
-	private var _trees: ScrollingList;
-	private var _perks: ScrollingList;
-	private var _ranks: ScrollingList;
+	private var roots: ScrollingList;
+	private var trees: ScrollingList;
+	private var perks: ScrollingList;
+	private var ranks: ScrollingList;
 
 
 	/* INITIALIZATION */
@@ -23,30 +24,30 @@ class GlobalListener extends MovieClip
 
 	public function onLoad(): Void
 	{
-		var roots: ScrollingList = _parent.roots;
+		roots  = _parent.roots;
 		if (roots != undefined) {
 			roots.addEventListener(EventTypes.ITEM_PRESS, this, "handleRootsPress");
 		} else {
 			log("could not get classes");
 		}
 
-		_trees = _parent.trees;
-		if (_trees != undefined) {
-			_trees.addEventListener(EventTypes.ITEM_PRESS, this, "handleTreesPress");
+		trees = _parent.trees;
+		if (trees != undefined) {
+			trees.addEventListener(EventTypes.ITEM_PRESS, this, "handleTreesPress");
 		} else {
 			log("could not get trees");
 		}
 
-		_perks = _parent.perks;
-		if (_perks != undefined) {
-			_perks.addEventListener(EventTypes.ITEM_PRESS, this, "handlePerksPress");
+		perks = _parent.perks;
+		if (perks != undefined) {
+			perks.addEventListener(EventTypes.ITEM_PRESS, this, "handlePerksPress");
 		} else {
 			log("could not get perks");
 		}
 
-		_ranks = _parent.ranks;
-		if (_ranks != undefined) {
-			_ranks.addEventListener(EventTypes.ITEM_PRESS, this, "handleRanksPress");
+		ranks = _parent.ranks;
+		if (ranks != undefined) {
+			ranks.addEventListener(EventTypes.ITEM_PRESS, this, "handleRanksPress");
 		} else {
 			log("could not get ranks");
 		}
@@ -93,7 +94,7 @@ class GlobalListener extends MovieClip
 	private function handlePerksPress(a_event: Object): Void
 	{
 		var perkIndex: Number = a_event.index;
-		var treeIndex: Number = _trees.selectedIndex;
+		var treeIndex: Number = trees.selectedIndex;
 		GameDelegate.call("OnPerkPress", [perkIndex, treeIndex]);
 	}
 
@@ -101,7 +102,7 @@ class GlobalListener extends MovieClip
 	private function handleRanksPress(a_event: Object): Void
 	{
 		var rankIndex: Number = a_event.index;
-		var treeIndex: Number = _trees.selectedIndex;
+		var treeIndex: Number = trees.selectedIndex;
 		GameDelegate.call("OnRankPress", [rankIndex, treeIndex]);
 	}
 
@@ -109,7 +110,7 @@ class GlobalListener extends MovieClip
 	private function handleRequisitesPress(a_event: Object): Void
 	{
 		var requisiteIndex: Number = a_event.index;
-		var treeIndex: Number = _trees.selectedIndex;
+		var treeIndex: Number = trees.selectedIndex;
 		GameDelegate.call("OnRequisitePress", [requisiteIndex, treeIndex]);
 	}
 
@@ -117,16 +118,16 @@ class GlobalListener extends MovieClip
 	private function handleUnlocksPress(a_event: Object): Void
 	{
 		var unlockIndex: Number = a_event.index;
-		var treeIndex: Number = _trees.selectedIndex;
+		var treeIndex: Number = trees.selectedIndex;
 		GameDelegate.call("OnUnlockPress", [unlockIndex, treeIndex]);
 	}
 
 
 	private function handleUnlockPress(a_event: Object): Void
 	{
-		var rankIndex: Number = _ranks.selectedIndex;
-		var perkIndex: Number = _perks.selectedIndex;
-		var treeIndex: Number = _trees.selectedIndex;
+		var rankIndex: Number = ranks.selectedIndex;
+		var perkIndex: Number = perks.selectedIndex;
+		var treeIndex: Number = trees.selectedIndex;
 		GameDelegate.call("UnlockPerk", [rankIndex, perkIndex, treeIndex]);
 	}
 
