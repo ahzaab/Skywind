@@ -64,10 +64,10 @@
     <ClCompile Include="src\MeterMenu.cpp">
       <Filter>src\Scaleform</Filter>
     </ClCompile>
-    <ClCompile Include="src\SkywindPCH.cpp">
+    <ClCompile Include="src\HudMenuExt.cpp" />
+    <ClCompile Include="src\PCH.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\HudMenuExt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\version.h">
@@ -133,10 +133,11 @@
     <ClInclude Include="include\MeterMenu.h">
       <Filter>include\Scaleform</Filter>
     </ClInclude>
-    <ClInclude Include="include\SkywindPCH.h">
+    <ClInclude Include="include\HudMenuExt.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="include\PCH.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\HudMenuExt.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="version.rc" />
