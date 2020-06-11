@@ -1002,4 +1002,5 @@ namespace Scaleform
 			a_str.assign(a_str, 1);
 		}
 	}
+
 }
