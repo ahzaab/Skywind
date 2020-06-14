@@ -7,6 +7,8 @@
 
 #include "CLIK/Array.h"
 #include "Scaleform.h"
+#include "SKSE/API.h"
+#include <thread>
 
 namespace Scaleform
 {
@@ -237,6 +239,7 @@ namespace Scaleform
 		}
 	}
 
+	constexpr  REL::ID StatsMenuEx::Vtbl(static_cast<std::uint64_t>(269955));
 
 	StatsMenuEx::StatsMenuEx() :
 		Base(),
@@ -279,9 +282,10 @@ namespace Scaleform
 			std::abort();
 		}
 
+		//Matched the flags used by the Native StatsMenu. kCustomRendering is needed to allow the Tween Menu animation
+		flags = Flag::kPausesGame | Flag::kUsesCursor | Flag::kUsesMenuContext | Flag::kDisablePauseMenu | Flag::kCustomRendering;
+		context = Context::kStats;
 		menuDepth = 5;	// JournalMenu == 5
-		flags |= Flag::kDisablePauseMenu | Flag::kTopmostRenderedMenu | Flag::kPausesGame;
-		context = Context::kFavor;
 
 		InitExtensions();
 		view->SetVisible(false);
@@ -300,11 +304,14 @@ namespace Scaleform
 		a_processor->Process("UnlockPerk", UnlockPerk);
 	}
 
-
 	auto StatsMenuEx::ProcessMessage(RE::UIMessage& a_message)
 		-> Result
 	{
 		using Message = RE::UI_MESSAGE_TYPE;
+
+		// Not used right now.  It will be for developerment
+		using ProcessMessage_t = decltype(&RE::StatsMenu::ProcessMessage);
+		REL::Function<ProcessMessage_t> _ProcessMessage(REL::ID(51638));
 
 		switch (a_message.type) {
 		case Message::kShow:
@@ -448,9 +455,14 @@ namespace Scaleform
 
 	void StatsMenuEx::OnMenuOpen()
 	{
+		auto bm = RE::UIBlurManager::GetSingleton();
+		bm->IncrementBlurCount();
+
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(RE::FaderMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
+
 		bool success;
 		view->SetVisible(true);
-
 		std::vector<std::pair<CLIK::Object*, std::string>> toGet;
 		toGet.push_back(std::make_pair(&_roots, "roots"));
 		toGet.push_back(std::make_pair(&_trees, "trees"));
@@ -491,10 +503,42 @@ namespace Scaleform
 		SetRoots();
 	}
 
+	static int count = 0;
+	void TaskFunc() {
+		auto pc = RE::PlayerCamera::GetSingleton();
+		pc->currentState.get()->Update(pc->cameraStates[RE::CameraStates::kTween]);
+		Sleep(100);
+
+		if (--count > 0)
+		{
+			auto task = SKSE::GetTaskInterface();
+			task->AddTask(TaskFunc);
+		}
+	};
 
 	void StatsMenuEx::OnMenuClose()
 	{
-		return;
+		auto bm = RE::UIBlurManager::GetSingleton();
+		bm->DecrementBlurCount();
+		
+		typedef void (*voidFn)();
+
+		auto ui = RE::UI::GetSingleton();
+		if (ui->IsMenuOpen(RE::TweenMenu::MENU_NAME))
+		{
+			// Start the animation
+			REL::Function<voidFn> TweenMenuStartCloseMenu(REL::ID(51838));
+			TweenMenuStartCloseMenu();
+
+			// Close the Tween Menu, This function needs to be called to allow the animation to finish;
+			REL::Function<voidFn> TweenMenuCloseMenu(REL::ID(51839));
+			TweenMenuCloseMenu();
+		}
+
+		// Make sure we are back on the Hud
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(RE::FaderMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
+		uiQueue->AddMessage(RE::CursorMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
@@ -1002,5 +1046,6 @@ namespace Scaleform
 			a_str.assign(a_str, 1);
 		}
 	}
+
 
 }

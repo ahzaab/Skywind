@@ -172,6 +172,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Scaleform.cpp" />
     <ClCompile Include="src\SpellmakingMenu.cpp" />
+    <ClCompile Include="src\StatsMenuHook.cpp" />
     <ClCompile Include="src\StatsMenuEx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +196,7 @@
     <ClInclude Include="include\Patches.h" />
     <ClInclude Include="include\Scaleform.h" />
     <ClInclude Include="include\SpellmakingMenu.h" />
+    <ClInclude Include="include\StatsMenuHook.h" />
     <ClInclude Include="include\StatsMenuEx.h" />
     <ClInclude Include="include\version.h" />
     <ClInclude Include="include\PCH.h" />

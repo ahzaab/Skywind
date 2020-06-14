@@ -12,11 +12,6 @@
 #include "CLIK/ScrollingList.h"
 #include "CLIK/TextField.h"
 
-namespace StatsMenuExVtbl
-{
-	static constexpr REL::ID Vtbl(static_cast<std::uint64_t>(269955));
-}
-
 namespace Scaleform
 {
 	namespace
@@ -202,28 +197,11 @@ namespace Scaleform
 
 		static void Register();
 		static RE::IMenu* Create();
+		
+	private:	
+		static const REL::ID Vtbl;
+		RE::BSTSmartPointer<RE::TESCameraState> m_currentCameraState;
 
-		//using Accept_t = decltype(Accept);
-		//using ProcessMessage_t = decltype(ProcessMessage);
-
-		//static inline REL::Function<Accept_t> _Accept;
-		//static inline REL::Function<ProcessMessage_t> _ProcessMessage;
-
-		void Hook_Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg)	// 01
-		{
-			//_Accept(this, a_cbReg);
-			
-		}
-
-
-		RE::UI_MESSAGE_RESULTS Hook_ProcessMessage(RE::UIMessage& a_message)	// 04
-		{
-			return RE::UI_MESSAGE_RESULTS::kHandled;
-			//return _ProcessMessage(this, a_message);
-		}
-
-		//269955
-	private:
 		static void Log(const RE::FxDelegateArgs& a_params);
 		static void OnRootPress(const RE::FxDelegateArgs& a_params);
 		static void OnTreePress(const RE::FxDelegateArgs& a_params);
@@ -278,21 +256,6 @@ namespace Scaleform
 		std::vector<Rank> _rankMappings;
 		std::vector<TextPerkLevel> _requisiteMappings;
 		std::vector<TextPerkLevel> _unlockMappings;
-
-		//using Accept_t = decltype(&StatsMenuEx::Accept);
-		//using ProcessMessage_t = decltype(&StatsMenuEx::ProcessMessage);
-
-		//static inline REL::Function<Accept_t> _Accept;
-		//static inline REL::Function<ProcessMessage_t> _ProcessMessage;
-		public:
-		static void InstallHooks()
-		{
-			REL::Offset<std::uintptr_t> vTable(StatsMenuExVtbl::Vtbl);
-			vTable.write_vfunc(0x1, &StatsMenuEx::Hook_Accept);
-			vTable.write_vfunc(0x4, &StatsMenuEx::Hook_ProcessMessage);
-
-			_MESSAGE("Installed hooks");
-		}
 	};
 
 
