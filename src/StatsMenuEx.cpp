@@ -8,10 +8,10 @@
 #include "CLIK/Array.h"
 #include "Scaleform.h"
 #include "SKSE/API.h"
-#include <thread>
 
 namespace Scaleform
 {
+	
 	namespace
 	{
 		RootMap::RootMap() :
@@ -239,7 +239,8 @@ namespace Scaleform
 		}
 	}
 
-	constexpr  REL::ID StatsMenuEx::Vtbl(static_cast<std::uint64_t>(269955));
+	//constexpr  REL::ID StatsMenuEx::Vtbl(static_cast<std::uint64_t>(269955));
+	bool StatsMenuEx::s_active = false;
 
 	StatsMenuEx::StatsMenuEx() :
 		Base(),
@@ -258,6 +259,7 @@ namespace Scaleform
 	{
 		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
 		using Flag = RE::IMenu::Flag;
+		//StatsMenuEx::s_active = false;
 
 		flags |= Flag::kUpdateUsesCursor;
 		auto loader = RE::BSScaleformManager::GetSingleton();
@@ -328,13 +330,21 @@ namespace Scaleform
 
 	void StatsMenuEx::Open()
 	{
+		if (!StatsMenuEx::s_active)
+			return;
+
 		auto uiQueue = RE::UIMessageQueue::GetSingleton();
 		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kShow, 0);
+		uiQueue->AddMessage(RE::FaderMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
+		uiQueue->AddMessage(RE::StatsMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
 	void StatsMenuEx::Close()
 	{
+		if (!StatsMenuEx::s_active)
+			return;
+
 		auto uiQueue = RE::UIMessageQueue::GetSingleton();
 		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
@@ -348,12 +358,27 @@ namespace Scaleform
 		_MESSAGE("Registered %s", Name().data());
 	}
 
+	bool StatsMenuEx::SetActive(bool active)
+	{
+		auto ui = RE::UI::GetSingleton();
+		if (ui->IsMenuOpen(Scaleform::StatsMenuEx::Name()) || ui->IsMenuOpen(RE::StatsMenu::MENU_NAME))
+			return false;
+
+		StatsMenuEx::s_active = active;
+
+		return true;
+	}
+
+	bool StatsMenuEx::GetActive()
+	{
+		return StatsMenuEx::s_active;
+	}
+
 
 	RE::IMenu* StatsMenuEx::Create()
 	{
 		return new StatsMenuEx();
 	}
-
 
 	void StatsMenuEx::Log(const RE::FxDelegateArgs& a_params)
 	{
@@ -456,6 +481,8 @@ namespace Scaleform
 	void StatsMenuEx::OnMenuOpen()
 	{
 		auto bm = RE::UIBlurManager::GetSingleton();
+		
+		// set blur
 		bm->IncrementBlurCount();
 
 		auto uiQueue = RE::UIMessageQueue::GetSingleton();
@@ -519,20 +546,17 @@ namespace Scaleform
 	void StatsMenuEx::OnMenuClose()
 	{
 		auto bm = RE::UIBlurManager::GetSingleton();
+		// Remove blur
 		bm->DecrementBlurCount();
 		
-		typedef void (*voidFn)();
-
 		auto ui = RE::UI::GetSingleton();
 		if (ui->IsMenuOpen(RE::TweenMenu::MENU_NAME))
 		{
-			// Start the animation
-			REL::Function<voidFn> TweenMenuStartCloseMenu(REL::ID(51838));
-			TweenMenuStartCloseMenu();
+			// Start to close the animation
+			TweenMenu::StartCloseMenu();
 
 			// Close the Tween Menu, This function needs to be called to allow the animation to finish;
-			REL::Function<voidFn> TweenMenuCloseMenu(REL::ID(51839));
-			TweenMenuCloseMenu();
+			TweenMenu::CloseMenu();
 		}
 
 		// Make sure we are back on the Hud

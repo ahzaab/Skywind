@@ -68,7 +68,8 @@
     <ClCompile Include="src\PCH.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\StatsMenuHook.cpp" />
+    <ClCompile Include="src\TweenMenu.cpp" />
+    <ClCompile Include="src\StatsMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\version.h">
@@ -139,7 +140,8 @@
     <ClInclude Include="include\PCH.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StatsMenuHook.h" />
+    <ClInclude Include="include\TweenMenu.h" />
+    <ClInclude Include="include\StatsMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="version.rc" />

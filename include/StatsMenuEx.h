@@ -11,6 +11,7 @@
 #include "CLIK/Button.h"
 #include "CLIK/ScrollingList.h"
 #include "CLIK/TextField.h"
+#include "TweenMenu.h"
 
 namespace Scaleform
 {
@@ -197,11 +198,12 @@ namespace Scaleform
 
 		static void Register();
 		static RE::IMenu* Create();
-		
-	private:	
-		static const REL::ID Vtbl;
-		RE::BSTSmartPointer<RE::TESCameraState> m_currentCameraState;
 
+		static bool SetActive(bool active);
+		static bool GetActive();
+
+	private:	
+		static bool s_active;
 		static void Log(const RE::FxDelegateArgs& a_params);
 		static void OnRootPress(const RE::FxDelegateArgs& a_params);
 		static void OnTreePress(const RE::FxDelegateArgs& a_params);

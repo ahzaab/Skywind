@@ -1,4 +1,5 @@
 ﻿#include "PCH.h"
+
 #include <memory>
 
 #include "Events.h"
@@ -10,12 +11,13 @@
 #include "BirthSignMenu.h"
 #include "MeterMenu.h"
 #include "SpellmakingMenu.h"
+#include "StatsMenu.h"
 #include "StatsMenuEx.h"
-#include "StatsMenuHook.h"
-#include "Papyrus.h"
 // TODO
 
+#include "RE/Skyrim.h"
 #include "SKSE/API.h"
+
 
 namespace
 {
@@ -24,7 +26,6 @@ namespace
 	public:
 		using EventResult = RE::BSEventNotifyControl;
 
-		
 
 		static InputEventHandler* GetSingleton()
 		{
@@ -43,7 +44,7 @@ namespace
 			if (!a_event) {
 				return EventResult::kContinue;
 			}
-			
+
 			auto ui = RE::UI::GetSingleton();
 			auto intfcStr = RE::InterfaceStrings::GetSingleton();
 			if (ui->IsMenuOpen(intfcStr->console)) {
@@ -51,20 +52,45 @@ namespace
 			}
 
 			for (auto event = *a_event; event; event = event->next) {
-				auto button = static_cast<RE::ButtonEvent*>(event);
 				if (event->eventType != Input::kButton) {
 					continue;
 				}
-				
+
+				auto button = static_cast<RE::ButtonEvent*>(event);
 				if (!button->IsDown() || button->device != Device::kKeyboard) {
 					continue;
 				}
 
 				switch (button->idCode) {
 				case Key::kF1:
-
+					Scaleform::StatsMenuEx::Open();
 					break;
-				default:
+				case Key::kF2:
+					Scaleform::StatsMenuEx::Close();
+					break;
+				case Key::kNum8:
+					Scaleform::MeterMenu::TweenTo(80);
+					break;
+				case Key::kNum7:
+					Scaleform::MeterMenu::TweenTo(70);
+					break;
+				case Key::kNum6:
+					Scaleform::MeterMenu::TweenTo(60);
+					break;
+				case Key::kNum5:
+					Scaleform::MeterMenu::TweenTo(50);
+					break;
+				case Key::kNum4:
+					Scaleform::MeterMenu::TweenTo(40);
+					break;
+				case Key::kNum3:
+					Scaleform::MeterMenu::TweenTo(30);
+					break;
+				case Key::kNum2:
+					Scaleform::MeterMenu::TweenTo(20);
+					break;
+				case Key::kNum1:
+					Scaleform::MeterMenu::TweenTo(10);
 					break;
 				}
 			}
@@ -90,12 +116,10 @@ namespace
 			{
 				Events::Install();
 
-				auto input = RE::BSInputDeviceManager::GetSingleton();
-				input->AddEventSink(InputEventHandler::GetSingleton());
+				[[maybe_unused]] auto input = RE::BSInputDeviceManager::GetSingleton();
+				//input->AddEventSink(InputEventHandler::GetSingleton());
+
 				Scaleform::RegisterCreators();
-
-				Scaleform::StatsMenuHook::RegisterEvents();
-
 			}
 			break;
 		}
@@ -146,6 +170,8 @@ extern "C" {
 
 		//Sleep(1000 * 2);
 
+		//auto v  = REL::IDDatabase::OffsetToID(0x8C0840);
+
 		if (!SKSE::Init(a_skse)) {
 			return false;
 		}
@@ -159,19 +185,9 @@ extern "C" {
 			return false;
 		}
 
-
-		auto papyrus = SKSE::GetPapyrusInterface();
-		if (!papyrus){
-			return false;
-		}
-
-		Papyrus::Register();
-
 		Patches::Install();
-
-		Scaleform::StatsMenuHook::InstallHooks();
-
 		Scaleform::RegisterCallbacks();
+		Scaleform::StatsMenuHook::InstallHooks();
 
 		return true;
 	}
