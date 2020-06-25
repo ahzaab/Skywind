@@ -1,7 +1,8 @@
+#include "PCH.h"
 #include "Events.h"
+#include "StatsMenuEx.h"
 
 #include <memory>
-
 
 namespace Events
 {
@@ -66,9 +67,9 @@ namespace Events
 		}
 
 		if (xHealth->health > healthMin) {
-			xHealth->health -= healthRelMax * 0.05;
-			if (xHealth->health < healthMin) {
-				xHealth->health = healthMin;
+			xHealth->health -= healthRelMax * 0.05f;
+			if (xHealth->health < static_cast<float>(healthMin)) {
+				xHealth->health = static_cast<float>(healthMin);
 			}
 		}
 
@@ -79,9 +80,72 @@ namespace Events
 	}
 
 
+
+	MenuAndInputHander* MenuAndInputHander::GetSingleton()
+	{
+		static MenuAndInputHander singleton;
+		return std::addressof(singleton);
+	}
+
+	void MenuAndInputHander::Sink()
+	{
+		auto input = RE::BSInputDeviceManager::GetSingleton();
+		input->AddEventSink(static_cast<RE::BSTEventSink<RE::InputEvent*>*>(MenuAndInputHander::GetSingleton()));
+		auto ui = RE::UI::GetSingleton();
+		ui->AddEventSink(static_cast<RE::BSTEventSink<RE::MenuOpenCloseEvent>*>(MenuAndInputHander::GetSingleton()));
+	}
+
+	RE::BSEventNotifyControl MenuAndInputHander::ProcessEvent(RE::MenuOpenCloseEvent const* a_event, [[maybe_unused]] RE::BSTEventSource<RE::MenuOpenCloseEvent>* a_eventSource)
+	{
+		if (!a_event) {
+			return RE::BSEventNotifyControl::kContinue;
+		}
+		if (a_event->menuName == RE::StatsMenu::MENU_NAME && a_event->opening)
+		{
+			Scaleform::StatsMenuEx::Open();
+		}
+		return RE::BSEventNotifyControl::kContinue;
+	}
+
+	RE::BSEventNotifyControl MenuAndInputHander::ProcessEvent(RE::InputEvent* const* a_event, [[maybe_unused]] RE::BSTEventSource<RE::InputEvent*>* a_eventSource)
+	{
+		using Device = RE::INPUT_DEVICE;
+		using Input = RE::INPUT_EVENT_TYPE;
+		using Key = RE::BSKeyboardDevice::Key;
+		using Message = RE::UI_MESSAGE_TYPE;
+
+		if (!a_event) {
+			return RE::BSEventNotifyControl::kContinue;
+		}
+
+		auto ui = RE::UI::GetSingleton();
+		for (auto event = *a_event; event; event = event->next) {
+			auto button = static_cast<RE::ButtonEvent*>(event);
+			if (event->eventType != Input::kButton) {
+				continue;
+			}
+
+			if (button->IsDown() && button->device == Device::kKeyboard && button->idCode == Key::kF1)
+			{
+				auto active = Scaleform::StatsMenuEx::GetActive();
+				Scaleform::StatsMenuEx::SetActive(!active);
+			}
+
+			if (button->IsDown() && button->userEvent.length() && (button->userEvent == "Quick Stats" || button->userEvent == "Cancel"))
+			{
+				if (ui->IsMenuOpen(Scaleform::StatsMenuEx::Name()))
+				{
+					Scaleform::StatsMenuEx::Close();
+				}
+			}	
+		}
+		return RE::BSEventNotifyControl::kContinue;
+	}
+
 	void Install()
 	{
 		//HitHandler::Sink();
+		MenuAndInputHander::Sink();
 		_MESSAGE("Installed all event sinks");
 	}
 }

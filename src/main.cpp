@@ -1,4 +1,6 @@
-﻿#include <memory>
+﻿#include "PCH.h"
+
+#include <memory>
 
 #include "Events.h"
 #include "Patches.h"
@@ -9,6 +11,7 @@
 #include "BirthSignMenu.h"
 #include "MeterMenu.h"
 #include "SpellmakingMenu.h"
+#include "StatsMenu.h"
 #include "StatsMenuEx.h"
 // TODO
 
@@ -59,11 +62,11 @@ namespace
 				}
 
 				switch (button->idCode) {
-				case Key::kNum0:
-					Scaleform::MeterMenu::Open();
+				case Key::kF1:
+					Scaleform::StatsMenuEx::Open();
 					break;
-				case Key::kNum9:
-					Scaleform::MeterMenu::Close();
+				case Key::kF2:
+					Scaleform::StatsMenuEx::Close();
 					break;
 				case Key::kNum8:
 					Scaleform::MeterMenu::TweenTo(80);
@@ -160,6 +163,15 @@ extern "C" {
 	{
 		_MESSAGE("Skywind loaded");
 
+		//while (!IsDebuggerPresent())
+		//{
+		//   Sleep(10);
+		//}
+
+		//Sleep(1000 * 2);
+
+		//auto v  = REL::IDDatabase::OffsetToID(0x8C0840);
+
 		if (!SKSE::Init(a_skse)) {
 			return false;
 		}
@@ -175,6 +187,7 @@ extern "C" {
 
 		Patches::Install();
 		Scaleform::RegisterCallbacks();
+		Scaleform::StatsMenuHook::InstallHooks();
 
 		return true;
 	}

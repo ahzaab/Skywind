@@ -1,9 +1,10 @@
+#include "PCH.h"
 #include "LevelUpMenu.h"
 
 #include <cassert>
 
 #include "Scaleform.h"
-
+#include "SKSE/Logger.h"
 
 namespace Scaleform
 {
@@ -14,7 +15,7 @@ namespace Scaleform
 
 		flags |= Flag::kUpdateUsesCursor;
 		auto loader = RE::BSScaleformManager::GetSingleton();
-		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		auto success = loader->LoadMovieEx(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
 
@@ -136,7 +137,7 @@ namespace Scaleform
 		RE::GFxValue retVal;
 		retVal.SetUndefined();
 
-		auto baseID = a_params[0].GetUInt();
+		auto baseID = static_cast<RE::FormID>(a_params[0].GetUInt());
 		auto pluginName = a_params[1].GetString();
 
 		auto dataHandler = RE::TESDataHandler::GetSingleton();
@@ -200,14 +201,14 @@ namespace Scaleform
 		assert(a_params[1].IsNumber());
 		assert(a_params[2].IsString());
 
-		auto baseID = a_params[0].GetUInt();
+		auto baseID = static_cast<RE::FormID>(a_params[0].GetUInt());
 		auto pluginName = a_params[2].GetString();
 
 		auto dataHandler = RE::TESDataHandler::GetSingleton();
 		auto global = dataHandler->LookupForm<RE::TESGlobal>(baseID, pluginName);
 		if (global) {
 			auto mod = a_params[1].GetNumber();
-			global->value += mod;
+			global->value += static_cast<float>(mod);
 		}
 	}
 

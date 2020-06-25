@@ -11,7 +11,7 @@
 #include "CLIK/Button.h"
 #include "CLIK/ScrollingList.h"
 #include "CLIK/TextField.h"
-
+#include "TweenMenu.h"
 
 namespace Scaleform
 {
@@ -199,7 +199,11 @@ namespace Scaleform
 		static void Register();
 		static RE::IMenu* Create();
 
-	private:
+		static bool SetActive(bool active);
+		static bool GetActive();
+
+	private:	
+		static bool s_active;
 		static void Log(const RE::FxDelegateArgs& a_params);
 		static void OnRootPress(const RE::FxDelegateArgs& a_params);
 		static void OnTreePress(const RE::FxDelegateArgs& a_params);
@@ -235,7 +239,7 @@ namespace Scaleform
 		void InvalidateRanks();
 		void InvalidateDesc();
 
-		void BFSOnPerkTree(RE::ActorValueInfo* a_av, llvm::function_ref<bool(RE::BGSSkillPerkTreeNode*)> a_predicate);
+		void BFSOnPerkTree(RE::ActorValueInfo* a_av, std::function<bool(RE::BGSSkillPerkTreeNode*)> a_predicate);
 		std::optional<UInt32> GetPerkLvlReq(RE::BGSPerk* a_perk);
 		void SanitizeString(std::string& a_str);
 
@@ -261,4 +265,6 @@ namespace Scaleform
 	{
 		return "StatsMenuEx";
 	}
+
+
 }

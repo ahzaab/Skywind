@@ -1,3 +1,5 @@
+#include "PCH.h"
+
 #include "StatsMenuEx.h"
 
 #include <queue>
@@ -5,10 +7,11 @@
 
 #include "CLIK/Array.h"
 #include "Scaleform.h"
-
+#include "SKSE/API.h"
 
 namespace Scaleform
 {
+	
 	namespace
 	{
 		RootMap::RootMap() :
@@ -236,6 +239,8 @@ namespace Scaleform
 		}
 	}
 
+	//constexpr  REL::ID StatsMenuEx::Vtbl(static_cast<std::uint64_t>(269955));
+	bool StatsMenuEx::s_active = false;
 
 	StatsMenuEx::StatsMenuEx() :
 		Base(),
@@ -254,10 +259,11 @@ namespace Scaleform
 	{
 		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
 		using Flag = RE::IMenu::Flag;
+		//StatsMenuEx::s_active = false;
 
 		flags |= Flag::kUpdateUsesCursor;
 		auto loader = RE::BSScaleformManager::GetSingleton();
-		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		auto success = loader->LoadMovieEx(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
 
@@ -278,9 +284,10 @@ namespace Scaleform
 			std::abort();
 		}
 
+		//Matched the flags used by the Native StatsMenu. kCustomRendering is needed to allow the Tween Menu animation
+		flags = Flag::kPausesGame | Flag::kUsesCursor | Flag::kUsesMenuContext | Flag::kDisablePauseMenu | Flag::kCustomRendering;
+		context = Context::kStats;
 		menuDepth = 5;	// JournalMenu == 5
-		flags |= Flag::kDisablePauseMenu | Flag::kTopmostRenderedMenu | Flag::kPausesGame;
-		context = Context::kFavor;
 
 		InitExtensions();
 		view->SetVisible(false);
@@ -299,11 +306,14 @@ namespace Scaleform
 		a_processor->Process("UnlockPerk", UnlockPerk);
 	}
 
-
 	auto StatsMenuEx::ProcessMessage(RE::UIMessage& a_message)
 		-> Result
 	{
 		using Message = RE::UI_MESSAGE_TYPE;
+
+		// Not used right now.  It will be for developerment
+		using ProcessMessage_t = decltype(&RE::StatsMenu::ProcessMessage);
+		REL::Function<ProcessMessage_t> _ProcessMessage(REL::ID(51638));
 
 		switch (a_message.type) {
 		case Message::kShow:
@@ -320,13 +330,21 @@ namespace Scaleform
 
 	void StatsMenuEx::Open()
 	{
+		if (!StatsMenuEx::s_active)
+			return;
+
 		auto uiQueue = RE::UIMessageQueue::GetSingleton();
 		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kShow, 0);
+		uiQueue->AddMessage(RE::FaderMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
+		uiQueue->AddMessage(RE::StatsMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
 	void StatsMenuEx::Close()
 	{
+		if (!StatsMenuEx::s_active)
+			return;
+
 		auto uiQueue = RE::UIMessageQueue::GetSingleton();
 		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
@@ -340,12 +358,27 @@ namespace Scaleform
 		_MESSAGE("Registered %s", Name().data());
 	}
 
+	bool StatsMenuEx::SetActive(bool active)
+	{
+		auto ui = RE::UI::GetSingleton();
+		if (ui->IsMenuOpen(Scaleform::StatsMenuEx::Name()) || ui->IsMenuOpen(RE::StatsMenu::MENU_NAME))
+			return false;
+
+		StatsMenuEx::s_active = active;
+
+		return true;
+	}
+
+	bool StatsMenuEx::GetActive()
+	{
+		return StatsMenuEx::s_active;
+	}
+
 
 	RE::IMenu* StatsMenuEx::Create()
 	{
 		return new StatsMenuEx();
 	}
-
 
 	void StatsMenuEx::Log(const RE::FxDelegateArgs& a_params)
 	{
@@ -447,9 +480,16 @@ namespace Scaleform
 
 	void StatsMenuEx::OnMenuOpen()
 	{
+		auto bm = RE::UIBlurManager::GetSingleton();
+		
+		// set blur
+		bm->IncrementBlurCount();
+
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(RE::FaderMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
+
 		bool success;
 		view->SetVisible(true);
-
 		std::vector<std::pair<CLIK::Object*, std::string>> toGet;
 		toGet.push_back(std::make_pair(&_roots, "roots"));
 		toGet.push_back(std::make_pair(&_trees, "trees"));
@@ -490,10 +530,39 @@ namespace Scaleform
 		SetRoots();
 	}
 
+	static int count = 0;
+	void TaskFunc() {
+		auto pc = RE::PlayerCamera::GetSingleton();
+		pc->currentState.get()->Update(pc->cameraStates[RE::CameraStates::kTween]);
+		Sleep(100);
+
+		if (--count > 0)
+		{
+			auto task = SKSE::GetTaskInterface();
+			task->AddTask(TaskFunc);
+		}
+	};
 
 	void StatsMenuEx::OnMenuClose()
 	{
-		return;
+		auto bm = RE::UIBlurManager::GetSingleton();
+		// Remove blur
+		bm->DecrementBlurCount();
+		
+		auto ui = RE::UI::GetSingleton();
+		if (ui->IsMenuOpen(RE::TweenMenu::MENU_NAME))
+		{
+			// Start to close the animation
+			TweenMenu::StartCloseMenu();
+
+			// Close the Tween Menu, This function needs to be called to allow the animation to finish;
+			TweenMenu::CloseMenu();
+		}
+
+		// Make sure we are back on the Hud
+		auto uiQueue = RE::UIMessageQueue::GetSingleton();
+		uiQueue->AddMessage(RE::FaderMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
+		uiQueue->AddMessage(RE::CursorMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
 
@@ -554,7 +623,7 @@ namespace Scaleform
 
 		for (std::size_t i = 0; i < _perkMappings.size(); ++i) {
 			if (_perkMappings[i].perkID == idToFind) {
-				_perks.SelectedIndex(i);
+				_perks.SelectedIndex(static_cast<double>(i));
 				break;
 			}
 		}
@@ -653,7 +722,7 @@ namespace Scaleform
 		_desc.unlock.Label("Unlock");
 
 		auto player = RE::PlayerCharacter::GetSingleton();
-		bool disabled = _stats.GetPerkPoints() == 0 || player->HasPerk(perk) || !perk->perkConditions.Run(player, player);
+		bool disabled = _stats.GetPerkPoints() == 0 || player->HasPerk(perk) || !perk->perkConditions.IsTrue(player, player);
 
 #if 0
 		// this second check might be unnecessary, the vanilla game seems to base perk eligibility on the previous check
@@ -952,7 +1021,7 @@ namespace Scaleform
 	}
 
 
-	void StatsMenuEx::BFSOnPerkTree(RE::ActorValueInfo* a_av, llvm::function_ref<bool(RE::BGSSkillPerkTreeNode*)> a_predicate)
+	void StatsMenuEx::BFSOnPerkTree(RE::ActorValueInfo* a_av, std::function<bool(RE::BGSSkillPerkTreeNode*)> a_predicate)
 	{
 		if (!a_av || !a_av->perkTree) {
 			return;
@@ -981,11 +1050,11 @@ namespace Scaleform
 
 	std::optional<UInt32> StatsMenuEx::GetPerkLvlReq(RE::BGSPerk* a_perk)
 	{
-		using FunctionID = RE::TESCondition::FunctionID;
+		using FunctionID = RE::FUNCTION_DATA::FunctionID;
 
 		for (auto cond = a_perk->perkConditions.head; cond; cond = cond->next) {
-			if (cond->functionID == FunctionID::kGetBaseActorValue) {
-				return std::make_optional(static_cast<UInt32>(cond->comparisonValue));
+			if (cond->data.functionData.function == FunctionID::kGetBaseActorValue) {
+				return std::make_optional(static_cast<UInt32>(cond->data.comparisonValue.f));
 			}
 		}
 		return std::nullopt;
@@ -1001,4 +1070,6 @@ namespace Scaleform
 			a_str.assign(a_str, 1);
 		}
 	}
+
+
 }

@@ -1,10 +1,11 @@
+#include "PCH.h"
+
 #include "SpellmakingMenu.h"
 
 #include <map>
 
 #include "CLIK/Array.h"
 #include "Scaleform.h"
-
 
 namespace Scaleform
 {
@@ -56,7 +57,7 @@ namespace Scaleform
 
 		flags |= Flag::kUpdateUsesCursor;
 		auto loader = RE::BSScaleformManager::GetSingleton();
-		auto success = loader->LoadMovieStd(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
+		auto success = loader->LoadMovieEx(this, SWF_NAME, [this](RE::GFxMovieDef* a_def)
 		{
 			using StateType = RE::GFxState::StateType;
 
@@ -474,9 +475,9 @@ namespace Scaleform
 	{
 		if (_selectedIdx < _selectedMappings.size()) {
 			auto& selected = _selectedMappings[_selectedIdx];
-			selected.magnitude = _magnitude.slider.Value();
-			selected.duration = _duration.slider.Value();
-			selected.area = _area.slider.Value();
+			selected.magnitude = static_cast<UInt32>(_magnitude.slider.Value());
+			selected.duration = static_cast<UInt32>(_duration.slider.Value());
+			selected.area = static_cast<UInt32>(_area.slider.Value());
 		}
 	}
 
@@ -512,7 +513,7 @@ namespace Scaleform
 
 		for (auto& selected : _selectedMappings) {
 			auto effect = new RE::Effect();
-			effect->effectItem.magnitude = selected.magnitude;
+			effect->effectItem.magnitude = static_cast<float>(selected.magnitude);
 			effect->effectItem.area = selected.area;
 			effect->effectItem.duration = selected.duration;
 			effect->baseEffect = RE::TESForm::LookupByID<RE::EffectSetting>(selected.effectID);

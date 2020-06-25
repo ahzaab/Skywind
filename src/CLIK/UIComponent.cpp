@@ -1,3 +1,4 @@
+#include "PCH.h"
 #include "CLIK/UIComponent.h"
 
 #include <cassert>

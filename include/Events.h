@@ -27,5 +27,16 @@ namespace Events
 	};
 
 
+	class MenuAndInputHander : public RE::BSTEventSink<RE::MenuOpenCloseEvent>, public RE::BSTEventSink<RE::InputEvent*>
+	{
+	public:
+
+		static MenuAndInputHander* GetSingleton();
+		static void Sink();
+		virtual	RE::BSEventNotifyControl ProcessEvent(RE::MenuOpenCloseEvent const* a_event, [[maybe_unused]] RE::BSTEventSource<RE::MenuOpenCloseEvent>* a_eventSource) override;
+		virtual	RE::BSEventNotifyControl ProcessEvent(RE::InputEvent* const* a_event, [[maybe_unused]] RE::BSTEventSource<RE::InputEvent*>* a_eventSource) override;
+	private:
+	};
+
 	void Install();
 }
